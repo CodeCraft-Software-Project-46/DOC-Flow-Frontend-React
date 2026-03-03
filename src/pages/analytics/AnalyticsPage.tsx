@@ -1,5 +1,5 @@
 // Main dashboard page — has two tabs: Overall Dashboard and Workflow Analytics
-// Step 2: Only Overall Dashboard skeleton with StatCards and time range filter
+// Displays system-wide and per-workflow KPIs with custom chart support
 
 import { useState } from "react";
 import StatCard from "../../components/chartAnalytics/StatCard";
@@ -7,6 +7,8 @@ import SLADonut from "../../components/chartAnalytics/SLADonut";
 import SLATrend from "../../components/chartAnalytics/SLATrend";
 import BottleneckSteps from "../../components/chartAnalytics/BottleneckSteps";
 import UserSLAList from "../../components/chartAnalytics/Userperformance";
+import CustomChartsSection from "../../components/chartAnalytics/CustomChartsSection";
+import { DEFAULT_CHARTS, WORKFLOWS } from "../../data/dummyData";
 
 type Tab = "overall" | "workflow";
 type TimeRange = "7d" | "30d" | "90d" | "custom";
@@ -16,6 +18,14 @@ export const AnalyticsPage = () => {
   const [timeRange, setTimeRange] = useState<TimeRange>("30d");
   const [customFromDate, setCustomFromDate] = useState("");
   const [customToDate, setCustomToDate] = useState("");
+  
+  // Charts state — initialized with DEFAULT_CHARTS from dummyData
+  const [selectedWorkflow, setSelectedWorkflow] = useState(WORKFLOWS[0]);
+
+  // Navigate to chart configuration page to create/edit charts
+  function handleCreateChart() {
+    window.location.href = "/analytics/chart-configuration";
+  }
 
   return (
     <div className="min-h-screen bg-slate-100 font-sans">
@@ -146,13 +156,73 @@ export const AnalyticsPage = () => {
               <UserSLAList />
             </div>
 
+            {/* ── Custom Charts — Overall source only ── */}
+            <CustomChartsSection
+              charts={DEFAULT_CHARTS}
+              source="overall"
+              onCreateClick={handleCreateChart}
+            />
+
           </div>
         )}
 
         {/* ══ WORKFLOW ANALYTICS TAB ══ */}
         {tab === "workflow" && (
-          <div className="text-slate-400 text-sm text-center py-20">
-            Workflow Analytics 
+          <div className="space-y-5">
+
+            {/* Page heading with workflow selector */}
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">Workflow Analytics</h2>
+                <p className="text-sm text-slate-500 mt-1">
+                  Per-workflow performance and instance drill-down
+                </p>
+              </div>
+              <select
+                value={selectedWorkflow}
+                onChange={(e) => setSelectedWorkflow(e.target.value)}
+                aria-label="Select workflow for analytics"
+                className="border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white text-slate-700 outline-none"
+              >
+                {WORKFLOWS.map((w) => (
+                  <option key={w} value={w}>{w}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Workflow stat cards */}
+            <div className="grid grid-cols-3 gap-4">
+              <StatCard
+                icon="📁"
+                value="120"
+                label="Total Instances"
+                sub="Selected period"
+                color="blue"
+              />
+              <StatCard
+                icon="⏱"
+                value="42h"
+                label="Avg Completion Time"
+                sub="Per instance"
+                color="blue"
+              />
+              <StatCard
+                icon="✅"
+                value="76%"
+                label="SLA Compliance"
+                sub="Overall rate"
+                color="red"
+              />
+            </div>
+
+            {/* ── Custom Charts — Workflow source only ── */}
+            <CustomChartsSection
+              charts={DEFAULT_CHARTS}
+              source="workflow"
+              workflow={selectedWorkflow}
+              onCreateClick={handleCreateChart}
+            />
+
           </div>
         )}
 
