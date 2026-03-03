@@ -39,7 +39,8 @@ const Sidebar: React.FC<SidebarProps> = ({
 
     const configMenu = [
         { name: "Dashboard Builder", path: "/dashboard-builder", icon: LayoutDashboard },
-        { name: "Analytics & Charts", path: "/analytics", icon: BarChart3 },
+        { name: "Analytics Dashboard", path: "/analytics", icon: BarChart3 },
+        { name: "Chart Configuration", path: "/analytics/chart-configuration", icon: BarChart3 },
         { name: "Document Types", path: "/document-types", icon: Folder },
         { name: "Workflows-Versions", path: "/workflow-version", icon:GitBranch},
         { name: "Roles & Users", path: "/user", icon: Users },

@@ -16,7 +16,7 @@ export const AnalyticsPage = () => {
   return (
     <div className="min-h-screen bg-slate-100 font-sans">
       {/* ── Tab Bar ── */}
-      <div className="bg-white border-b border-slate-200 px-8 flex">
+      <div className="bg-white border-b border-slate-200 px-8 flex -mt-2">
         {(["overall", "workflow"] as Tab[]).map((t) => (
           <button
             key={t}
@@ -33,7 +33,7 @@ export const AnalyticsPage = () => {
       </div>
 
       {/* ── Page Content ── */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-2">
 
         {/* ══ OVERALL DASHBOARD TAB ══ */}
         {tab === "overall" && (
