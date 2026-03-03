@@ -291,3 +291,40 @@ export const STATUS_DISTRIBUTION = {
     { name: "Breached", value: 20, color: "#ef4444" },
   ],
 };
+
+// ── Chart data helper ───────────────────────────────────────────────────────────
+// Returns chart data array based on chart config
+// In real app — this comes from Django API
+export function getChartData(
+  chart: CustomChart
+): { label: string; value: number }[] {
+
+  // Status distribution — fixed 3 slices
+  if (chart.metric === "status_distribution") {
+    const key = chart.source === "overall" ? "overall" : chart.workflow;
+    const dist = STATUS_DISTRIBUTION[key as keyof typeof STATUS_DISTRIBUTION]
+      || STATUS_DISTRIBUTION["overall"];
+    return dist.map((d) => ({ label: d.name, value: d.value }));
+  }
+
+  // Workflow source — group by step name
+  if (chart.source === "workflow" && chart.workflow) {
+    const stepData = STEP_CHART_DATA[chart.workflow];
+    const stepNames = STEP_NAMES[chart.workflow] || [];
+    if (!stepData) return [];
+    const values = stepData[chart.metric] || [];
+    return stepNames.map((name, i) => ({
+      label: name,
+      value: values[i] ?? 0,
+    }));
+  }
+
+  // Overall source — group by workflow name
+  const wfData = WORKFLOW_CHART_DATA;
+  const values = wfData[chart.metric as keyof typeof wfData] as number[];
+  if (!values) return [];
+  return wfData.labels.map((label, i) => ({
+    label,
+    value: values[i] ?? 0,
+  }));
+}
