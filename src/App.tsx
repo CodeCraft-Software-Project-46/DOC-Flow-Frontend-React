@@ -1,9 +1,8 @@
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
-import { AuthProvider } from "./contexts/AuthContext";
 
 // Layouts
 import { RootLayout } from "./components/RootLayout";
-import {ProtectedRoute} from "./components/ProtectedRoute.tsx";
+import {ProtectedRoute} from "./components/nesandu/ProtectedRoute.tsx";
 
 import { DocumentPage } from "./pages/documents/DocumentPage";
 import {SettingsPage} from "./pages/settings/SettingsPage.tsx";
@@ -54,9 +53,5 @@ export default function App() {
         { path: "*", element: <Navigate to="/dashboard" replace /> }
     ]);
 
-    return (
-  <AuthProvider>
-    <RouterProvider router={routes} />
-  </AuthProvider>
-);
+    return <RouterProvider router={routes} />;
 }

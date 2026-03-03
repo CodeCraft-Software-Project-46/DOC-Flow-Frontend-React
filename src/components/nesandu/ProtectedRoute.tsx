@@ -1,32 +1,21 @@
-import React, { type ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth, type AppRole, DASHBOARD_ROUTES } from '../../contexts/AuthContext';
+import { Navigate, Outlet } from 'react-router';
 
-interface RoleGuardProps {
-  children: ReactNode;
-  allowedRoles?: AppRole[];
+// Define the roles explicitly so you don't make typos later
+export type UserRole = 'Admin' | 'Manager' | 'Employee' | 'Auditor' | 'External';
+
+interface ProtectedRouteProps {
+  allowedRoles?: UserRole[];
 }
 
-export function RoleGuard({ children, allowedRoles }: RoleGuardProps) {
-  const { user, isAuthenticated } = useAuth();
+export const ProtectedRoute = () => {
+    // Check the flag we set in LoginPage
+    const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
 
-  if (!isAuthenticated || !user) {
-    return <Navigate to="/login" replace />;
-  }
+    // Debugging: Check console if it still fails
+    if (!isAuthenticated) {
+        console.warn("Access denied. Redirecting to Login.");
+        return <Navigate to="/" replace />;
+    }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to={DASHBOARD_ROUTES[user.role]} replace />;
-  }
-
-  return <>{children}</>;
-}
-
-export function RedirectToDashboard() {
-  const { user, isAuthenticated } = useAuth();
-
-  if (!isAuthenticated || !user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <Navigate to={DASHBOARD_ROUTES[user.role]} replace />;
-}
+    return <Outlet />;
+};
