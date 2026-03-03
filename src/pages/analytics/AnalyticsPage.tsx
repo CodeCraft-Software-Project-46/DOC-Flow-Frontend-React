@@ -1,7 +1,7 @@
 // Main dashboard page — has two tabs: Overall Dashboard and Workflow Analytics
 // Displays system-wide and per-workflow KPIs with custom chart support
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import StatCard from "../../components/chartAnalytics/StatCard";
 import SLADonut from "../../components/chartAnalytics/SLADonut";
 import SLATrend from "../../components/chartAnalytics/SLATrend";
@@ -9,8 +9,14 @@ import BottleneckSteps from "../../components/chartAnalytics/BottleneckSteps";
 import UserSLAList from "../../components/chartAnalytics/Userperformance";
 import CustomChartsSection from "../../components/chartAnalytics/CustomChartsSection";
 import InstanceDrilldown from "../../components/chartAnalytics/InstanceDrilldown";
+import WorkflowStepFlow from "../../components/chartAnalytics/WorkflowStepFlow";
 import { useCharts } from "../../context/ChartsContext";
-import { WORKFLOWS, DASHBOARD_KPI } from "../../data/dummyData";
+import {
+  WORKFLOWS,
+  DASHBOARD_KPI,
+  getWorkflowKPI,
+  getOverallLiveKPI,
+} from "../../data/dummyData";
 
 type Tab = "overall" | "workflow";
 type TimeRange = "7d" | "30d" | "90d" | "custom";
@@ -26,6 +32,13 @@ export const AnalyticsPage = () => {
   
   // Workflow tab — selected workflow
   const [selectedWorkflow, setSelectedWorkflow] = useState(WORKFLOWS[0]);
+
+  const workflowKPI = useMemo(
+    () => getWorkflowKPI(selectedWorkflow),
+    [selectedWorkflow]
+  );
+
+  const overallLiveKPI = useMemo(() => getOverallLiveKPI(), []);
 
   // Navigate to chart configuration page to create/edit charts
   function handleCreateChart() {
@@ -70,14 +83,14 @@ export const AnalyticsPage = () => {
             <div className="grid grid-cols-2 gap-4">
               <StatCard
                 icon="📄"
-                value={DASHBOARD_KPI.overall.runningDocuments.toString()}
+                value={overallLiveKPI.runningDocuments.toString()}
                 label="Running Documents"
                 sub="Currently Active"
                 color="blue"
               />
               <StatCard
                 icon="⚠️"
-                value={DASHBOARD_KPI.overall.activeOverdueTasks.toString()}
+                value={overallLiveKPI.activeOverdueTasks.toString()}
                 label="Active Overdue Tasks"
                 sub="Requires Immediate Attention"
                 color="red"
@@ -157,7 +170,12 @@ export const AnalyticsPage = () => {
 
             {/* bottleneck + user sections */}
             <div className="grid grid-cols-2 gap-4">
-              <BottleneckSteps />
+              <BottleneckSteps 
+                onWorkflowSelect={(workflow) => {
+                  setSelectedWorkflow(workflow);
+                  setTab("workflow");
+                }}
+              />
               <UserSLAList />
             </div>
 
@@ -199,26 +217,29 @@ export const AnalyticsPage = () => {
             <div className="grid grid-cols-3 gap-4">
               <StatCard
                 icon="📁"
-                value={DASHBOARD_KPI.workflow.totalInstances.toString()}
+                value={workflowKPI.totalInstances.toString()}
                 label="Total Instances"
                 sub="Selected period"
                 color="blue"
               />
               <StatCard
                 icon="⏱"
-                value={DASHBOARD_KPI.workflow.avgCompletionTime}
+                value={workflowKPI.avgCompletionTime}
                 label="Avg Completion Time"
                 sub="Per instance"
                 color="blue"
               />
               <StatCard
                 icon="✅"
-                value={`${DASHBOARD_KPI.workflow.slaCompliance}%`}
+                value={`${workflowKPI.slaCompliance}%`}
                 label="SLA Compliance"
                 sub="Overall rate"
                 color="red"
               />
             </div>
+
+            {/* ── Workflow Step Flow Analysis ── */}
+            <WorkflowStepFlow workflow={selectedWorkflow} />
 
             {/* ── Instance Drill-down for selected workflow ── */}
             <InstanceDrilldown workflow={selectedWorkflow} />

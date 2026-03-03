@@ -5,41 +5,28 @@ import { INSTANCE_DETAILS } from "../../data/dummyData";
 
 export default function SLADonut() {
 
-  // Aggregate step statuses across all instances
+  // Aggregate COMPLETED step statuses (Met or Breached only) across all instances
   let met = 0;
   let breached = 0;
-  let atRisk = 0;
-  let pending = 0;
 
   Object.values(INSTANCE_DETAILS).forEach((instance) => {
     instance.steps.forEach((step) => {
-      switch (step.status) {
-        case "Met":
-          met++;
-          break;
-        case "Breached":
-          breached++;
-          break;
-        case "At Risk":
-          atRisk++;
-          break;
-        case "Pending":
-          pending++;
-          break;
+      // Only count completed steps (Met or Breached), ignore At Risk and Pending
+      if (step.status === "Met") {
+        met++;
+      } else if (step.status === "Breached") {
+        breached++;
       }
     });
   });
 
   const data = [
     { name: "On Time", value: met, color: "#22c55e" },
-    { name: "At Risk", value: atRisk, color: "#f59e0b" },
     { name: "Breached", value: breached, color: "#ef4444" },
-    { name: "Pending", value: pending, color: "#94a3b8" },
   ].filter(item => item.value > 0); // Remove empty categories
 
   const getLegendDotClass = (name: string): string => {
     if (name === "On Time") return "bg-green-500";
-    if (name === "At Risk") return "bg-amber-500";
     if (name === "Breached") return "bg-red-500";
     return "bg-slate-400";
   };
