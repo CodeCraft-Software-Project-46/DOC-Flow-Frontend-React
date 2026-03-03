@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
 // Layouts
 import { RootLayout } from "./components/RootLayout";
 import {ProtectedRoute} from "./components/ProtectedRoute.tsx";
+import { ChartsProvider } from "./context/ChartsContext";
 
 import { DocumentPage } from "./pages/documents/DocumentPage";
 import {SettingsPage} from "./pages/settings/SettingsPage.tsx";
@@ -55,5 +56,9 @@ export default function App() {
         { path: "*", element: <Navigate to="/dashboard" replace /> }
     ]);
 
-    return <RouterProvider router={routes} />;
+    return (
+        <ChartsProvider>
+            <RouterProvider router={routes} />
+        </ChartsProvider>
+    );
 }

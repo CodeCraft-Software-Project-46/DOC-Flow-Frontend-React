@@ -1,14 +1,15 @@
 // Configuration page — full create + edit + delete functionality
+// Uses shared charts context so changes appear in Analytics dashboard immediately
 
 import { useState } from "react";
 import ChartTable from "../../components/chartAnalytics/ChartTable";
 import ChartFormModal from "../../components/chartAnalytics/ChartFormModal";
-import { DEFAULT_CHARTS } from "../../data/dummyData";
+import { useCharts } from "../../context/ChartsContext";
 import type { CustomChart } from "../../types";
 
 export const ChartConfigurationPage = () => {
-  // All charts in state
-  const [charts, setCharts] = useState<CustomChart[]>(DEFAULT_CHARTS);
+  // Use shared context instead of local state
+  const { charts, addChart, updateChart, deleteChart } = useCharts();
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,25 +27,12 @@ export const ChartConfigurationPage = () => {
     setIsModalOpen(true);
   }
 
-  // Delete chart by id
-  function handleDelete(id: number) {
-    setCharts((prev) => prev.filter((c) => c.id !== id));
-  }
-
-  // Save — handles both create and edit
+  // Save — create or update using context methods
   function handleSave(formData: Omit<CustomChart, "id">, id?: number) {
     if (id) {
-      // Edit mode — update existing chart
-      setCharts((prev) =>
-        prev.map((c) => (c.id === id ? { ...formData, id } : c))
-      );
+      updateChart(id, formData); // edit
     } else {
-      // Create mode — add new chart with unique id
-      const newChart: CustomChart = {
-        ...formData,
-        id: Date.now(), // temporary id — backend will assign real id later
-      };
-      setCharts((prev) => [...prev, newChart]);
+      addChart(formData);        // create
     }
   }
 
@@ -78,7 +66,7 @@ export const ChartConfigurationPage = () => {
           <ChartTable
             charts={charts}
             onEdit={handleEdit}
-            onDelete={handleDelete}
+            onDelete={deleteChart}
           />
         </div>
 

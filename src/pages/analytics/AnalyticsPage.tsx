@@ -9,7 +9,8 @@ import BottleneckSteps from "../../components/chartAnalytics/BottleneckSteps";
 import UserSLAList from "../../components/chartAnalytics/Userperformance";
 import CustomChartsSection from "../../components/chartAnalytics/CustomChartsSection";
 import InstanceDrilldown from "../../components/chartAnalytics/InstanceDrilldown";
-import { DEFAULT_CHARTS, WORKFLOWS } from "../../data/dummyData";
+import { useCharts } from "../../context/ChartsContext";
+import { WORKFLOWS } from "../../data/dummyData";
 
 type Tab = "overall" | "workflow";
 type TimeRange = "7d" | "30d" | "90d" | "custom";
@@ -20,7 +21,10 @@ export const AnalyticsPage = () => {
   const [customFromDate, setCustomFromDate] = useState("");
   const [customToDate, setCustomToDate] = useState("");
   
-  // Charts state — initialized with DEFAULT_CHARTS from dummyData
+  // Get shared charts from context — updates when charts are created/edited/deleted
+  const { charts } = useCharts();
+  
+  // Workflow tab — selected workflow
   const [selectedWorkflow, setSelectedWorkflow] = useState(WORKFLOWS[0]);
 
   // Navigate to chart configuration page to create/edit charts
@@ -159,7 +163,7 @@ export const AnalyticsPage = () => {
 
             {/* ── Custom Charts — Overall source only ── */}
             <CustomChartsSection
-              charts={DEFAULT_CHARTS}
+              charts={charts}
               source="overall"
               onCreateClick={handleCreateChart}
             />
@@ -221,7 +225,7 @@ export const AnalyticsPage = () => {
 
             {/* ── Custom Charts — Workflow source only ── */}
             <CustomChartsSection
-              charts={DEFAULT_CHARTS}
+              charts={charts}
               source="workflow"
               workflow={selectedWorkflow}
               onCreateClick={handleCreateChart}
