@@ -12,15 +12,17 @@ interface ChartTableProps {
 export default function ChartTable({ charts, onEdit, onDelete }: ChartTableProps) {
 
   // Get readable label for time range value
-  function getTimeRangeLabel(value: string | null): string {
-    if (!value) return "Live snapshot";
+  function getTimeRangeLabel(chart: CustomChart): string {
+    const { timeRange, fromDate, toDate } = chart;
+    if (!timeRange) return "Live snapshot";
     const map: Record<string, string> = {
       "7d": "Last 7 Days",
       "30d": "Last 30 Days",
       "90d": "Last 90 Days",
       "all": "All Time",
+      "custom": fromDate && toDate ? `${fromDate} to ${toDate}` : "Custom (incomplete)",
     };
-    return map[value] || value;
+    return map[timeRange] || timeRange;
   }
 
   // Get readable metric label from metric value
@@ -95,7 +97,7 @@ export default function ChartTable({ charts, onEdit, onDelete }: ChartTableProps
                   <td className={`px-4 py-3 text-sm ${
                     chart.timeRange ? "text-slate-600" : "text-slate-400 italic"
                   }`}>
-                    {getTimeRangeLabel(chart.timeRange)}
+                    {getTimeRangeLabel(chart)}
                   </td>
 
                   {/* Group By */}

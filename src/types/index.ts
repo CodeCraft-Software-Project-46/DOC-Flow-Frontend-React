@@ -29,7 +29,9 @@ export interface CustomChart {
   metric: KPIMetric;
   groupBy: "step_name" | "workflow_name";
   status: ChartStatus;
-  timeRange: string | null; // null for status_distribution
+  timeRange: string | null; // null for status_distribution, or "7d" | "30d" | "90d" | "all" | "custom"
+  fromDate?: string;        // ISO date for custom range
+  toDate?: string;          // ISO date for custom range
   colors: ChartColors;
   thresholds: ChartThresholds;
 }
