@@ -37,6 +37,13 @@ export default function SLADonut() {
     { name: "Pending", value: pending, color: "#94a3b8" },
   ].filter(item => item.value > 0); // Remove empty categories
 
+  const getLegendDotClass = (name: string): string => {
+    if (name === "On Time") return "bg-green-500";
+    if (name === "At Risk") return "bg-amber-500";
+    if (name === "Breached") return "bg-red-500";
+    return "bg-slate-400";
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6">
       <div className="font-semibold text-slate-900 text-base">
@@ -72,10 +79,7 @@ export default function SLADonut() {
           {data.map((item) => (
             <div key={item.name}>
               <div className="flex items-center gap-2">
-                <span
-                  className="w-3 h-3 rounded-full inline-block"
-                  style={{ backgroundColor: item.color }}
-                />
+                <span className={`w-3 h-3 rounded-full inline-block ${getLegendDotClass(item.name)}`} />
                 <span className="text-sm font-semibold text-slate-700">
                   {item.name}
                 </span>

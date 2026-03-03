@@ -5,6 +5,8 @@ import { useState } from "react";
 import StatCard from "../../components/chartAnalytics/StatCard";
 import SLADonut from "../../components/chartAnalytics/SLADonut";
 import SLATrend from "../../components/chartAnalytics/SLATrend";
+import BottleneckSteps from "../../components/chartAnalytics/BottleneckSteps";
+import UserSLAList from "../../components/chartAnalytics/Userperformance";
 
 type Tab = "overall" | "workflow";
 type TimeRange = "7d" | "30d" | "90d" | "custom";
@@ -138,14 +140,10 @@ export const AnalyticsPage = () => {
               <SLATrend />
             </div>
 
-            {/* Placeholder for bottleneck + user sections — Step 4 */}
+            {/* bottleneck + user sections */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white rounded-2xl shadow-sm p-6 flex items-center justify-center h-52 text-slate-300 text-sm">
-                Bottleneck Steps
-              </div>
-              <div className="bg-white rounded-2xl shadow-sm p-6 flex items-center justify-center h-52 text-slate-300 text-sm">
-                User SLA List 
-              </div>
+              <BottleneckSteps />
+              <UserSLAList />
             </div>
 
           </div>
