@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from 'react-router';
+import { Navigate, Outlet } from 'react-router-dom';
 
 // Define the roles explicitly so you don't make typos later
 export type UserRole = 'Admin' | 'Manager' | 'Employee' | 'Auditor' | 'External';
