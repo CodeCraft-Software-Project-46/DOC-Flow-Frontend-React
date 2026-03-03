@@ -10,7 +10,7 @@ import UserSLAList from "../../components/chartAnalytics/Userperformance";
 import CustomChartsSection from "../../components/chartAnalytics/CustomChartsSection";
 import InstanceDrilldown from "../../components/chartAnalytics/InstanceDrilldown";
 import { useCharts } from "../../context/ChartsContext";
-import { WORKFLOWS } from "../../data/dummyData";
+import { WORKFLOWS, DASHBOARD_KPI } from "../../data/dummyData";
 
 type Tab = "overall" | "workflow";
 type TimeRange = "7d" | "30d" | "90d" | "custom";
@@ -70,14 +70,14 @@ export const AnalyticsPage = () => {
             <div className="grid grid-cols-2 gap-4">
               <StatCard
                 icon="📄"
-                value="48"
+                value={DASHBOARD_KPI.overall.runningDocuments.toString()}
                 label="Running Documents"
                 sub="Currently Active"
                 color="blue"
               />
               <StatCard
                 icon="⚠️"
-                value="7"
+                value={DASHBOARD_KPI.overall.activeOverdueTasks.toString()}
                 label="Active Overdue Tasks"
                 sub="Requires Immediate Attention"
                 color="red"
@@ -128,11 +128,11 @@ export const AnalyticsPage = () => {
               <div className="bg-white rounded-2xl shadow-sm p-6">
                 <div className="flex justify-between items-start">
                   <div>
-                    <div className="text-4xl font-bold text-slate-900">32</div>
+                    <div className="text-4xl font-bold text-slate-900">{DASHBOARD_KPI.overall.completedTasks}</div>
                     <div className="text-sm text-slate-500 mt-1">Completed Tasks (Selected Period)</div>
                     <div className="text-xs text-slate-400">vs previous period</div>
                   </div>
-                  <span className="text-green-500 text-sm font-semibold">▲ +8%</span>
+                  <span className="text-green-500 text-sm font-semibold">▲ +{DASHBOARD_KPI.overall.completedTasksChange}%</span>
                 </div>
               </div>
 
@@ -140,11 +140,11 @@ export const AnalyticsPage = () => {
               <div className="bg-white rounded-2xl shadow-sm p-6">
                 <div className="flex justify-between items-start">
                   <div>
-                    <div className="text-4xl font-bold text-slate-900">80%</div>
+                    <div className="text-4xl font-bold text-slate-900">{DASHBOARD_KPI.overall.slaCompliance}%</div>
                     <div className="text-sm text-slate-500 mt-1">SLA Compliance (Selected Period)</div>
                     <div className="text-xs text-slate-400">vs previous period</div>
                   </div>
-                  <span className="text-red-500 text-sm font-semibold">▼ -1%</span>
+                  <span className="text-red-500 text-sm font-semibold">▼ {DASHBOARD_KPI.overall.slaComplianceChange}%</span>
                 </div>
               </div>
             </div>
@@ -199,21 +199,21 @@ export const AnalyticsPage = () => {
             <div className="grid grid-cols-3 gap-4">
               <StatCard
                 icon="📁"
-                value="120"
+                value={DASHBOARD_KPI.workflow.totalInstances.toString()}
                 label="Total Instances"
                 sub="Selected period"
                 color="blue"
               />
               <StatCard
                 icon="⏱"
-                value="42h"
+                value={DASHBOARD_KPI.workflow.avgCompletionTime}
                 label="Avg Completion Time"
                 sub="Per instance"
                 color="blue"
               />
               <StatCard
                 icon="✅"
-                value="76%"
+                value={`${DASHBOARD_KPI.workflow.slaCompliance}%`}
                 label="SLA Compliance"
                 sub="Overall rate"
                 color="red"

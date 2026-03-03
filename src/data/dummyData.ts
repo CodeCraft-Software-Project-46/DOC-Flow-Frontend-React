@@ -328,3 +328,22 @@ export function getChartData(
     value: values[i] ?? 0,
   }));
 }
+
+// ── Dashboard KPI data ──────────────────────────────────────────────────────────
+// Live metrics for dashboard stat cards
+export const DASHBOARD_KPI = {
+  overall: {
+    runningDocuments: 48,
+    activeOverdueTasks: 7,
+    completedTasks: 32,
+    slaCompliance: 80,
+    completedTasksChange: 8,      // % vs previous period
+    slaComplianceChange: -1,       // % vs previous period
+  },
+  workflow: {
+    // Per-workflow metrics (example for first workflow)
+    totalInstances: 120,
+    avgCompletionTime: "42h",
+    slaCompliance: 76,
+  },
+};
