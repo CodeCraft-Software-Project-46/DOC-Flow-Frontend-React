@@ -1,5 +1,5 @@
 export const DashBoardBuilder = () => (
     <>
-
+DashBoardBuilder
     </>
 );
