@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
+import { AuthProvider } from "./contexts/AuthContext";
 
 // Layouts
 import { RootLayout } from "./components/RootLayout";
@@ -53,5 +54,9 @@ export default function App() {
         { path: "*", element: <Navigate to="/dashboard" replace /> }
     ]);
 
-    return <RouterProvider router={routes} />;
+    return (
+  <AuthProvider>
+    <RouterProvider router={routes} />
+  </AuthProvider>
+);
 }
