@@ -55,7 +55,7 @@ export const AnalyticsPage = () => {
             onClick={() => setTab(t)}
             className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
               tab === t
-                ? "border-blue-500 text-blue-600"
+                ? "border-blue-600 text-blue-700"
                 : "border-transparent text-slate-500 hover:text-slate-700"
             }`}
           >

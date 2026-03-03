@@ -33,9 +33,9 @@ export default function SLATrend() {
           <Line
             type="monotone"
             dataKey="c"
-            stroke="#3b82f6"
+            stroke="#2563eb"
             strokeWidth={2}
-            dot={{ r: 3, fill: "#3b82f6" }}
+            dot={{ r: 3, fill: "#1d4ed8" }}
             name="Compliance %"
           />
         </LineChart>

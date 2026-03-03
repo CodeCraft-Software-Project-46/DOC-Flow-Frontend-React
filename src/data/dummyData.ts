@@ -311,7 +311,7 @@ export const DEFAULT_CHARTS: CustomChart[] = [
     groupBy: "workflow_name",
     status: "active",
     timeRange: "30d",
-    colors: { good: "#3b82f6", warning: "#f59e0b", critical: "#ef4444" },
+    colors: { good: "#22c55e", warning: "#f59e0b", critical: "#ef4444" },
     thresholds: { good: 100, warning: 150 },
   },
   {

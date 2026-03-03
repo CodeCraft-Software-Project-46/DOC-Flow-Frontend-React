@@ -56,7 +56,7 @@ export const ChartConfigurationPage = () => {
             <span className="font-semibold text-slate-900">Configured Charts</span>
             <button
               onClick={handleCreate}
-              className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+              className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
             >
               + Create Chart
             </button>
