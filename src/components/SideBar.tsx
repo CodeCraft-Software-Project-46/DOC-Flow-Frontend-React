@@ -1,160 +1,171 @@
-import React from "react";
+import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import {
-    LayoutDashboard,
-    FileText,
-    Activity,
-    Workflow,
-    BarChart3,
-    Folder,
-    Users,
-    Bell,
-    Settings,
-    HelpCircle,
-    GitBranch
-} from "lucide-react";
+  LayoutDashboard,
+  GitBranch,
+  FileText,
+  Settings,
+  Users,
+  FolderOpen,
+  ChevronLeft,
+  ChevronRight,
+  Workflow,
+  Activity,
+  Bell,
+  HelpCircle,
+  ShieldAlert
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useAuth, type AppRole, DASHBOARD_ROUTES } from '@/contexts/AuthContext';
 
+interface NavItem {
+  label: string;
+  icon: React.ElementType;
+  path: string;
+  badge?: number;
+  roles?: AppRole[];
+}
 
+interface SidebarProps {
+  onCollapsedChange?: (collapsed: boolean) => void; // 👈 new prop
+}
 
-type SidebarProps = {
-    isOpen: boolean;
-    onClose: () => void;
-    selectedKey: string;
-    onMenuClick: (key: string) => void;
-    onLogout: () => void;
-};
+const getMainNavItems = (role: AppRole): NavItem[] => [
+  { label: 'Dashboard', icon: LayoutDashboard, path: DASHBOARD_ROUTES[role] },
+  { label: 'Documents', icon: FileText, path: '/document' },
+  { label: 'Instances', icon: Activity, path: '/instances' },
+  { label: 'Workflows', icon: GitBranch, path: '/workflow', roles: ['admin', 'supervisor'] },
+];
 
-const Sidebar: React.FC<SidebarProps> = ({
-                                             isOpen,
-                                             onClose,
-                                             selectedKey,
-                                             onMenuClick,
-                                         }) => {
-    const mainMenu = [
-        { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-        { name: "Documents", path: "/document", icon: FileText },
-        { name: "Instances", path: "/instances", icon: Activity },
-        { name: "Workflows", path: "/workflow", icon: Workflow },
+const configNavItems: NavItem[] = [
+  { label: 'Dashboard Builder', icon: LayoutDashboard, path: '/dashboard-builder', roles: ['admin'] },
+  { label: 'Analytics & Charts', icon: Activity, path: '/analytics', roles: ['admin'] },
+  { label: 'Document Types', icon: FolderOpen, path: '/document-types', roles: ['admin'] },
+  { label: 'Workflows-Versions', icon: GitBranch, path: '/workflow-version', roles: ['admin', 'supervisor'] },
+  { label: 'Roles & Users', icon: Users, path: '/user', roles: ['admin'] },
+  { label: 'Audit Log', icon: ShieldAlert, path: '/audit-log', roles: ['admin', 'supervisor'] },
+  { label: 'Notifications', icon: Bell, path: '/notifications', badge: 3, roles: ['admin'] },
+  { label: 'Settings', icon: Settings, path: '/settings', roles: ['admin'] },
+];
 
-    ];
+export function Sidebar({ onCollapsedChange }: SidebarProps) {
+  const [collapsed, setCollapsed] = useState(false);
+  const location = useLocation();
+  const { user } = useAuth();
 
-    const configMenu = [
-        { name: "Dashboard Builder", path: "/dashboard-builder", icon: LayoutDashboard },
-        { name: "Analytics & Charts", path: "/analytics", icon: BarChart3 },
-        { name: "Document Types", path: "/document-types", icon: Folder },
-        { name: "Workflows-Versions", path: "/workflow-version", icon:GitBranch},
-        { name: "Roles & Users", path: "/user", icon: Users },
-        { name: "Notifications", path: "/notifications", icon: Bell, badge: 3 },
-        { name: "Settings", path: "/settings", icon: Settings },
+  const role = user?.role || 'staff';
 
-    ];
+  const toggleCollapsed = () => {
+    const next = !collapsed;
+    setCollapsed(next);
+    onCollapsedChange?.(next); // 👈 notify parent
+  };
 
-    return (
-        <>
-            {isOpen && (
-                <div
-                    className="fixed inset-0 bg-black/40 z-40 md:hidden"
-                    onClick={onClose}
-                />
-            )}
+  const isActive = (path: string) => {
+    if (path.startsWith('/dashboard/')) return location.pathname === path;
+    if (path === '/') return location.pathname === '/';
+    return location.pathname.startsWith(path);
+  };
 
-            <aside
-                className={`
-                    fixed md:static z-50
-                    w-72 h-screen
-                    bg-[#0F1E2E]
-                    border-r border-white/5
-                    transform transition-transform duration-300
-                    ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-                `}
+  const canSee = (item: NavItem) => !item.roles || item.roles.includes(role);
+
+  const mainItems = getMainNavItems(role).filter(canSee);
+  const configItems = configNavItems.filter(canSee);
+
+  return (
+    <aside
+      className={cn(
+        "fixed left-0 top-0 z-40 h-screen bg-sidebar transition-all duration-300 flex flex-col overflow-hidden",
+        collapsed ? "w-16" : "w-64"
+      )}
+    >
+      {/* Logo */}
+      <div className="flex items-center h-16 px-4 border-b border-sidebar-accent">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+            <Workflow className="w-5 h-5 text-primary-foreground" />
+          </div>
+          {!collapsed && (
+            <span className="text-lg font-semibold text-sidebar-foreground">
+              DocFlow
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Main Navigation */}
+      <nav className="sidebar-nav flex-1 px-3 py-4 overflow-y-auto">
+        <div className="space-y-1">
+          {mainItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={cn("sidebar-item", isActive(item.path) && "sidebar-item-active")}
+              title={collapsed ? item.label : undefined}
             >
-                <div className="flex flex-col h-full px-5 py-6">
+              <item.icon className="w-5 h-5 shrink-0" />
+              {!collapsed && <span>{item.label}</span>}
+              {!collapsed && item.badge && (
+                <span className="ml-auto bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
+                  {item.badge}
+                </span>
+              )}
+            </Link>
+          ))}
+        </div>
 
-                    {/* Logo */}
-                    <div className="flex items-center gap-3 mb-10">
-                        <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
-                            <LayoutDashboard size={18} className="text-white" />
-                        </div>
-                        <span className="text-lg font-semibold text-white">
-                            DocFlow
-                        </span>
-                    </div>
+        {configItems.length > 0 && (
+          <>
+            {!collapsed && (
+              <div className="mt-8 mb-2 px-3 text-xs font-semibold uppercase tracking-wide text-sidebar-foreground opacity-50">
+                Configuration
+              </div>
+            )}
+            <div className={cn("space-y-1", collapsed && "mt-8")}>
+              {configItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={cn("sidebar-item", isActive(item.path) && "sidebar-item-active")}
+                  title={collapsed ? item.label : undefined}
+                >
+                  <item.icon className="w-5 h-5 shrink-0" />
+                  {!collapsed && <span>{item.label}</span>}
+                  {!collapsed && item.badge && (
+                    <span className="ml-auto bg-destructive text-destructive-foreground text-xs px-2 py-0.5 rounded-full">
+                      {item.badge}
+                    </span>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
+      </nav>
 
-                    {/* Main Menu */}
-                    <nav className="flex flex-col gap-1">
-                        {mainMenu.map((item) => {
-                            const Icon = item.icon;
-                            return (
-                                <button
-                                    key={item.path}
-                                    onClick={() => onMenuClick(item.path)}
-                                    className={`
-                                        flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all
-                                        ${
-                                        selectedKey === item.path
-                                            ? "bg-blue-500/20 text-white"
-                                            : "text-white/60 hover:bg-white/5 hover:text-white"
-                                    }
-                                    `}
-                                >
-                                    <Icon size={18} />
-                                    {item.name}
-                                </button>
-                            );
-                        })}
-                    </nav>
+      {/* Help Section */}
+      <div className="px-3 py-4 border-t border-sidebar-accent">
+        <Link
+          to="/help"
+          className="sidebar-item"
+          title={collapsed ? "Help & Support" : undefined}
+        >
+          <HelpCircle className="w-5 h-5 shrink-0" />
+          {!collapsed && <span>Help & Support</span>}
+        </Link>
+      </div>
 
-                    {/* Configuration Section */}
-                    <div className="mt-5">
-                        <p className="text-xs text-blue-400/60 tracking-widest mb-3 px-3">
-                            CONFIGURATION
-                        </p>
-
-                        <nav className="flex flex-col gap-1">
-                            {configMenu.map((item) => {
-                                const Icon = item.icon;
-                                return (
-                                    <button
-                                        key={item.path}
-                                        onClick={() => onMenuClick(item.path)}
-                                        className={`
-                                            flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all
-                                            ${
-                                            selectedKey === item.path
-                                                ? "bg-blue-500/20 text-white"
-                                                : "text-white/60 hover:bg-white/5 hover:text-white"
-                                        }
-                                        `}
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <Icon size={18} />
-                                            {item.name}
-                                        </div>
-
-                                        {item.badge && (
-                                            <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                                                {item.badge}
-                                            </span>
-                                        )}
-                                    </button>
-                                );
-                            })}
-                        </nav>
-                    </div>
-
-                    {/* Bottom Section */}
-                    <div className="mt-3 pt-2 border-t border-white/5">
-                        <button
-                            onClick={() => onMenuClick("/help")}
-                            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/60 hover:bg-white/5 hover:text-white w-full transition"
-                        >
-                            <HelpCircle size={18} />
-                            Help & Support
-                        </button>
-                    </div>
-                </div>
-            </aside>
-        </>
-    );
-};
-
-export default Sidebar;
+      {/* Collapse Button */}
+      <button
+        onClick={toggleCollapsed}
+        className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-card border border-border flex items-center justify-center shadow-sm hover:bg-accent transition-colors"
+      >
+        {collapsed ? (
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        ) : (
+          <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+        )}
+      </button>
+    </aside>
+  );
+}
