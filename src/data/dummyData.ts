@@ -3,6 +3,15 @@ import type {
   BottleneckStep, UserSLA, TrendPoint
 } from "../types";
 
+// KPI metric options — used in config form and chart table
+export const METRICS = [
+  { value: "sla_compliance",      label: "SLA Compliance %",   unit: "%",     higherBetter: true  },
+  { value: "avg_time",            label: "Average Time",        unit: "hours", higherBetter: false },
+  { value: "completion_rate",     label: "Completion Rate %",   unit: "%",     higherBetter: true  },
+  { value: "breach_count",        label: "Breach Count",        unit: "count", higherBetter: false },
+  { value: "status_distribution", label: "Status Distribution", unit: null,    higherBetter: null  },
+];
+
 // ── Workflow names available in dropdowns ─────────────────────────────────────
 export const WORKFLOWS = [  //for Dropdown selections of workflows
   "Purchase Order Approval",
