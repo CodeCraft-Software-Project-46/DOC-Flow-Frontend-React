@@ -3,6 +3,8 @@
 
 import { useState } from "react";
 import StatCard from "../../components/chartAnalytics/StatCard";
+import SLADonut from "../../components/chartAnalytics/SLADonut";
+import SLATrend from "../../components/chartAnalytics/SLATrend";
 
 type Tab = "overall" | "workflow";
 type TimeRange = "7d" | "30d" | "90d" | "custom";
@@ -130,14 +132,10 @@ export const AnalyticsPage = () => {
               </div>
             </div>
 
-            {/* Placeholder for charts — added in Step 3 */}
+            {/* SLA Charts */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white rounded-2xl shadow-sm p-6 flex items-center justify-center h-52 text-slate-300 text-sm">
-                SLA Distribution Chart 
-              </div>
-              <div className="bg-white rounded-2xl shadow-sm p-6 flex items-center justify-center h-52 text-slate-300 text-sm">
-                SLA Trend Chart 
-              </div>
+              <SLADonut />
+              <SLATrend />
             </div>
 
             {/* Placeholder for bottleneck + user sections — Step 4 */}
