@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 
 export type AppRole = 'staff' | 'approver' | 'supervisor' | 'admin' | 'external';
 

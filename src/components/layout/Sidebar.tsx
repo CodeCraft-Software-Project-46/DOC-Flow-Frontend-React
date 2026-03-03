@@ -1,66 +1,50 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import {
-  LayoutDashboard,
-  GitBranch,
-  FileText,
-  Settings,
-  Users,
+import { 
+  LayoutDashboard, 
+  GitBranch, 
+  FileText, 
+  Settings, 
+  Users, 
   FolderOpen,
   ChevronLeft,
   ChevronRight,
   Workflow,
   Activity,
   Bell,
-  HelpCircle,
-  ShieldAlert
+  HelpCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useAuth, DASHBOARD_ROUTES } from '@/contexts/AuthContext';
-import type { AppRole } from '@/contexts/AuthContext';
+import { useAuth, AppRole, DASHBOARD_ROUTES } from '@/contexts/AuthContext';
 
 interface NavItem {
   label: string;
   icon: React.ElementType;
   path: string;
   badge?: number;
-  roles?: AppRole[];
-}
-
-interface SidebarProps {
-  onCollapsedChange?: (collapsed: boolean) => void;
+  roles?: AppRole[]; // if undefined, all roles can see it
 }
 
 const getMainNavItems = (role: AppRole): NavItem[] => [
   { label: 'Dashboard', icon: LayoutDashboard, path: DASHBOARD_ROUTES[role] },
-  { label: 'Documents', icon: FileText, path: '/document' },
+  { label: 'Documents', icon: FileText, path: '/documents' },
   { label: 'Instances', icon: Activity, path: '/instances' },
-  { label: 'Workflows', icon: GitBranch, path: '/workflow', roles: ['admin', 'supervisor'] },
+  { label: 'Workflows', icon: GitBranch, path: '/workflows', roles: ['admin', 'supervisor'] },
 ];
 
 const configNavItems: NavItem[] = [
-  { label: 'Dashboard Builder', icon: LayoutDashboard, path: '/dashboard-builder', roles: ['admin'] },
-  { label: 'Analytics & Charts', icon: Activity, path: '/analytics', roles: ['admin'] },
   { label: 'Document Types', icon: FolderOpen, path: '/document-types', roles: ['admin'] },
-  { label: 'Workflows-Versions', icon: GitBranch, path: '/workflow-version', roles: ['admin', 'supervisor'] },
-  { label: 'Roles & Users', icon: Users, path: '/user', roles: ['admin'] },
-  { label: 'Audit Log', icon: ShieldAlert, path: '/audit-log', roles: ['admin', 'supervisor'] },
+  { label: 'Roles & Users', icon: Users, path: '/roles', roles: ['admin'] },
   { label: 'Notifications', icon: Bell, path: '/notifications', badge: 3, roles: ['admin'] },
   { label: 'Settings', icon: Settings, path: '/settings', roles: ['admin'] },
 ];
 
-export function Sidebar({ onCollapsedChange }: SidebarProps) {
+export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const { user } = useAuth();
 
   const role = user?.role || 'staff';
-
-  const toggleCollapsed = () => {
-    const next = !collapsed;
-    setCollapsed(next);
-    onCollapsedChange?.(next);
-  };
 
   const isActive = (path: string) => {
     if (path.startsWith('/dashboard/')) return location.pathname === path;
@@ -74,9 +58,9 @@ export function Sidebar({ onCollapsedChange }: SidebarProps) {
   const configItems = configNavItems.filter(canSee);
 
   return (
-    <aside
+    <aside 
       className={cn(
-        "fixed left-0 top-0 z-40 h-screen bg-sidebar transition-all duration-300 flex flex-col overflow-hidden",
+        "fixed left-0 top-0 z-40 h-screen bg-sidebar transition-all duration-300 flex flex-col",
         collapsed ? "w-16" : "w-64"
       )}
     >
@@ -95,13 +79,16 @@ export function Sidebar({ onCollapsedChange }: SidebarProps) {
       </div>
 
       {/* Main Navigation */}
-      <nav className="sidebar-nav flex-1 px-3 py-4 overflow-y-auto">
+      <nav className="flex-1 px-3 py-4 overflow-y-auto">
         <div className="space-y-1">
           {mainItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
-              className={cn("sidebar-item", isActive(item.path) && "sidebar-item-active")}
+              className={cn(
+                "sidebar-item",
+                isActive(item.path) && "sidebar-item-active"
+              )}
               title={collapsed ? item.label : undefined}
             >
               <item.icon className="w-5 h-5 shrink-0" />
@@ -118,16 +105,20 @@ export function Sidebar({ onCollapsedChange }: SidebarProps) {
         {configItems.length > 0 && (
           <>
             {!collapsed && (
-              <div className="mt-8 mb-2 px-3 text-xs font-semibold uppercase tracking-wide text-sidebar-foreground opacity-50">
+              <div className="mt-8 mb-2 px-3 text-xs font-semibold uppercase tracking-wide text-sidebar-muted">
                 Configuration
               </div>
             )}
+            
             <div className={cn("space-y-1", collapsed && "mt-8")}>
               {configItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={cn("sidebar-item", isActive(item.path) && "sidebar-item-active")}
+                  className={cn(
+                    "sidebar-item",
+                    isActive(item.path) && "sidebar-item-active"
+                  )}
                   title={collapsed ? item.label : undefined}
                 >
                   <item.icon className="w-5 h-5 shrink-0" />
@@ -158,7 +149,7 @@ export function Sidebar({ onCollapsedChange }: SidebarProps) {
 
       {/* Collapse Button */}
       <button
-        onClick={toggleCollapsed}
+        onClick={() => setCollapsed(!collapsed)}
         className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-card border border-border flex items-center justify-center shadow-sm hover:bg-accent transition-colors"
       >
         {collapsed ? (

@@ -17,6 +17,7 @@ import { WorkFlowInstances } from "./pages/workflow/WorkFlowInstances.tsx";
 import { AnalyticsPage } from "./pages/analytics/AnalyticsPage.tsx";
 import { DocumentTypesPage } from "./pages/documents/DocumentTypesPage.tsx";
 import { AuditLogPage } from "./pages/analytics/AuditLogPage.tsx";
+import NotificationsPage from "./pages/NotificationsPage";
 
 // 👇 Move routes OUTSIDE the component so it's not recreated on every render
 const routes = createBrowserRouter([
@@ -38,6 +39,7 @@ const routes = createBrowserRouter([
                     { path: "/user", element: <UserPage /> },
                     { path: "/analytics", element: <AnalyticsPage /> },
                     { path: "/audit-log", element: <AuditLogPage /> },
+                    { path: "/notifications", element: <NotificationsPage /> },
                 ]
             }
         ]

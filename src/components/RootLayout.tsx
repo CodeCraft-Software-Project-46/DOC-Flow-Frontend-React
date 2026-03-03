@@ -25,7 +25,7 @@ export function RootLayout() {
             >
                 <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} currentPage={selectedKey} />
                 <main className="flex-1 overflow-auto p-4 md:p-6">
-                    <div className="bg-gray-50 shadow-sm p-2 md:p-6 min-h-full">
+                    <div className="bg-gray-50 min-h-full">
                         <Outlet />
                     </div>
                 </main>
