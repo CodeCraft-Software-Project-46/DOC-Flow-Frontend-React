@@ -8,6 +8,7 @@ import SLATrend from "../../components/chartAnalytics/SLATrend";
 import BottleneckSteps from "../../components/chartAnalytics/BottleneckSteps";
 import UserSLAList from "../../components/chartAnalytics/Userperformance";
 import CustomChartsSection from "../../components/chartAnalytics/CustomChartsSection";
+import InstanceDrilldown from "../../components/chartAnalytics/InstanceDrilldown";
 import { DEFAULT_CHARTS, WORKFLOWS } from "../../data/dummyData";
 
 type Tab = "overall" | "workflow";
@@ -214,6 +215,9 @@ export const AnalyticsPage = () => {
                 color="red"
               />
             </div>
+
+            {/* ── Instance Drill-down for selected workflow ── */}
+            <InstanceDrilldown workflow={selectedWorkflow} />
 
             {/* ── Custom Charts — Workflow source only ── */}
             <CustomChartsSection
