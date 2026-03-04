@@ -17,13 +17,10 @@ import {AnalyticsPage} from "./pages/analytics/AnalyticsPage.tsx";
 import {DocumentTypesPage} from "./pages/documents/DocumentTypesPage.tsx";
 
 
-
-
 export default function App() {
     const routes = createBrowserRouter([
         // 1. Login Route
         { path: "/", element: <SignIn /> },
-
 
 
         // 2. Protected App Routes
