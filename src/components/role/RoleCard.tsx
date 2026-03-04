@@ -1,5 +1,5 @@
 import React from "react";
-import { type Role } from "../../sampleData/RolesData";
+import { type Role, SAMPLE_ROLES } from "../../../sampleData/RolesData.ts";
 
 interface RoleCardProps {
     role: Role;

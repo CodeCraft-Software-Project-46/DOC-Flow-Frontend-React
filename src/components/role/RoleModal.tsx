@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { ALL_PERMISSIONS, type Role } from "../../sampleData/RolesData";
+import {PERMISSION_CATEGORIES} from "../../../sampleData/permissionsData.ts";
+
 
 interface RoleModalProps {
     initial?: Role;
@@ -27,40 +28,43 @@ export const RoleModal: React.FC<RoleModalProps> = ({ initial, onClose, onSubmit
         onClose();
     };
 
-    const isEdit = !!initial;
-
     return (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-            <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+            <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+
                 {/* Header */}
-                <div className="px-6 pt-6 pb-4 border-b border-slate-100 flex items-start justify-between">
-                    <div>
-                        <h2 className="text-lg font-bold text-slate-800">{isEdit ? "Edit Role" : "Create Role"}</h2>
-                        <p className="text-sm text-slate-400 mt-0.5">Define role name, description, and permissions</p>
-                    </div>
-                    <button onClick={onClose} className="text-slate-400 hover:text-slate-700 text-xl leading-none">✕</button>
+                <div
+                    className="px-6 pt-6 pb-4 border-b border-slate-100 flex justify-between items-start flex-shrink-0">
+                    <h2 className="text-lg font-bold text-slate-800">{initial ? "Edit Role" : "Create Role"}</h2>
+                    <button onClick={onClose} className="text-slate-400 hover:text-slate-700 text-xl leading-none">✕
+                    </button>
                 </div>
 
                 {/* Body */}
-                <div className="px-6 py-5 space-y-5">
+                <div className="px-6 py-5 space-y-5 overflow-y-auto">
+                    {/* Name */}
                     <div>
-                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Role Name <span className="text-red-500">*</span></label>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                            Role Name <span className="text-red-500">*</span>
+                        </label>
                         <input
                             type="text"
-                            placeholder="e.g. Approver"
                             value={name}
-                            onChange={(e) => { setName(e.target.value); setErrors((p) => ({ ...p, name: "" })); }}
-                            className={`w-full px-3 py-2.5 text-sm border rounded-lg outline-none ${
+                            onChange={(e) => {
+                                setName(e.target.value);
+                                setErrors(p => ({...p, name: ""}));
+                            }}
+                            className={`w-full px-3 py-2.5 text-sm border rounded-lg outline-none transition ${
                                 errors.name ? "border-red-400 focus:border-red-500" : "border-slate-200 focus:border-blue-400"
                             }`}
                         />
                         {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
                     </div>
 
+                    {/* Description */}
                     <div>
                         <label className="block text-sm font-semibold text-slate-700 mb-1.5">Description</label>
                         <textarea
-                            placeholder="What this role can do"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             rows={3}
@@ -68,21 +72,34 @@ export const RoleModal: React.FC<RoleModalProps> = ({ initial, onClose, onSubmit
                         />
                     </div>
 
+                    {/* Permissions */}
                     <div>
-                        <label className={`block text-sm font-semibold mb-2 ${errors.permissions ? "text-red-500" : "text-slate-700"}`}>
+                        <label
+                            className={`block text-sm font-semibold mb-2 ${errors.permissions ? "text-red-500" : "text-slate-700"}`}>
                             Permissions <span className="text-red-500">*</span>
                         </label>
-                        <div className={`grid grid-cols-2 gap-3 p-4 border rounded-xl ${errors.permissions ? "border-red-400 bg-red-50" : "border-slate-200 bg-slate-50"}`}>
-                            {ALL_PERMISSIONS.map((perm) => (
-                                <label key={perm} className="flex items-center gap-2.5 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={permissions.includes(perm)}
-                                        onChange={() => { togglePermission(perm); setErrors((p) => ({ ...p, permissions: "" })); }}
-                                        className="w-4 h-4 rounded accent-blue-600"
-                                    />
-                                    <span className="text-sm capitalize">{perm.replace(/_/g, " ")}</span>
-                                </label>
+                        <div className="space-y-4 border rounded-xl p-4 bg-slate-50 max-h-[50vh] overflow-y-auto">
+                            {PERMISSION_CATEGORIES.map(({category, permissions: permsInCategory}) => (
+                                <div key={category}>
+                                    <p className="font-semibold text-slate-700 mb-1">{category}</p>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {permsInCategory.map(perm => (
+                                            <label key={perm} className="flex items-center gap-2 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={permissions.includes(perm)}
+                                                    onChange={() => {
+                                                        togglePermission(perm);
+                                                        setErrors(p => ({...p, permissions: ""}));
+                                                    }}
+                                                    className="w-4 h-4 accent-blue-600"
+                                                />
+                                                <span
+                                                    className="text-sm text-slate-700 capitalize">{perm.replace(/_/g, " ")}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
                             ))}
                         </div>
                         {errors.permissions && <p className="text-xs text-red-500 mt-1">{errors.permissions}</p>}
@@ -90,12 +107,17 @@ export const RoleModal: React.FC<RoleModalProps> = ({ initial, onClose, onSubmit
                 </div>
 
                 {/* Footer */}
-                <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
-                    <button onClick={onClose} className="px-5 py-2 text-sm font-semibold border rounded-lg text-slate-600 hover:bg-white">Cancel</button>
-                    <button onClick={handleSubmit} className="px-5 py-2 text-sm font-semibold bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        {isEdit ? "Save Changes" : "Create"}
+                <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3 flex-shrink-0">
+                    <button onClick={onClose}
+                            className="px-5 py-2 text-sm font-semibold border border-slate-200 rounded-lg text-slate-600 hover:bg-white transition">
+                        Cancel
+                    </button>
+                    <button onClick={handleSubmit}
+                            className="px-5 py-2 text-sm font-semibold bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        {initial ? "Save Changes" : "Create"}
                     </button>
                 </div>
+
             </div>
         </div>
     );

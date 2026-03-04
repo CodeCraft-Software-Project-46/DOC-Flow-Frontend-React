@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { type Role, SAMPLE_ROLES } from "../../sampleData/RolesData";
-import { RoleModal } from "./RoleModal";
+import { type Role, SAMPLE_ROLES } from "../../../sampleData/RolesData.ts";
+
 import { DeleteRoleModal } from "./DeleteRoleModal";
-import { RoleCard } from "./RoleCard";
+import {RoleCard} from "./RoleCard.tsx";
+import {RoleModal} from "./RoleModal.tsx";
+
 
 export const RolesTab: React.FC = () => {
     const [roles, setRoles] = useState<Role[]>(SAMPLE_ROLES);
