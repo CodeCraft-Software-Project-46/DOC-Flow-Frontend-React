@@ -1,26 +1,27 @@
-
 import React, { useState } from "react";
-import {RolesTab} from "../../components/role/RolesTab.tsx";
-import {UsersTab} from "../../components/role/UsersTab.tsx";
+import { RolesTab } from "../../components/role/RolesTab";
+import { UsersTab } from "../../components/user/UsersTab";
+import {SAMPLE_ROLES} from "../../../sampleData/RolesData.ts";
+
 
 type TabType = "users" | "roles";
 
 export const UserPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState<TabType>("roles");
+    const [roles, setRoles] = useState<Role[]>(SAMPLE_ROLES);
 
     return (
-        <div className="min-h-screen bg-slate-100" style={{ fontFamily: "'DM Sans','Segoe UI',sans-serif" }}>
-            {/* Tab switcher */}
-            <div className="bg-white border-b border-slate-200 px-6 pt-4">
-                <div className="flex gap-1">
+        <div className="min-h-screen bg-slate-100">
+            <div className="bg-white border-b px-6 pt-4">
+                <div className="flex gap-2">
                     {(["users", "roles"] as TabType[]).map((key) => (
                         <button
                             key={key}
                             onClick={() => setActiveTab(key)}
-                            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-t-lg border border-b-0 transition-all duration-200 ${
+                            className={`px-4 py-2 font-semibold rounded-t-lg ${
                                 activeTab === key
-                                    ? "bg-white border-slate-200 text-slate-800 shadow-sm -mb-px z-10"
-                                    : "bg-transparent border-transparent text-slate-500 hover:text-slate-700"
+                                    ? "bg-white border text-black"
+                                    : "text-gray-500"
                             }`}
                         >
                             {key === "users" ? "👤 Users" : "🛡 Roles"}
@@ -29,10 +30,13 @@ export const UserPage: React.FC = () => {
                 </div>
             </div>
 
-            {/* Content */}
-            <div className="p-6">{activeTab === "roles" ? <RolesTab /> : <UsersTab />}</div>
+            <div className="p-6">
+                {activeTab === "roles" ? (
+                    <RolesTab roles={roles} setRoles={setRoles} />
+                ) : (
+                    <UsersTab roles={roles} setRoles={setRoles} />
+                )}
+            </div>
         </div>
     );
 };
-
-
