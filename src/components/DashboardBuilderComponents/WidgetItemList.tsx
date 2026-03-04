@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import WidgetCard from "./WidgetCard.tsx";
+import {WidgetCard} from "./WidgetCard.tsx";
+
 
 // Types
 export interface Widget {
