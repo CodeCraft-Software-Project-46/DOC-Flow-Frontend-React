@@ -1,4 +1,5 @@
 /*
+/!*
 import React, { useState } from "react";
 import WidgetItemList, {ALL_WIDGETS, type Widget} from "./WidgetItemList";
 import ConfigPanel from "./ConfigPanel";
@@ -181,7 +182,7 @@ const DashboardCanvasPage: React.FC<Props> = ({ dashboard, onBack }) => {
     );
 };
 
-export default DashboardCanvasPage;*/
+export default DashboardCanvasPage;*!/
 
 import React, { useState, useEffect } from "react";
 import WidgetItemList, { ALL_WIDGETS, type Widget } from "./WidgetItemList";
@@ -337,7 +338,7 @@ const DashboardCanvasPage: React.FC<Props> = ({ dashboard, onBack }) => {
 
     return (
         <div className="flex flex-col min-h-screen bg-slate-100">
-            {/* Header */}
+            {/!* Header *!/}
             <div className="bg-white border-b border-slate-200 px-1 py-0 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <button
@@ -374,9 +375,9 @@ const DashboardCanvasPage: React.FC<Props> = ({ dashboard, onBack }) => {
                 </div>
             </div>
 
-            {/* Panels */}
+            {/!* Panels *!/}
             <div className="flex flex-1 overflow-hidden">
-                {/* Left: Widget Library */}
+                {/!* Left: Widget Library *!/}
                 <div className="w-72 bg-white border-r border-slate-200 flex flex-col flex-shrink-0">
                     <div className="px-4 py-4 border-b border-slate-100">
                         <h2 className="text-sm font-bold text-slate-800">Widget Library</h2>
@@ -390,7 +391,7 @@ const DashboardCanvasPage: React.FC<Props> = ({ dashboard, onBack }) => {
                     </div>
                 </div>
 
-                {/* Center: Canvas */}
+                {/!* Center: Canvas *!/}
                 <div className="flex-1 flex flex-col overflow-hidden">
                     <div className="px-6 py-3 border-b border-slate-200 bg-white flex items-center justify-between">
                         <h2 className="text-sm font-bold text-slate-700">
@@ -413,12 +414,480 @@ const DashboardCanvasPage: React.FC<Props> = ({ dashboard, onBack }) => {
                     </div>
                 </div>
 
-                {/* Right: Configuration Panel */}
+                {/!* Right: Configuration Panel *!/}
                 <div className="w-72 bg-white border-l border-slate-200 flex flex-col flex-shrink-0">
                     <div className="px-4 py-4 border-b border-slate-100">
                         <h2 className="text-sm font-bold text-slate-800">
                             Widget Configuration
                         </h2>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-4">
+                        <ConfigPanel selected={selected} onUpdate={handleUpdate} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default DashboardCanvasPage;*/
+/*
+
+import React, { useState, useEffect } from "react";
+import {ALL_WIDGETS, type Widget, WidgetItemList} from "./WidgetItemList";
+import ConfigPanel from "./ConfigPanel";
+import Canvas, { type CanvasItem } from "./Canvas";
+import { DashboardPreviewPage } from "./DashBoardPreviewPage";
+
+// Default widgets for roles
+const ROLE_DEFAULT_WIDGETS: Record<string, number[]> = {
+    "Department Manager": [6, 8],
+    "Admin": ALL_WIDGETS.map((w) => w.id),
+};
+
+interface Props {
+    dashboard: {
+        name: string;
+        description: string;
+        role: string;
+    };
+    onBack: () => void;
+    onSave: (dashboard: any) => void; // <--- parent save handler
+}
+
+
+const mapSampleDataToStats = (widget: Widget): CanvasItem => {
+    const uid = Date.now() + Math.random(); // unique uid
+    return {
+        ...widget,
+        uid,
+        cols: widget.cols,
+        rows: widget.rows,
+        dataSource: widget.dataSource,
+        title: widget.title,
+    };
+};
+
+const DashboardCanvasPage: React.FC<Props> = ({ dashboard, onBack,onSave }) => {
+    const [canvasItems, setCanvasItems] = useState<CanvasItem[]>([]);
+    const [selectedUid, setSelectedUid] = useState<number | null>(null);
+    const [isPreview, setIsPreview] = useState(false);
+
+    const selected = canvasItems.find((c) => c.uid === selectedUid) ?? null;
+
+    // Initialize canvas with role-based default widgets
+    useEffect(() => {
+        let initialWidgets: Widget[] = [];
+        if (ROLE_DEFAULT_WIDGETS[dashboard.role]) {
+            initialWidgets = ALL_WIDGETS.filter((w) =>
+                ROLE_DEFAULT_WIDGETS[dashboard.role].includes(w.id)
+            );
+        }
+        const canvasInit = initialWidgets.map((w) => mapSampleDataToStats(w));
+        setCanvasItems(canvasInit);
+    }, [dashboard.role]);
+
+    // Add widget
+    const handleAdd = (widget: Widget) => {
+        if (canvasItems.find((c) => c.id === widget.id)) return;
+        const uid = Date.now();
+        setCanvasItems((prev) => [
+            ...prev,
+            {
+                ...widget,
+                uid,
+                cols: widget.cols,
+                rows: widget.rows,
+                dataSource: "current user",
+                title: widget.title,
+            },
+        ]);
+        setSelectedUid(uid);
+    };
+
+    // Remove widget
+    const handleRemove = (uid: number) => {
+        setCanvasItems((prev) => prev.filter((c) => c.uid !== uid));
+        if (selectedUid === uid) setSelectedUid(null);
+    };
+
+    // Move widget up
+    const handleMoveUp = (uid: number) => {
+        setCanvasItems((prev) => {
+            const i = prev.findIndex((c) => c.uid === uid);
+            if (i <= 0) return prev;
+            const next = [...prev];
+            [next[i - 1], next[i]] = [next[i], next[i - 1]];
+            return next;
+        });
+    };
+
+    // Move widget down
+    const handleMoveDown = (uid: number) => {
+        setCanvasItems((prev) => {
+            const i = prev.findIndex((c) => c.uid === uid);
+            if (i >= prev.length - 1) return prev;
+            const next = [...prev];
+            [next[i], next[i + 1]] = [next[i + 1], next[i]];
+            return next;
+        });
+    };
+
+    // Update widget configuration
+    const handleUpdate = (updated: CanvasItem) => {
+        setCanvasItems((prev) =>
+            prev.map((c) => (c.uid === updated.uid ? updated : c))
+        );
+    };
+
+    // Save dashboard including widgets
+    const handleSaveDashboard = () => {
+        const payload = {
+            name: dashboard.name,
+            description: dashboard.description,
+            role: dashboard.role,
+            widgets: canvasItems.map((w) => ({
+                id: w.id,
+                title: w.title,
+                cols: w.cols,
+                rows: w.rows,
+                dataSource: w.dataSource,
+                uid: w.uid,
+            })),
+        };
+
+        // Call parent save handler or API
+        onSave(payload);
+
+        // Navigate back to builder
+        onBack();
+    };
+
+    // Preview mode
+    if (isPreview) {
+        return (
+            <DashboardPreviewPage
+                dashboard={dashboard}
+                widgets={canvasItems}
+                onBack={() => setIsPreview(false)}
+            />
+        );
+    }
+
+    return (
+        <div className="flex flex-col min-h-screen bg-slate-100">
+            {/!* Header *!/}
+            <div className="bg-white border-b border-slate-200 px-1 py-0 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={onBack}
+                        className="text-slate-500 hover:text-slate-800 text-lg font-medium transition-colors"
+                    >
+                        ←
+                    </button>
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-base font-bold text-slate-800">{dashboard.name}</h1>
+                            <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-medium">
+                Draft
+              </span>
+                        </div>
+                        <p className="text-xs text-slate-400 mt-0.5">{dashboard.description}</p>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => setIsPreview(true)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition"
+                    >
+                        👁 Preview
+                    </button>
+                    <button
+                        onClick={handleSaveDashboard}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-sm"
+                    >
+                        💾 Save
+                    </button>
+                </div>
+            </div>
+
+            {/!* Panels *!/}
+            <div className="flex flex-1 overflow-hidden">
+                {/!* Left: Widget Library *!/}
+                <div className="w-72 bg-white border-r border-slate-200 flex flex-col flex-shrink-0">
+                    <div className="px-4 py-4 border-b border-slate-100">
+                        <h2 className="text-sm font-bold text-slate-800">Widget Library</h2>
+                    </div>
+                    <div className="flex-1 overflow-hidden p-4">
+                        <WidgetItemList
+                            widgets={ALL_WIDGETS}
+                            canvasWidgets={canvasItems}
+                            onAdd={handleAdd}
+                            role={dashboard.role}
+                        />
+                    </div>
+                </div>
+
+                {/!* Center: Canvas *!/}
+                <div className="flex-1 flex flex-col overflow-hidden">
+                    <div className="px-6 py-3 border-b border-slate-200 bg-white flex items-center justify-between">
+                        <h2 className="text-sm font-bold text-slate-700">
+                            Canvas — <span className="text-blue-600">{canvasItems.length}</span> widget
+                            {canvasItems.length !== 1 ? "s" : ""}
+                        </h2>
+                        <span className="text-xs bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-medium">
+              12-column grid
+            </span>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-6">
+                        <Canvas
+                            widgets={canvasItems}
+                            selectedUid={selectedUid}
+                            onSelect={(item) => setSelectedUid(item.uid)}
+                            onMoveUp={handleMoveUp}
+                            onMoveDown={handleMoveDown}
+                            onRemove={handleRemove}
+                        />
+                    </div>
+                </div>
+
+                {/!* Right: Configuration Panel *!/}
+                <div className="w-72 bg-white border-l border-slate-200 flex flex-col flex-shrink-0">
+                    <div className="px-4 py-4 border-b border-slate-100">
+                        <h2 className="text-sm font-bold text-slate-800">Widget Configuration</h2>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-4">
+                        <ConfigPanel selected={selected} onUpdate={handleUpdate} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default DashboardCanvasPage;*/
+
+
+import React, { useState, useEffect } from "react";
+import { ALL_WIDGETS, type Widget, WidgetItemList } from "./WidgetItemList";
+import ConfigPanel from "./ConfigPanel";
+import Canvas, { type CanvasItem } from "./Canvas";
+import { DashboardPreviewPage } from "./DashBoardPreviewPage";
+
+// Default widgets per role
+const ROLE_DEFAULT_WIDGETS: Record<string, number[]> = {
+    "Department Manager": [6, 8],
+    "Admin": ALL_WIDGETS.map((w) => w.id),
+};
+
+interface Dashboard {
+    name: string;
+    description: string;
+    role: string;
+    widgets?: CanvasItem[];
+}
+
+interface Props {
+    dashboard: Dashboard;
+    onBack: () => void;
+    onSave: (dashboard: Dashboard) => void;
+}
+
+
+const mapSampleDataToStats = (widget: Widget, existingUid?: number): CanvasItem => {
+    const uid = existingUid ?? Date.now() + Math.random();
+    return {
+        ...widget,
+        uid,
+        cols: widget.cols,
+        rows: widget.rows,
+        dataSource: widget.dataSource,
+        title: widget.title,
+    };
+};
+
+const DashboardCanvasPage: React.FC<Props> = ({ dashboard, onBack, onSave }) => {
+    const [canvasItems, setCanvasItems] = useState<CanvasItem[]>([]);
+    const [selectedUid, setSelectedUid] = useState<number | null>(null);
+    const [isPreview, setIsPreview] = useState(false);
+
+    const selected = canvasItems.find((c) => c.uid === selectedUid) ?? null;
+
+
+    useEffect(() => {
+        if (dashboard.widgets && dashboard.widgets.length > 0) {
+            // Load saved widgets
+            setCanvasItems(dashboard.widgets);
+        } else if (ROLE_DEFAULT_WIDGETS[dashboard.role]) {
+            // Otherwise, use role defaults
+            const initialWidgets = ALL_WIDGETS.filter((w) =>
+                ROLE_DEFAULT_WIDGETS[dashboard.role].includes(w.id)
+            ).map((w) => mapSampleDataToStats(w));
+            setCanvasItems(initialWidgets);
+        }
+    }, [dashboard]);
+
+    // Add widget
+    const handleAdd = (widget: Widget) => {
+        if (canvasItems.find((c) => c.id === widget.id)) return;
+        const uid = Date.now();
+        setCanvasItems((prev) => [
+            ...prev,
+            {
+                ...widget,
+                uid,
+                cols: widget.cols,
+                rows: widget.rows,
+                dataSource: "current user",
+                title: widget.title,
+            },
+        ]);
+        setSelectedUid(uid);
+    };
+
+    // Remove widget
+    const handleRemove = (uid: number) => {
+        setCanvasItems((prev) => prev.filter((c) => c.uid !== uid));
+        if (selectedUid === uid) setSelectedUid(null);
+    };
+
+    // Move widget up
+    const handleMoveUp = (uid: number) => {
+        setCanvasItems((prev) => {
+            const i = prev.findIndex((c) => c.uid === uid);
+            if (i <= 0) return prev;
+            const next = [...prev];
+            [next[i - 1], next[i]] = [next[i], next[i - 1]];
+            return next;
+        });
+    };
+
+    // Move widget down
+    const handleMoveDown = (uid: number) => {
+        setCanvasItems((prev) => {
+            const i = prev.findIndex((c) => c.uid === uid);
+            if (i >= prev.length - 1) return prev;
+            const next = [...prev];
+            [next[i], next[i + 1]] = [next[i + 1], next[i]];
+            return next;
+        });
+    };
+
+    // Update widget configuration
+    const handleUpdate = (updated: CanvasItem) => {
+        setCanvasItems((prev) =>
+            prev.map((c) => (c.uid === updated.uid ? updated : c))
+        );
+    };
+
+    // Save dashboard including current widgets
+    const handleSaveDashboard = () => {
+        const payload: Dashboard = {
+            ...dashboard,
+            widgets: canvasItems.map((w) => ({
+                ...w,
+                uid: w.uid, // preserve UID
+            })),
+        };
+
+        onSave(payload);
+        onBack();
+    };
+
+    // Preview mode
+    if (isPreview) {
+        return (
+            <DashboardPreviewPage
+                dashboard={dashboard}
+                widgets={canvasItems}
+                onBack={() => setIsPreview(false)}
+            />
+        );
+    }
+
+    return (
+        <div className="flex flex-col min-h-screen bg-slate-100">
+            {/* Header */}
+            <div className="bg-white border-b border-slate-200 px-1 py-0 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={onBack}
+                        className="text-slate-500 hover:text-slate-800 text-lg font-medium transition-colors"
+                    >
+                        ←
+                    </button>
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-base font-bold text-slate-800">{dashboard.name}</h1>
+                            <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-medium">
+                                Draft
+                            </span>
+                        </div>
+                        <p className="text-xs text-slate-400 mt-0.5">{dashboard.description}</p>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => setIsPreview(true)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition"
+                    >
+                        👁 Preview
+                    </button>
+                    <button
+                        onClick={handleSaveDashboard}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-sm"
+                    >
+                        💾 Save
+                    </button>
+                </div>
+            </div>
+
+            {/* Panels */}
+            <div className="flex flex-1 overflow-hidden">
+                {/* Left: Widget Library */}
+                <div className="w-72 bg-white border-r border-slate-200 flex flex-col flex-shrink-0">
+                    <div className="px-4 py-4 border-b border-slate-100">
+                        <h2 className="text-sm font-bold text-slate-800">Widget Library</h2>
+                    </div>
+                    <div className="flex-1 overflow-hidden p-4">
+                        <WidgetItemList
+                            widgets={ALL_WIDGETS}
+                            canvasWidgets={canvasItems}
+                            onAdd={handleAdd}
+                            role={dashboard.role}
+                        />
+                    </div>
+                </div>
+
+                {/* Center: Canvas */}
+                <div className="flex-1 flex flex-col overflow-hidden">
+                    <div className="px-6 py-3 border-b border-slate-200 bg-white flex items-center justify-between">
+                        <h2 className="text-sm font-bold text-slate-700">
+                            Canvas — <span className="text-blue-600">{canvasItems.length}</span>{" "}
+                            widget{canvasItems.length !== 1 ? "s" : ""}
+                        </h2>
+                        <span className="text-xs bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-medium">
+                            12-column grid
+                        </span>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-6">
+                        <Canvas
+                            widgets={canvasItems}
+                            selectedUid={selectedUid}
+                            onSelect={(item) => setSelectedUid(item.uid)}
+                            onMoveUp={handleMoveUp}
+                            onMoveDown={handleMoveDown}
+                            onRemove={handleRemove}
+                        />
+                    </div>
+                </div>
+
+                {/* Right: Configuration Panel */}
+                <div className="w-72 bg-white border-l border-slate-200 flex flex-col flex-shrink-0">
+                    <div className="px-4 py-4 border-b border-slate-100">
+                        <h2 className="text-sm font-bold text-slate-800">Widget Configuration</h2>
                     </div>
                     <div className="flex-1 overflow-y-auto p-4">
                         <ConfigPanel selected={selected} onUpdate={handleUpdate} />

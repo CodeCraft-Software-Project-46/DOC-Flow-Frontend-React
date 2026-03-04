@@ -1,3 +1,4 @@
+/*
 import React, { useState } from "react";
 import {WidgetCard} from "./WidgetCard.tsx";
 
@@ -38,7 +39,7 @@ export const ALL_WIDGETS: Widget[] = [
 
 const TABS = ["All", "Task", "Document", "SLA", "Analytics", "Notification", "Custom"];
 
-/*
+/!*
 // Card
 function WidgetCard({ widget, isAdded, onAdd }: { widget: Widget; isAdded: boolean; onAdd: (w: Widget) => void }) {
     return (
@@ -63,7 +64,7 @@ function WidgetCard({ widget, isAdded, onAdd }: { widget: Widget; isAdded: boole
             </button>
         </div>
     );
-}*/
+}*!/
 
 export const WidgetItemList: React.FC<Props> = ({ widgets, canvasWidgets, onAdd }) => {
     const [activeTab, setActiveTab] = useState("All");
@@ -81,7 +82,7 @@ export const WidgetItemList: React.FC<Props> = ({ widgets, canvasWidgets, onAdd 
 
     return (
         <div className="flex flex-col h-full">
-            {/* search */}
+            {/!* search *!/}
             <input
                 type="text"
                 placeholder="Search widgets..."
@@ -90,7 +91,7 @@ export const WidgetItemList: React.FC<Props> = ({ widgets, canvasWidgets, onAdd 
                 className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg outline-none focus:border-blue-400 placeholder-slate-400 text-slate-700 mb-3"
             />
 
-            {/* tabs */}
+            {/!* tabs *!/}
             <div className="flex gap-1.5 flex-wrap mb-3">
                 {TABS.map((tab) => (
                     <button
@@ -107,7 +108,7 @@ export const WidgetItemList: React.FC<Props> = ({ widgets, canvasWidgets, onAdd 
                 ))}
             </div>
 
-            {/* list */}
+            {/!* list *!/}
             <div className="flex-1 overflow-y-auto border border-slate-100 rounded-lg">
                 {filtered.length === 0 ? (
                     <p className="text-xs text-slate-400 text-center py-8">No widgets found.</p>
@@ -121,4 +122,109 @@ export const WidgetItemList: React.FC<Props> = ({ widgets, canvasWidgets, onAdd 
     );
 };
 
-export default WidgetItemList;
+export default WidgetItemList;*/
+
+import React, { useState } from "react";
+import { WidgetCard } from "./WidgetCard";
+
+export interface Widget {
+    id: number;
+    icon: string;
+    title: string;
+    description: string;
+    category: string;
+    cols: number;
+    rows: number;
+    dataSource: string;
+}
+
+interface Props {
+    widgets: Widget[];
+    canvasWidgets: Widget[];
+    onAdd: (widget: Widget) => void;
+    role?: string;
+}
+
+export const ALL_WIDGETS: Widget[] = [
+    { id: 1, icon: "📋", title: "My Pending Tasks", description: "Tasks awaiting action", category: "Task", cols: 6, rows: 2, dataSource: "current user" },
+    { id: 2, icon: "✅", title: "Approvals Waiting", description: "Approvals assigned to the user", category: "Task", cols: 6, rows: 2, dataSource: "current user" },
+    { id: 3, icon: "⚠️", title: "Overdue Tasks", description: "Tasks past SLA deadline", category: "SLA", cols: 6, rows: 2, dataSource: "all users" },
+    { id: 4, icon: "🔁", title: "Revision Required", description: "Documents sent back for revision", category: "Document", cols: 6, rows: 2, dataSource: "current user" },
+    { id: 5, icon: "🕐", title: "Completed Today", description: "Tasks completed today", category: "Task", cols: 6, rows: 2, dataSource: "current user" },
+    { id: 6, icon: "📈", title: "Trend Analysis", description: "Visualize trends over time", category: "Analytics", cols: 8, rows: 3, dataSource: "all users" },
+    { id: 7, icon: "🔔", title: "Recent Notifications", description: "Latest notifications", category: "Notification", cols: 4, rows: 2, dataSource: "current user" },
+    { id: 8, icon: "🏢", title: "Dept Performance", description: "Performance metrics by department", category: "Analytics", cols: 6, rows: 3, dataSource: "all depts" },
+    { id: 9, icon: "📊", title: "SLA Breach Summary", description: "Overview of breached SLAs", category: "SLA", cols: 8, rows: 3, dataSource: "all depts" },
+    { id: 10, icon: "📄", title: "Recent Documents", description: "Latest documents accessed", category: "Document", cols: 6, rows: 2, dataSource: "current user" },
+    { id: 11, icon: "📢", title: "Alert Summary", description: "Grouped view of alerts", category: "Notification", cols: 4, rows: 2, dataSource: "all users" },
+    { id: 12, icon: "🎛️", title: "Custom Dashboard", description: "Build your own layout", category: "Custom", cols: 6, rows: 3, dataSource: "custom" },
+];
+
+const TABS = ["All", "Task", "Document", "SLA", "Analytics", "Notification", "Custom"];
+
+// Role-based widget access
+export const ROLE_WIDGET_ACCESS: Record<string, number[]> = {
+    "Staff / Initiator": [1, 2, 3, 4, 5],
+    "Approver": [2, 3, 5],
+    "Supervisor / Manager": [1, 2, 3, 5, 6, 8],
+    "Admin": ALL_WIDGETS.map(w => w.id),
+    "External Party": [4, 10],
+};
+
+export const WidgetItemList: React.FC<Props> = ({ widgets, canvasWidgets, onAdd, role }) => {
+    const [activeTab, setActiveTab] = useState("All");
+    const [search, setSearch] = useState("");
+
+    const addedIds = canvasWidgets.map(w => w.id);
+    const accessibleIds = ROLE_WIDGET_ACCESS[role || ""] || [];
+
+    const filtered = widgets.filter(w => {
+        const matchTab = activeTab === "All" || w.category === activeTab;
+        const matchSearch = w.title.toLowerCase().includes(search.toLowerCase()) ||
+            w.description.toLowerCase().includes(search.toLowerCase());
+        const hasAccess = accessibleIds.includes(w.id);
+        return matchTab && matchSearch && hasAccess;
+    });
+
+    return (
+        <div className="flex flex-col h-full">
+            <input
+                type="text"
+                placeholder="Search widgets..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg outline-none focus:border-blue-400 placeholder-slate-400 text-slate-700 mb-3"
+            />
+            <div className="flex gap-1.5 flex-wrap mb-3">
+                {TABS.map(tab => (
+                    <button
+                        key={tab}
+                        onClick={() => { setActiveTab(tab); setSearch(""); }}
+                        className={`text-xs font-semibold px-2.5 py-1 rounded-full transition-all duration-200 ${
+                            activeTab === tab ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                        }`}
+                    >
+                        {tab}
+                    </button>
+                ))}
+            </div>
+
+            <div className="flex-1 overflow-y-auto border border-slate-100 rounded-lg">
+                {filtered.length === 0 ? (
+                    <p className="text-xs text-slate-400 text-center py-8">No widgets found.</p>
+                ) : (
+                    filtered.map(w => (
+                        <WidgetCard
+                            key={w.id}
+                            widget={w}
+                            isAdded={addedIds.includes(w.id)}
+                            suggested={accessibleIds.includes(w.id)}
+                            disabled={!accessibleIds.includes(w.id)}
+                            onAdd={onAdd}
+                        />
+                    ))
+                )}
+            </div>
+        </div>
+    );
+};

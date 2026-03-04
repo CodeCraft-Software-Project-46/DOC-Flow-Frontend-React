@@ -8,13 +8,14 @@ import { DocumentPage } from "./pages/documents/DocumentPage";
 import {SettingsPage} from "./pages/settings/SettingsPage.tsx";
 import {SignIn} from "./pages/signIn-signup/SignIn.tsx";
 import {DashboardSuperAdmin} from "./pages/dashboard/Dashboard-SuperAdmin.tsx";
-import {WorkFlowVersionPage} from "./pages/workflow/WorkFlowVersionPage.tsx";
+
 import {UserPage} from "./pages/user/UserPage.tsx";
 import {DashBoardBuilder} from "./pages/dashboard/DashBoardBuilder.tsx";
 import {WorkFlowPage} from "./pages/workflow/WorkFlowPage.tsx";
 import {WorkFlowInstances} from "./pages/workflow/WorkFlowInstances.tsx";
 import {AnalyticsPage} from "./pages/analytics/AnalyticsPage.tsx";
 import {DocumentTypesPage} from "./pages/documents/DocumentTypesPage.tsx";
+import WorkFlowVersionPage from "./pages/workflow/WorkFlowVersionPage.tsx";
 
 
 export default function App() {

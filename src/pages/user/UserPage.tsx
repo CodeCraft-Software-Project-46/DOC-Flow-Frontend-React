@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { RolesTab } from "../../components/role/RolesTab";
 import { UsersTab } from "../../components/user/UsersTab";
-import {SAMPLE_ROLES} from "../../../sampleData/RolesData.ts";
+import {type Role, SAMPLE_ROLES} from "../../../sampleData/RolesData.ts";
+
 
 
 type TabType = "users" | "roles";

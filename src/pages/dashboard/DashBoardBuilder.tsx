@@ -3,7 +3,8 @@ import DashboardStats from "../../components/DashboardBuilderComponents/Dashboar
 import { DashboardList } from "../../components/DashboardBuilderComponents/DashboardList";
 import { DashboardFilters } from "../../components/DashboardBuilderComponents/DashboardFilter";
 import { CreateDashboardModal } from "../../components/DashboardBuilderComponents/CreateDashboardModal";
-import DashboardCanvasPage from "../../components/DashboardBuilderComponents/DashboardCanvasPage";
+import DashboardCanvasPage from "../../components/DashboardBuilderComponents/DashboardCanvasPage.tsx";
+
 
 export interface Dashboard {
     id: number;
@@ -60,7 +61,7 @@ export const DashBoardBuilder: React.FC = () => {
     };
 
 
-    const handleEdit = (dashboard: Dashboard) => {
+    const handleEdit = (dashboard:any) => {
         setCanvasDashboard(dashboard);
     };
     const handleBack = () => {
@@ -68,10 +69,14 @@ export const DashBoardBuilder: React.FC = () => {
     };
 
     if (canvasDashboard) {
+
         return (
             <DashboardCanvasPage
                 dashboard={canvasDashboard}
                 onBack={handleBack}
+                onSave={(savedDashboard) => {
+                    console.log("Dashboard saved in parent:", savedDashboard);
+                }}
             />
         );
     }

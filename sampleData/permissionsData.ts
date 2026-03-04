@@ -53,6 +53,8 @@ export const PERMISSION_CATEGORIES: PermissionCategory[] = [
             "view_user_performance",
             "view_workflow_bottlenecks",
             "view_workflow_performance",
+            "view_bottleneck_steps",
+
         ],
     },
 ];
