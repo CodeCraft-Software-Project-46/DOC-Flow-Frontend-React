@@ -160,3 +160,26 @@ export function getAccessibleWidgetIds(roleName) {
         .filter(w => w.requiredPermissions.some(p => role.permissions.includes(p)))
         .map(w => w.id);
 }
+
+
+export class Role {
+    id: number;
+    name: string;
+    description: string;
+    userCount: number;
+
+
+    constructor(data: {
+        id: number;
+        name: string;
+        description?: string;
+        userCount?: number;
+
+    }) {
+        this.id = data.id;
+        this.name = data.name;
+        this.description = data.description ?? "";
+        this.userCount = data.userCount ?? 0;
+
+    }
+}
