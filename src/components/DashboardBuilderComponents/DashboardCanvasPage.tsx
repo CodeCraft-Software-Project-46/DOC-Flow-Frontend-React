@@ -667,6 +667,7 @@ const DashboardCanvasPage: React.FC<Props> = ({ dashboard, onBack,onSave }) => {
 };
 
 export default DashboardCanvasPage;*/
+/*
 
 
 import React, { useState, useEffect } from "react";
@@ -808,7 +809,7 @@ const DashboardCanvasPage: React.FC<Props> = ({ dashboard, onBack, onSave }) => 
 
     return (
         <div className="flex flex-col min-h-screen bg-slate-100">
-            {/* Header */}
+            {/!* Header *!/}
             <div className="bg-white border-b border-slate-200 px-1 py-0 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <button
@@ -844,9 +845,9 @@ const DashboardCanvasPage: React.FC<Props> = ({ dashboard, onBack, onSave }) => 
                 </div>
             </div>
 
-            {/* Panels */}
+            {/!* Panels *!/}
             <div className="flex flex-1 overflow-hidden">
-                {/* Left: Widget Library */}
+                {/!* Left: Widget Library *!/}
                 <div className="w-72 bg-white border-r border-slate-200 flex flex-col flex-shrink-0">
                     <div className="px-4 py-4 border-b border-slate-100">
                         <h2 className="text-sm font-bold text-slate-800">Widget Library</h2>
@@ -861,7 +862,7 @@ const DashboardCanvasPage: React.FC<Props> = ({ dashboard, onBack, onSave }) => 
                     </div>
                 </div>
 
-                {/* Center: Canvas */}
+                {/!* Center: Canvas *!/}
                 <div className="flex-1 flex flex-col overflow-hidden">
                     <div className="px-6 py-3 border-b border-slate-200 bg-white flex items-center justify-between">
                         <h2 className="text-sm font-bold text-slate-700">
@@ -884,7 +885,7 @@ const DashboardCanvasPage: React.FC<Props> = ({ dashboard, onBack, onSave }) => 
                     </div>
                 </div>
 
-                {/* Right: Configuration Panel */}
+                {/!* Right: Configuration Panel *!/}
                 <div className="w-72 bg-white border-l border-slate-200 flex flex-col flex-shrink-0">
                     <div className="px-4 py-4 border-b border-slate-100">
                         <h2 className="text-sm font-bold text-slate-800">Widget Configuration</h2>
@@ -898,4 +899,176 @@ const DashboardCanvasPage: React.FC<Props> = ({ dashboard, onBack, onSave }) => 
     );
 };
 
-export default DashboardCanvasPage;
+export default DashboardCanvasPage;*/
+
+
+import { useState, useEffect, useCallback } from "react";
+import { WidgetLibrary }         from "./WidgetLibrary";
+import { Canvas }                from "./Canvas";
+import { ConfigPanel }           from "./ConfigPanel";
+import {DashboardPreviewPage} from "./DashBoardPreviewPage.tsx";
+
+
+export function DashboardCanvasPage({ dashboard, onBack, onSave }) {
+    const [canvasItems, setCanvasItems] = useState([]);
+    const [selectedUid, setSelectedUid] = useState(null);
+    const [isPreview,   setIsPreview]   = useState(false);
+    const [saved,       setSaved]       = useState(false);
+
+    const selected = canvasItems.find(c => c.uid === selectedUid) ?? null;
+
+    // Load saved widgets when opening the editor
+    useEffect(() => {
+        if (dashboard.widgets && dashboard.widgets.length > 0) {
+            setCanvasItems(dashboard.widgets);
+        } else {
+            setCanvasItems([]);
+        }
+    }, [dashboard]);
+
+    // Add widget from library
+    const handleAdd = useCallback((widget) => {
+        if (canvasItems.find(c => c.id === widget.id)) return;
+        const uid = Date.now() + Math.random();
+        setCanvasItems(prev => [...prev, { ...widget, uid }]);
+        setSelectedUid(uid);
+        setSaved(false);
+    }, [canvasItems]);
+
+    const handleRemove = (uid) => {
+        setCanvasItems(p => p.filter(c => c.uid !== uid));
+        if (selectedUid === uid) setSelectedUid(null);
+        setSaved(false);
+    };
+
+    const handleMoveUp = (uid) => {
+        setCanvasItems(p => {
+            const i = p.findIndex(c => c.uid === uid);
+            if (i <= 0) return p;
+            const n = [...p]; [n[i - 1], n[i]] = [n[i], n[i - 1]]; return n;
+        });
+        setSaved(false);
+    };
+
+    const handleMoveDown = (uid) => {
+        setCanvasItems(p => {
+            const i = p.findIndex(c => c.uid === uid);
+            if (i >= p.length - 1) return p;
+            const n = [...p]; [n[i], n[i + 1]] = [n[i + 1], n[i]]; return n;
+        });
+        setSaved(false);
+    };
+
+    const handleUpdate = (updated) => {
+        setCanvasItems(p => p.map(c => c.uid === updated.uid ? updated : c));
+        setSaved(false);
+    };
+
+    // Called from preview page when user hits "Save Layout"
+    // Receives widgets with updated gridX/gridY/cols/rows
+    const handlePreviewSave = (updatedWidgets) => {
+        setCanvasItems(updatedWidgets);
+        setSaved(false); // layout changed — mark main canvas as needing a save too
+    };
+
+    // Save all to parent (canvas widget list + any grid positions)
+    const handleSave = () => {
+        onSave({ ...dashboard, widgets: canvasItems });
+        setSaved(true);
+        setTimeout(() => onBack(), 600);
+    };
+
+    // Preview mode
+    if (isPreview) {
+        return (
+            <DashboardPreviewPage
+                dashboard={dashboard}
+                widgets={canvasItems}
+                onBack={() => setIsPreview(false)}
+                onSave={handlePreviewSave}
+            />
+        );
+    }
+
+    return (
+        <div className="flex flex-col min-h-screen bg-slate-100">
+
+            {/* Header*/}
+            <div className="bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between shadow-sm">
+                <div className="flex items-center gap-3">
+                    <button onClick={onBack} className="text-slate-400 hover:text-slate-700 text-lg transition">←</button>
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-sm font-bold text-slate-800">{dashboard.name}</h1>
+                            <span className="text-xs bg-amber-50 text-amber-600 border border-amber-200 px-2 py-0.5 rounded-full font-medium">Draft</span>
+                            <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">{dashboard.role}</span>
+                        </div>
+                        <p className="text-xs text-slate-400">{dashboard.description}</p>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setIsPreview(true)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition"
+                    >
+                        👁 Preview
+                    </button>
+                    <button
+                        onClick={handleSave}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white rounded-lg transition shadow-sm ${
+                            saved ? "bg-emerald-500" : "bg-blue-600 hover:bg-blue-700"
+                        }`}
+                    >
+                        {saved ? "✓ Saved!" : "💾 Save"}
+                    </button>
+                </div>
+            </div>
+
+
+            <div className="flex flex-1 overflow-hidden">
+
+                {/* Widget Library */}
+                <div className="w-64 bg-white border-r border-slate-200 flex flex-col flex-shrink-0">
+                    <div className="px-4 py-3 border-b border-slate-100">
+                        <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Widget Library</h2>
+                    </div>
+                    <div className="flex-1 overflow-hidden p-3">
+                        <WidgetLibrary canvasItems={canvasItems} onAdd={handleAdd} role={dashboard.role} />
+                    </div>
+                </div>
+
+                {/* Canvas */}
+                <div className="flex-1 flex flex-col overflow-hidden">
+                    <div className="px-6 py-2.5 border-b border-slate-200 bg-white flex items-center justify-between">
+                        <h2 className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+                            Canvas — <span className="text-blue-600">{canvasItems.length}</span> widget{canvasItems.length !== 1 ? "s" : ""}
+                        </h2>
+                        <span className="text-xs bg-slate-100 text-slate-500 px-2.5 py-1 rounded-full">12-column grid</span>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-5">
+                        <Canvas
+                            items={canvasItems}
+                            selectedUid={selectedUid}
+                            onSelect={item => setSelectedUid(item.uid)}
+                            onMoveUp={handleMoveUp}
+                            onMoveDown={handleMoveDown}
+                            onRemove={handleRemove}
+                        />
+                    </div>
+                </div>
+
+                {/* Configuration Panel */}
+                <div className="w-60 bg-white border-l border-slate-200 flex flex-col flex-shrink-0">
+                    <div className="px-4 py-3 border-b border-slate-100">
+                        <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Configuration</h2>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-4">
+                        <ConfigPanel selected={selected} onUpdate={handleUpdate} />
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    );
+}

@@ -1,120 +1,154 @@
-import React, { useState } from "react";
-import DashboardStats from "../../components/DashboardBuilderComponents/DashboardStats";
-import { DashboardList } from "../../components/DashboardBuilderComponents/DashboardList";
-import { DashboardFilters } from "../../components/DashboardBuilderComponents/DashboardFilter";
-import { CreateDashboardModal } from "../../components/DashboardBuilderComponents/CreateDashboardModal";
-import DashboardCanvasPage from "../../components/DashboardBuilderComponents/DashboardCanvasPage.tsx";
+import { useState } from "react";
+import {DashboardCanvasPage} from "../../components/DashboardBuilderComponents/DashboardCanvasPage.tsx";
+import {StatsBar} from "../../components/DashboardBuilderComponents/StatsBar.tsx";
+import {DashboardList} from "../../components/DashboardBuilderComponents/DashboardList.tsx";
+import {CreateDashboardModal} from "../../components/DashboardBuilderComponents/CreateDashboardModal.tsx";
 
 
-export interface Dashboard {
-    id: number;
-    name: string;
-    description: string;
-    role: string;
-    widgets: number;
-    status: "Active" | "Draft" | "Disabled";
-    updatedAt: string;
-}
+const INITIAL_DASHBOARDS = [
+    {
+        id: 1,
+        name: "Staff Dashboard",
+        description: "Default dashboard for staff members",
+        role: "Staff / Initiator",
+        status: "Active",
+        updatedAt: "2/19/2026",
+        widgets: [],
+    },
+    {
+        id: 2,
+        name: "Admin Overview",
+        description: "Full system overview for administrators",
+        role: "Admin",
+        status: "Draft",
+        updatedAt: "3/1/2026",
+        widgets: [],
+    },
+];
 
-export const DashBoardBuilder: React.FC = () => {
-    const [dashboards, setDashboards] = useState<Dashboard[]>([
-        {
-            id: 1,
-            name: "Staff Dashboard",
-            description: "Default dashboard for staff",
-            role: "Staff / Initiator",
-            widgets: 6,
-            status: "Active",
-            updatedAt: "2/19/2026",
-        },
-    ]);
+export function DashBoardBuilder() {
+    const [dashboards,      setDashboards]      = useState(INITIAL_DASHBOARDS);
+    const [search,          setSearch]          = useState("");
+    const [statusFilter,    setStatusFilter]    = useState("All");
+    const [isModalOpen,     setIsModalOpen]     = useState(false);
+    const [canvasDashboard, setCanvasDashboard] = useState(null);
 
-    const [search, setSearch]               = useState("");
-    const [status, setStatus]               = useState("All");
-    const [isModalOpen, setIsModalOpen]     = useState(false);
-    const [canvasDashboard, setCanvasDashboard] = useState<Dashboard | null>(null);
-
-    const filteredDashboards = dashboards.filter((d) => {
-        const matchesSearch = d.name.toLowerCase().includes(search.toLowerCase());
-        const matchesStatus = status === "All" || d.status === status;
-        return matchesSearch && matchesStatus;
+    const filtered = dashboards.filter(d => {
+        const matchSearch = d.name.toLowerCase().includes(search.toLowerCase());
+        const matchStatus = statusFilter === "All" || d.status === statusFilter;
+        return matchSearch && matchStatus;
     });
 
-    const handleCreateDashboard = (data: {
-        name: string;
-        description: string;
-        roles: string[];
-    }) => {
-        const newDashboard: Dashboard = {
+    const handleCreate = (data) => {
+        const newD = {
             id: Date.now(),
             name: data.name,
             description: data.description,
-            role: data.roles.join(", "),
-            widgets: 0,
+            role: data.role,
             status: "Draft",
             updatedAt: new Date().toLocaleDateString(),
+            widgets: [],
         };
-
-        setDashboards((prev) => [...prev, newDashboard]);
+        setDashboards(prev => [...prev, newD]);
         setIsModalOpen(false);
-        setCanvasDashboard(newDashboard);
+        setCanvasDashboard(newD);
     };
 
-
-    const handleEdit = (dashboard:any) => {
-        setCanvasDashboard(dashboard);
-    };
-    const handleBack = () => {
+    const handleSave = (savedDashboard) => {
+        setDashboards(prev =>
+            prev.map(d =>
+                d.id === savedDashboard.id
+                    ? { ...savedDashboard, updatedAt: new Date().toLocaleDateString() }
+                    : d
+            )
+        );
         setCanvasDashboard(null);
     };
 
-    if (canvasDashboard) {
+    const handleDelete = (id) => setDashboards(prev => prev.filter(d => d.id !== id));
 
+    const handleDuplicate = (d) =>
+        setDashboards(prev => [
+            ...prev,
+            {
+                ...d,
+                id: Date.now(),
+                name: `${d.name} (Copy)`,
+                status: "Draft",
+                updatedAt: new Date().toLocaleDateString(),
+            },
+        ]);
+
+    if (canvasDashboard) {
         return (
             <DashboardCanvasPage
                 dashboard={canvasDashboard}
-                onBack={handleBack}
-                onSave={(savedDashboard) => {
-                    console.log("Dashboard saved in parent:", savedDashboard);
-                }}
+                onBack={() => setCanvasDashboard(null)}
+                onSave={handleSave}
             />
         );
     }
 
-
     return (
-        <div className=" bg-gray-50 min-h-screen space-y-6">
-            <div className="flex justify-between items-center">
-                <DashboardFilters
-                    search={search}
-                    setSearch={setSearch}
-                    status={status}
-                    setStatus={setStatus}
-                />
+        <div className="min-h-screen bg-slate-50 p-6 space-y-5">
+
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-xl font-bold text-slate-800">Dashboard Builder</h1>
+                    <p className="text-sm text-slate-500">Create and manage role-based dashboards</p>
+                </div>
                 <button
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
                     onClick={() => setIsModalOpen(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition shadow-sm"
                 >
                     + Create Dashboard
                 </button>
             </div>
 
-            <DashboardStats dashboards={filteredDashboards} />
+            {/* Stats */}
+            <StatsBar dashboards={dashboards} />
 
+            {/* Filters */}
+            <div className="flex items-center gap-3">
+                <input
+                    type="text"
+                    placeholder="Search dashboards..."
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    className="flex-1 max-w-xs border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 bg-white"
+                />
+                <div className="flex gap-1">
+                    {["All", "Active", "Draft", "Disabled"].map(s => (
+                        <button
+                            key={s}
+                            onClick={() => setStatusFilter(s)}
+                            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition ${
+                                statusFilter === s
+                                    ? "bg-blue-600 text-white"
+                                    : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+                            }`}
+                        >
+                            {s}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* List */}
             <DashboardList
-                dashboards={filteredDashboards}
-                onEdit={handleEdit}
-                onView={() => {}}
-                onDuplicate={() => {}}
-                onDelete={() => {}}
-                onDownload={() => {}}
+                dashboards={filtered}
+                onEdit={setCanvasDashboard}
+                onDelete={handleDelete}
+                onDuplicate={handleDuplicate}
             />
 
+            {/* Modal */}
             <CreateDashboardModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onSubmit={handleCreateDashboard}
+                onSubmit={handleCreate}
             />
         </div>
     );
-};
+}
