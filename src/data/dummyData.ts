@@ -2,6 +2,7 @@ import type {
   CustomChart, InstanceDetail, InstanceSummary,
   BottleneckStep, UserSLA, TrendPoint
 } from "../types";
+import type { WorkingHoursConfig } from "../services/workingHoursService";
 
 // ══════════════════════════════════════════════════════════════════════════════
 // CONFIGURATION & METADATA
@@ -23,6 +24,59 @@ export const WORKFLOWS = [
   "SRN Workflow",
   "Direct Payment",
 ];
+
+// ═══════════════════════════════════════════════════════════════════════════ 
+// WORKING HOURS CONFIGURATION
+// ═══════════════════════════════════════════════════════════════════════════
+// Define company working hours: business days, hours/day, holidays
+// All SLA calculations will use only these working hours
+
+export const COMPANY_WORKING_HOURS: WorkingHoursConfig = {
+  workStartTime: "09:00",
+  workEndTime: "17:00",
+  workDays: [1, 2, 3, 4, 5], // Monday to Friday (0=Sunday)
+  holidays: [
+    // 2026 Public Holidays
+    "2026-01-01", // New Year's Day
+    "2026-01-20", // MLK Jr. Day (US)
+    "2026-02-17", // Presidents Day (US)
+    "2026-03-17", // St. Patrick's Day
+    "2026-05-25", // Memorial Day (US)
+    "2026-07-04", // Independence Day (US)
+    "2026-09-07", // Labor Day (US)
+    "2026-11-26", // Thanksgiving (US)
+    "2026-12-25", // Christmas
+  ],
+  timeZone: "UTC",
+};
+
+// Historical average times for each step per workflow
+// Used for SLA Recovery Analysis
+export const STEP_HISTORICAL_AVERAGES: Record<string, Record<string, number>> = {
+  "Purchase Order Approval": {
+    "Dept Approval": 3.5,     // Historical average: 3.5 hours
+    "Manager Approval": 22,   // Historical average: 22 hours
+    "CFO Approval": 36,       // Historical average: 36 hours
+    "Payment Release": 8.5,   // Historical average: 8.5 hours
+  },
+  "GRN Processing": {
+    "QC Inspection": 2,
+    "Goods Receipt": 4,
+    "Invoice Matching": 16,
+    "Approval": 8,
+  },
+  "SRN Workflow": {
+    "Return Request": 1,
+    "Inspection": 3,
+    "Approval": 6,
+    "Refund Processing": 2,
+  },
+  "Direct Payment": {
+    "Request Submission": 0.5,
+    "Approval": 5,
+    "Payment": 3,
+  },
+};
 
 // ══════════════════════════════════════════════════════════════════════════════
 // WORKFLOW INSTANCES & DETAILS (organized by workflow)
@@ -323,7 +377,7 @@ export const DEFAULT_CHARTS: CustomChart[] = [
     metric: "status_distribution",
     groupBy: "step_name",
     status: "draft",
-    timeRange: null,
+    timeRange: "30d",
     colors: { good: "#22c55e", warning: "#f59e0b", critical: "#ef4444" },
     thresholds: { good: 90, warning: 75 },
   },
@@ -376,34 +430,43 @@ export const WORKFLOW_CHART_DATA = {
   breach_count:    [18, 10, 3, 22],
 };
 
-// Status distribution data (pie/donut) — always live snapshot
-export const STATUS_DISTRIBUTION = {
-  overall: [
-    { name: "On Time", value: 77, color: "#22c55e" },
-    { name: "At Risk", value: 13, color: "#f59e0b" },
-    { name: "Breached", value: 10, color: "#ef4444" },
-  ],
-  "Purchase Order Approval": [
-    { name: "On Time", value: 65, color: "#22c55e" },
-    { name: "At Risk", value: 20, color: "#f59e0b" },
-    { name: "Breached", value: 15, color: "#ef4444" },
-  ],
-  "GRN Processing": [
-    { name: "On Time", value: 80, color: "#22c55e" },
-    { name: "At Risk", value: 12, color: "#f59e0b" },
-    { name: "Breached", value: 8, color: "#ef4444" },
-  ],
-  "SRN Workflow": [
-    { name: "On Time", value: 90, color: "#22c55e" },
-    { name: "At Risk", value: 7, color: "#f59e0b" },
-    { name: "Breached", value: 3, color: "#ef4444" },
-  ],
-  "Direct Payment": [
-    { name: "On Time", value: 60, color: "#22c55e" },
-    { name: "At Risk", value: 20, color: "#f59e0b" },
-    { name: "Breached", value: 20, color: "#ef4444" },
-  ],
-};
+function getRangeFactor(timeRange: string | null, fromDate?: string, toDate?: string): number {
+  if (timeRange === "7d") return 0.25;
+  if (timeRange === "30d") return 0.6;
+  if (timeRange === "90d") return 0.9;
+  if (timeRange === "all") return 1;
+  if (timeRange === "custom" && fromDate && toDate) {
+    const from = new Date(fromDate);
+    const to = new Date(toDate);
+    if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime()) || to < from) return 0.5;
+    const days = Math.max(1, Math.ceil((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+    return Math.min(1, days / 365);
+  }
+  return 0.6;
+}
+
+function getCompletedMetBreachedCounts(workflow?: string): { completed: number; breached: number } {
+  const selected = workflow
+    ? (INSTANCES[workflow] ?? []).map((instance) => instance.id)
+    : Object.values(INSTANCES).flat().map((instance) => instance.id);
+
+  const details = selected
+    .map((id) => INSTANCE_DETAILS[id])
+    .filter((detail): detail is InstanceDetail => Boolean(detail));
+
+  const completedDetails = details.filter((detail) =>
+    detail.steps.every((step) => !step.pending && !step.running && step.timeTaken !== null)
+  );
+
+  const breached = completedDetails.filter((detail) =>
+    detail.steps.some((step) => step.status === "Breached")
+  ).length;
+
+  return {
+    completed: completedDetails.length,
+    breached,
+  };
+}
 
 // ── Chart data helper ───────────────────────────────────────────────────────────
 // Returns chart data array based on chart config
@@ -412,12 +475,21 @@ export function getChartData(
   chart: CustomChart
 ): { label: string; value: number }[] {
 
-  // Status distribution — fixed 3 slices
+  // Status distribution — selected time range, completed tasks only (Met vs Breached)
   if (chart.metric === "status_distribution") {
-    const key = chart.source === "overall" ? "overall" : chart.workflow;
-    const dist = STATUS_DISTRIBUTION[key as keyof typeof STATUS_DISTRIBUTION]
-      || STATUS_DISTRIBUTION["overall"];
-    return dist.map((d) => ({ label: d.name, value: d.value }));
+    const scopeWorkflow = chart.source === "workflow" ? chart.workflow : undefined;
+    const base = getCompletedMetBreachedCounts(scopeWorkflow);
+    const factor = getRangeFactor(chart.timeRange, chart.fromDate, chart.toDate);
+
+    const completedInRange = Math.max(1, Math.round(base.completed * factor));
+    const breachRate = base.completed > 0 ? base.breached / base.completed : 0.1;
+    const breachedInRange = Math.min(completedInRange, Math.round(completedInRange * breachRate));
+    const metInRange = Math.max(0, completedInRange - breachedInRange);
+
+    return [
+      { label: "Met", value: metInRange },
+      { label: "Breached", value: breachedInRange },
+    ];
   }
 
   // Workflow source — group by step name

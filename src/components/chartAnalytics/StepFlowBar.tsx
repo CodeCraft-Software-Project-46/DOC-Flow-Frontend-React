@@ -9,14 +9,6 @@ interface StepFlowBarProps {
 
 export default function StepFlowBar({ steps }: StepFlowBarProps) {
 
-  // Get icon for each step based on status
-  function getIcon(step: WorkflowStep): string {
-    if (step.pending)          return "⭕";
-    if (step.running)          return "🔵";
-    if (step.status === "Breached") return "❌";
-    return "✅";
-  }
-
   // Get border + background color per step status
   function getStepStyle(step: WorkflowStep): string {
     if (step.running)               return "bg-blue-50 border-blue-400";
@@ -40,7 +32,6 @@ export default function StepFlowBar({ steps }: StepFlowBarProps) {
 
           {/* Step pill */}
           <div className={`flex items-center gap-1.5 border-2 rounded-full px-3 py-1.5 ${getStepStyle(step)}`}>
-            <span className="text-sm">{getIcon(step)}</span>
             <span className={`text-xs font-semibold ${getTextColor(step)}`}>
               {step.name}
             </span>

@@ -124,30 +124,49 @@ export default function WorkflowStepFlow({ workflow }: Props) {
         </div>
         <div className="text-xs text-slate-600">
           {(() => {
-            const bottleneck = flowData.steps.reduce((max, step) =>
-              step.processing > max.processing ? step : max
+            // Find all steps with high breach rates (>= 30%) or significant processing queue
+            const bottleneckSteps = flowData.steps.filter(
+              (step) => step.slaBreachRate >= 30 || step.processing > 0
             );
-            if (bottleneck.processing > 0) {
+
+            if (bottleneckSteps.length === 0) {
               return (
-                <>
-                  <span className="font-semibold text-orange-600">
-                    "{bottleneck.stepName}"
-                  </span>{" "}
-                  has the highest queue with {bottleneck.processing} document
-                  {bottleneck.processing > 1 ? "s" : ""} currently processing.
-                  {bottleneck.slaBreachRate > 20 && (
-                    <span className="text-red-600 font-medium">
-                      {" "}
-                      High SLA breach rate ({bottleneck.slaBreachRate}%) detected.
-                    </span>
-                  )}
-                </>
+                <span className="text-green-600">
+                  No significant bottlenecks detected. Workflow is flowing smoothly.
+                </span>
               );
             }
+
+            // Find steps with high breach rates
+            const highBreachSteps = flowData.steps.filter(
+              (step) => step.slaBreachRate >= 30 && step.received > 0
+            );
+
+            if (highBreachSteps.length > 0) {
+              const stepNames = highBreachSteps
+                .map((s) => `"${s.stepName}" (${s.slaBreachRate}% breach rate)`)
+                .join(", ");
+              
+              return (
+                <span className="text-red-600 font-medium">
+                  High SLA breach rates detected at: {stepNames}. Immediate attention required.
+                </span>
+              );
+            }
+
+            // Otherwise, show queue-based bottleneck
+            const maxQueue = flowData.steps.reduce((max, step) =>
+              step.processing > max.processing ? step : max
+            );
+
             return (
-              <span className="text-green-600">
-                No significant bottlenecks detected. Workflow is flowing smoothly.
-              </span>
+              <>
+                <span className="font-semibold text-orange-600">
+                  "{maxQueue.stepName}"
+                </span>{" "}
+                has the highest queue with {maxQueue.processing} document
+                {maxQueue.processing > 1 ? "s" : ""} currently processing.
+              </>
             );
           })()}
         </div>

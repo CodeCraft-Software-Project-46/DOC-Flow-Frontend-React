@@ -5,6 +5,8 @@ import { useState, useRef, useEffect } from "react";
 import { Send, Maximize2, Minimize2 } from "lucide-react";
 import { INSTANCES, INSTANCE_DETAILS } from "../data/dummyData";
 import { generateChatResponse } from "../services/chatbotService";
+import { LLMProviderFactory } from "../services/llmProviderAdapter";
+import { initializeEmbeddingService } from "../services/embeddingService";
 
 interface Message {
   id: string;
@@ -25,7 +27,7 @@ export default function ChatBot({ userRole = "user", userWorkflows = [] }: ChatB
     {
       id: "1",
       role: "assistant",
-      content: "Hello! I'm your workflow assistant. Ask me about document status, SLA remaining time, or generate summaries. What would you like to know?",
+      content: "Hello! I'm your DocFlow assistant. Ask me about document status, SLA remaining time, or generate summaries. What would you like to know?",
       timestamp: new Date(),
     },
   ]);
@@ -37,6 +39,29 @@ export default function ChatBot({ userRole = "user", userWorkflows = [] }: ChatB
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Initialize LLM providers and embedding service on mount
+  useEffect(() => {
+    const initializeServices = async () => {
+      // Initialize LLM Provider with environment variables
+      // In production, these would come from .env or backend config
+      LLMProviderFactory.initializeProviders({
+        geminiKey: import.meta.env.VITE_GEMINI_API_KEY,
+        chatGptKey: import.meta.env.VITE_OPENAI_API_KEY,
+        ollamaEndpoint: import.meta.env.VITE_OLLAMA_ENDPOINT || "http://localhost:11434",
+        ollamaModel: import.meta.env.VITE_OLLAMA_MODEL || "mistral",
+      });
+
+      // Initialize embedding service
+      await initializeEmbeddingService();
+
+      console.log("ChatBot services initialized");
+    };
+
+    initializeServices().catch((error) => {
+      console.error("Failed to initialize chatbot services:", error);
+    });
+  }, []);
 
   // Handle user message submission
   async function handleSendMessage() {
@@ -106,7 +131,7 @@ export default function ChatBot({ userRole = "user", userWorkflows = [] }: ChatB
       {/* Header */}
       <div className="bg-blue-600 text-white px-5 py-4 rounded-t-lg flex justify-between items-center">
         <div>
-          <div className="font-semibold">Workflow Assistant</div>
+          <div className="font-semibold">DocFlow Assistant</div>
           <div className="text-xs text-blue-100">RAG-powered Q&A</div>
         </div>
         <div className="flex gap-2">

@@ -12,6 +12,7 @@ interface CustomChartsSectionProps {
   source: "overall" | "workflow"; // which tab we are on
   workflow?: string;              // selected workflow (workflow tab only)
   onCreateClick: () => void;      // opens create chart modal
+  onExportClick?: () => void;     // exports this custom charts section as PDF
 }
 
 export default function CustomChartsSection({
@@ -19,6 +20,7 @@ export default function CustomChartsSection({
   source,
   workflow,
   onCreateClick,
+  onExportClick,
 }: CustomChartsSectionProps) {
 
   // Filter charts:
@@ -45,13 +47,23 @@ export default function CustomChartsSection({
           </div>
         </div>
 
-        {/* Create chart button */}
-        <button
-          onClick={onCreateClick}
-          className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
-        >
-          + Create Chart
-        </button>
+        {/* Action buttons */}
+        <div className="flex items-center gap-2 export-hide">
+          {onExportClick && (
+            <button
+              onClick={onExportClick}
+              className="bg-slate-700 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+            >
+              Export PDF
+            </button>
+          )}
+          <button
+            onClick={onCreateClick}
+            className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+          >
+            + Create Chart
+          </button>
+        </div>
       </div>
 
       {/* No active charts message */}
@@ -84,7 +96,7 @@ function ChartCard({ chart }: { chart: CustomChart }) {
 
   // Time range label for display
   function getTimeLabel(): string {
-    if (!chart.timeRange) return "Live Snapshot";
+    if (!chart.timeRange) return "All Time";
     if (chart.timeRange === "custom" && chart.fromDate && chart.toDate) {
       return `${chart.fromDate} to ${chart.toDate}`;
     }

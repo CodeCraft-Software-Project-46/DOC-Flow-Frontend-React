@@ -1,29 +1,14 @@
 // Full instance drilldown section
-// Shows step flow, step table, summary and SLA recovery
+// Shows step flow, step table and summary
 
 import { useState, useEffect } from "react";
 import type { InstanceSummary } from "../../types";
 import { INSTANCES, INSTANCE_DETAILS } from "../../data/dummyData";
 import StepFlowBar from "./StepFlowBar";
-import SLARecovery from "./SLARecovery";
 
 interface InstanceDrilldownProps {
   workflow: string; // currently selected workflow name
 }
-
-// Badge styles per instance status
-const STATUS_BG: Record<string, string> = {
-  "On Track":  "bg-green-100 text-green-700",
-  "At Risk":   "bg-amber-100 text-amber-700",
-  "SLA Breach":"bg-red-100 text-red-600",
-};
-
-// Status label colors for summary row
-const STATUS_COLOR: Record<string, string> = {
-  "On Track":  "text-green-600",
-  "At Risk":   "text-amber-600",
-  "SLA Breach":"text-red-600",
-};
 
 export default function InstanceDrilldown({ workflow }: InstanceDrilldownProps) {
 
@@ -60,7 +45,7 @@ export default function InstanceDrilldown({ workflow }: InstanceDrilldownProps) 
           </div>
         </div>
 
-        {/* Instance selector + status badge */}
+        {/* Instance selector */}
         <div className="flex items-center gap-3">
           <span className="text-sm text-slate-500">Instance:</span>
           <select
@@ -73,11 +58,6 @@ export default function InstanceDrilldown({ workflow }: InstanceDrilldownProps) 
               <option key={i.id} value={i.id}>{i.id}</option>
             ))}
           </select>
-
-          {/* Status badge */}
-          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${STATUS_BG[instanceMeta.status]}`}>
-            {instanceMeta.status}
-          </span>
         </div>
       </div>
 
@@ -131,23 +111,19 @@ export default function InstanceDrilldown({ workflow }: InstanceDrilldownProps) 
                 <td className="px-4 py-3">
                   {step.pending ? (
                     <span className="bg-slate-100 text-slate-400 text-xs px-2.5 py-1 rounded-full font-medium">
-                      ⭕ Not Started
+                      Pending
                     </span>
                   ) : step.running ? (
-                    <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
-                      step.status === "At Risk"
-                        ? "bg-amber-100 text-amber-700"
-                        : "bg-blue-100 text-blue-700"
-                    }`}>
-                      ⏳ {step.status} ({step.pct}% used)
+                    <span className="bg-blue-100 text-blue-700 text-xs px-2.5 py-1 rounded-full font-medium">
+                      Current
                     </span>
                   ) : step.status === "Met" ? (
                     <span className="bg-green-100 text-green-700 text-xs px-2.5 py-1 rounded-full font-medium">
-                      ✅ Met
+                      Met
                     </span>
                   ) : (
                     <span className="bg-red-100 text-red-600 text-xs px-2.5 py-1 rounded-full font-medium">
-                      ❌ Breached
+                      Breached
                     </span>
                   )}
                 </td>
@@ -164,21 +140,6 @@ export default function InstanceDrilldown({ workflow }: InstanceDrilldownProps) 
           Total Breaches:{" "}
           <strong className="text-red-500">{breachCount}</strong>
         </span>
-        <span className="text-slate-500">
-          Overall Status:{" "}
-          <strong className={STATUS_COLOR[instanceMeta.status]}>
-            {instanceMeta.status}
-          </strong>
-        </span>
-        <span className="text-slate-500">
-          Department:{" "}
-          <strong className="text-slate-700">{detail.department}</strong>
-        </span>
-      </div>
-
-      {/* SLA Recovery collapsible */}
-      <div className="mt-4">
-        <SLARecovery data={detail} />
       </div>
 
     </div>
