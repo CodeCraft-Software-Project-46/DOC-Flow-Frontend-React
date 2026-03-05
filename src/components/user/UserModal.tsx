@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import type {Role} from "../../../sampleData/RolesData.ts";
 
 
-// ─── User type ────────────────────────────────────────────────────────────────
 export interface User {
     id: number;
     username: string;
@@ -11,7 +10,7 @@ export interface User {
     role: Role | null;
 }
 
-// ─── Role badge colour map ────────────────────────────────────────────────────
+// role badge color
 const ROLE_COLORS: Record<string, string> = {
     "Admin":               "bg-purple-100 text-purple-700 border-purple-200",
     "Department Manager":  "bg-blue-100   text-blue-700   border-blue-200",
@@ -22,7 +21,7 @@ const ROLE_COLORS: Record<string, string> = {
     "Staff / Initiator":   "bg-cyan-100   text-cyan-700   border-cyan-200",
 };
 
-// ─── Small field wrapper ──────────────────────────────────────────────────────
+//Small field wrapper
 const Field: React.FC<{
     label: string;
     required?: boolean;
