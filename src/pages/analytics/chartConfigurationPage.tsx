@@ -4,7 +4,7 @@
 import { useState } from "react";
 import ChartTable from "../../components/chartAnalytics/ChartTable";
 import ChartFormModal from "../../components/chartAnalytics/ChartFormModal";
-import { useCharts } from "../../context/ChartsContext";
+import { useCharts } from "../../context/useCharts";
 import type { CustomChart } from "../../types";
 
 export const ChartConfigurationPage = () => {
@@ -72,6 +72,7 @@ export const ChartConfigurationPage = () => {
 
         {/* Create / Edit modal */}
         <ChartFormModal
+          key={`${isModalOpen}-${editChart?.id ?? "new"}`}
           isOpen={isModalOpen}
           editChart={editChart}
           onClose={() => setIsModalOpen(false)}

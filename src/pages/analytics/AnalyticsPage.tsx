@@ -10,7 +10,7 @@ import UserSLAList from "../../components/chartAnalytics/Userperformance";
 import CustomChartsSection from "../../components/chartAnalytics/CustomChartsSection";
 import InstanceDrilldown from "../../components/chartAnalytics/InstanceDrilldown";
 import WorkflowStepFlow from "../../components/chartAnalytics/WorkflowStepFlow";
-import { useCharts } from "../../context/ChartsContext";
+import { useCharts } from "../../context/useCharts";
 import { exportElementAsPdf } from "../../services/pdfExportService";
 import {
   WORKFLOWS,
@@ -313,7 +313,7 @@ export const AnalyticsPage = () => {
               <WorkflowStepFlow workflow={selectedWorkflow} />
 
               {/* ── Instance Drill-down for selected workflow ── */}
-              <InstanceDrilldown workflow={selectedWorkflow} />
+              <InstanceDrilldown key={selectedWorkflow} workflow={selectedWorkflow} />
             </div>
 
             {/* ── Custom Charts — Workflow source only ── */}

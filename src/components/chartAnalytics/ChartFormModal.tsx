@@ -1,7 +1,7 @@
 // Modal form for creating and editing custom charts
 // Handles all conditions: chart type options, time range, color thresholds
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { CustomChart, ChartType, KPIMetric, ChartSource } from "../../types";
 import { WORKFLOWS, METRICS } from "../../data/dummyData";
 
@@ -40,22 +40,16 @@ interface ChartFormModalProps {
 export default function ChartFormModal({
   isOpen, editChart, onClose, onSave
 }: ChartFormModalProps) {
+  const initialForm: Omit<CustomChart, "id"> = editChart
+    ? (() => {
+        const rest = { ...editChart };
+        delete (rest as Partial<CustomChart>).id;
+        return rest;
+      })()
+    : BLANK_FORM;
 
-  const [form, setForm] = useState<Omit<CustomChart, "id">>(BLANK_FORM);
+  const [form, setForm] = useState<Omit<CustomChart, "id">>(initialForm);
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  // When modal opens — load edit data or reset to blank
-  useEffect(() => {
-    if (editChart) {
-      // Edit mode — populate form with existing chart data
-      const { id, ...rest } = editChart;
-      setForm(rest);
-    } else {
-      // Create mode — reset to blank
-      setForm(BLANK_FORM);
-    }
-    setErrors({}); // Clear errors when modal opens
-  }, [editChart, isOpen]);
 
   // Is current metric "status_distribution"?
   const isDistribution = form.metric === "status_distribution";

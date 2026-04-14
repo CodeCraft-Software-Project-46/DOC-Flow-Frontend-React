@@ -267,7 +267,7 @@ export class LLMProviderFactory {
           console.log(`Using LLM Provider: ${provider.name}`);
           return provider;
         }
-      } catch (error) {
+      } catch {
         console.warn(`${provider.name} failed availability check`);
       }
     }

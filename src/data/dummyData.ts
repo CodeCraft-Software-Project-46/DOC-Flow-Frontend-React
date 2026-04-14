@@ -1,3 +1,21 @@
+/**
+ * ------------------------------------------------------------
+ * Analytics Dummy Data & Helper Functions
+ * ------------------------------------------------------------
+ * This file contains mock workflow data used for frontend
+ * analytics dashboards, chart rendering, KPI calculations,
+ * workflow step-flow analysis, and PDF export previews.
+ *
+ * It simulates backend API responses until real Django API
+ * integration is completed.
+ *
+ * Responsibilities:
+ * - Store workflow instance summaries and details
+ * - Provide KPI calculation helper functions
+ * - Generate chart-ready data
+ * - Support workflow bottleneck analysis
+ * - Provide static dashboard metrics
+ */
 import type {
   CustomChart, InstanceDetail, InstanceSummary,
   BottleneckStep, UserSLA, TrendPoint
@@ -8,14 +26,18 @@ import type { WorkingHoursConfig } from "../services/workingHoursService";
 // CONFIGURATION & METADATA
 // ══════════════════════════════════════════════════════════════════════════════
 
-// KPI metric options — used in config form and chart table
+// KPI metric options
 export const METRICS = [
-  { value: "sla_compliance",      label: "SLA Compliance %",   unit: "%",     higherBetter: true  },
-  { value: "avg_time",            label: "Average Time",        unit: "hours", higherBetter: false },
+  { value: "sla_compliance",      label: "SLA Compliance %",   unit: "%",     higherBetter: true  }, //Higher value means better performance
+  { value: "avg_time",            label: "Average Time",        unit: "hours", higherBetter: false },//User sees: Average Time But system stores: avg_time
   { value: "completion_rate",     label: "Completion Rate %",   unit: "%",     higherBetter: true  },
   { value: "breach_count",        label: "Breach Count",        unit: "count", higherBetter: false },
   { value: "status_distribution", label: "Status Distribution", unit: null,    higherBetter: null  },
 ];
+/*[
+   { label: "PO Approval", value: 76 },
+   { label: "GRN", value: 82 }
+]*/
 
 // Workflow names available in dropdowns
 export const WORKFLOWS = [

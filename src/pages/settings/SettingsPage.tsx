@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { WorkingHoursModal } from "../../components/WorkingHoursModal";
 import type { WorkingHoursConfig } from "../../services/workingHoursService";
 import { DEFAULT_WORKING_HOURS, getWorkingHoursPerDay } from "../../services/workingHoursService";
@@ -12,19 +12,18 @@ function formatWorkDays(workDays: number[]): string {
 
 export const SettingsPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [workingConfig, setWorkingConfig] = useState<WorkingHoursConfig>(DEFAULT_WORKING_HOURS);
-
-    useEffect(() => {
+    const [workingConfig, setWorkingConfig] = useState<WorkingHoursConfig>(() => {
         const storedConfig = localStorage.getItem(SETTINGS_STORAGE_KEY);
-        if (!storedConfig) return;
+        if (!storedConfig) {
+            return DEFAULT_WORKING_HOURS;
+        }
 
         try {
-            const parsedConfig = JSON.parse(storedConfig) as WorkingHoursConfig;
-            setWorkingConfig(parsedConfig);
+            return JSON.parse(storedConfig) as WorkingHoursConfig;
         } catch {
-            setWorkingConfig(DEFAULT_WORKING_HOURS);
+            return DEFAULT_WORKING_HOURS;
         }
-    }, []);
+    });
 
     const handleSaveConfig = (config: WorkingHoursConfig) => {
         setWorkingConfig(config);

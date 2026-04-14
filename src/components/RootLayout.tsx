@@ -1,6 +1,6 @@
 
-import { Outlet, useLocation, useNavigate } from "react-router"; 
-import { useState, useEffect } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router";
+import { useState } from "react";
 import Header from "./Header";
 import Sidebar from "./SideBar";
 import Footer from "./Footer";
@@ -9,19 +9,14 @@ import ChatBot from "./ChatBot";
 export function RootLayout() {
     const navigate = useNavigate();
     const location = useLocation();
-    const [selectedKey, setSelectedKey] = useState<string>(location.pathname);
+    const selectedKey = location.pathname;
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
     
     // Mock user data — replace with actual auth context in production
     const [userRole] = useState<"admin" | "manager" | "user">("admin");
     const [userWorkflows] = useState<string[]>(["Purchase Order Approval", "GRN Processing", "SRN Workflow", "Direct Payment"]);
 
-    useEffect(() => {
-        setSelectedKey(location.pathname);
-    }, [location.pathname]);
-
     const handleMenuClick = (key: string) => {
-        setSelectedKey(key);
         navigate(key);
         setIsSidebarOpen(false);
     };

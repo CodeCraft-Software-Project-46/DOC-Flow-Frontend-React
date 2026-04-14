@@ -1,19 +1,10 @@
 // Shared charts state across Config page and Dashboard Analytics page
 // When admin creates/edits/deletes a chart in Config — dashboard updates too
 
-import { createContext, useContext, useState } from "react";
+import { useState } from "react";
 import type { CustomChart } from "../types";
 import { DEFAULT_CHARTS } from "../data/dummyData";
-
-interface ChartsContextType {
-  charts: CustomChart[];
-  addChart:    (chart: Omit<CustomChart, "id">) => void;
-  updateChart: (id: number, chart: Omit<CustomChart, "id">) => void;
-  deleteChart: (id: number) => void;
-}
-
-// Create context
-const ChartsContext = createContext<ChartsContextType | null>(null);
+import { ChartsContext } from "./chartsContextStore";
 
 // Provider — wrap around app so all pages share same charts
 export function ChartsProvider({ children }: { children: React.ReactNode }) {
@@ -45,11 +36,4 @@ export function ChartsProvider({ children }: { children: React.ReactNode }) {
       {children}
     </ChartsContext.Provider>
   );
-}
-
-// Custom hook — use this in any page/component
-export function useCharts() {
-  const ctx = useContext(ChartsContext);
-  if (!ctx) throw new Error("useCharts must be used inside ChartsProvider");
-  return ctx;
 }

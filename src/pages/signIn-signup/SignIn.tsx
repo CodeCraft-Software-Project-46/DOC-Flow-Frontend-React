@@ -3,11 +3,17 @@ import { Form, Input, Button, Card, Alert, Checkbox } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 
+interface SignInFormValues {
+    username: string;
+    password: string;
+    remember?: boolean;
+}
+
 export const SignIn: React.FC = () => {
     const navigate = useNavigate();
     const [error, setError] = useState<string | null>(null);
 
-    const onFinish = (values: any) => {
+    const onFinish = (values: SignInFormValues) => {
         // FAKE AUTH LOGIC (Replace with API later)
         if (values.username === "admin" && values.password === "1234") {
             localStorage.setItem("isAuthenticated", "true");

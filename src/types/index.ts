@@ -1,4 +1,5 @@
 // All TypeScript types used across the app
+//data structure definitions
 
 export type ChartSource = "workflow" | "overall";
 export type ChartType = "bar" | "line" | "pie" | "donut";

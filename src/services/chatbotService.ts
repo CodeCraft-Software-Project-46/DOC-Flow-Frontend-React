@@ -213,7 +213,8 @@ function getWorkflowOfDocument(docId: string, instances: Record<string, Instance
 /**
  * Step 3: Format retrieved context for LLM
  */
-function formatContextForLLM(instances: InstanceDetail[], _queryType: string): string {
+function formatContextForLLM(instances: InstanceDetail[], queryType: string): string {
+  void queryType;
   if (instances.length === 0) return "";
 
   const doc = instances[0]; // Focus on first result for simplicity
@@ -348,7 +349,9 @@ function generateResponseViaTemplate(userQuery: string, queryType: string): stri
  * ✅ Supports airandome access flags/workflow/step IDs
  */
 
-export async function generateSummaryViaLLMAPI(_documentText: string, _apiProvider: "openai" | "anthropic"): Promise<string> {
+export async function generateSummaryViaLLMAPI(documentText: string, apiProvider: "openai" | "anthropic"): Promise<string> {
+  void documentText;
+  void apiProvider;
   // DEPRECATED: Summary should be generated at document submission time
   // See DocumentEmbeddingService.indexDocument() for new approach
 
@@ -358,7 +361,9 @@ export async function generateSummaryViaLLMAPI(_documentText: string, _apiProvid
   return "Summary generation moved to document submission phase.";
 }
 
-export async function generateSummaryViaLocalModel(_documentText: string, _modelName?: string): Promise<string> {
+export async function generateSummaryViaLocalModel(documentText: string, modelName?: string): Promise<string> {
+  void documentText;
+  void modelName;
   // DEPRECATED: Summary should be generated at document submission time
   // See DocumentEmbeddingService.indexDocument() for new approach
 
@@ -368,7 +373,8 @@ export async function generateSummaryViaLocalModel(_documentText: string, _model
   return "Summary generation moved to document submission phase.";
 }
 
-export function generateSummaryViaTemplate(_detail: InstanceDetail): string {
+export function generateSummaryViaTemplate(detail: InstanceDetail): string {
+  void detail;
   // DEPRECATED: Summary should be generated at document submission time
   // See DocumentEmbeddingService.indexDocument() for new approach
 

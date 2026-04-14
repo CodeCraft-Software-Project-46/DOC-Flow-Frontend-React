@@ -270,13 +270,17 @@ export function getRecoveryRecommendation(analysis: RecoveryAnalysis): string {
 
   if (analysis.overallRecovery === "AT_RISK") {
     // Find which steps need reduction
-    const atRiskSteps = analysis.recoveryPlan.filter((s) => s.stage === "remaining" && s.recommendation?.requiredReduction! > 0);
+    const atRiskSteps = analysis.recoveryPlan.filter(
+      (s) => s.stage === "remaining" && (s.recommendation?.requiredReduction ?? 0) > 0
+    );
 
     if (atRiskSteps.length === 0) {
       return `⚠️ At Risk: ${analysis.deficit.toFixed(1)} hours deficit. Review workflow efficiency.`;
     }
 
-    const reductions = atRiskSteps.map((s) => `${s.stepName} by ${s.recommendation?.requiredReduction.toFixed(1)}h`).join(", ");
+    const reductions = atRiskSteps
+      .map((s) => `${s.stepName} by ${(s.recommendation?.requiredReduction ?? 0).toFixed(1)}h`)
+      .join(", ");
     return `🔴 CRITICAL: Reduce ${reductions} to recover SLA.`;
   }
 

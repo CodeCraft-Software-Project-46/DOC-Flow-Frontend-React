@@ -1,7 +1,7 @@
 // Full instance drilldown section
 // Shows step flow, step table and summary
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { InstanceSummary } from "../../types";
 import { INSTANCES, INSTANCE_DETAILS } from "../../data/dummyData";
 import StepFlowBar from "./StepFlowBar";
@@ -17,12 +17,6 @@ export default function InstanceDrilldown({ workflow }: InstanceDrilldownProps) 
 
   // Selected instance id
   const [selId, setSelId] = useState<string>(instanceList[0]?.id || "");
-
-  // Reset selection when workflow changes
-  useEffect(() => {
-    const list = INSTANCES[workflow] || [];
-    setSelId(list[0]?.id || "");
-  }, [workflow]);
 
   // Get full detail of selected instance
   const detail     = INSTANCE_DETAILS[selId];
