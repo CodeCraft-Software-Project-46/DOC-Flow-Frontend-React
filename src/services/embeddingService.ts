@@ -102,7 +102,6 @@ export class DocumentEmbeddingService {
     documents.forEach((doc) => {
       this.embeddingIndex.set(doc.docId, doc);
     });
-    console.log(`Loaded ${documents.length} document embeddings`);
   }
 
   /**
@@ -145,7 +144,6 @@ export class DocumentEmbeddingService {
     };
 
     this.embeddingIndex.set(docId, indexEntry);
-    console.log(`Indexed document: ${docId}`);
 
     // TODO: In production, persist to backend database
   }
@@ -284,8 +282,6 @@ export async function initializeEmbeddingService() {
     // const response = await fetch('/api/documents/embeddings');
     // const embeddings = await response.json();
     // DocumentEmbeddingService.loadFromBackend(embeddings);
-
-    console.log("Embedding service initialized");
   } catch (error) {
     console.warn("Could not load embeddings:", error);
   }

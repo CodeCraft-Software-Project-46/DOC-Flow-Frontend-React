@@ -156,7 +156,6 @@ async function retrieveInstancesWithEmbeddings(
         }
       });
 
-      console.log(`Found ${retrieved.length} documents via semantic search`);
     } catch (error) {
       console.warn("Embedding search failed, falling back to keyword search:", error);
 

@@ -54,8 +54,6 @@ export default function ChatBot({ userRole = "user", userWorkflows = [] }: ChatB
 
       // Initialize embedding service
       await initializeEmbeddingService();
-
-      console.log("ChatBot services initialized");
     };
 
     initializeServices().catch((error) => {

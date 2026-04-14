@@ -264,7 +264,6 @@ export class LLMProviderFactory {
     for (const provider of this.providers) {
       try {
         if (await provider.isAvailable()) {
-          console.log(`Using LLM Provider: ${provider.name}`);
           return provider;
         }
       } catch {
