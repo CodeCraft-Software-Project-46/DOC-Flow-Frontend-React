@@ -6,11 +6,20 @@ interface BottleneckStepsProps {
   onWorkflowSelect?: (workflow: string) => void;
 }
 
+interface BreachStyle {
+  barClass: string;
+  textClass: string;
+}
+
 // Returns color based on breach percentage
-function getBreachColorClass(breach: number): string {
-  if (breach <= 5) return "bg-green-500 text-green-500";
-  if (breach <= 15) return "bg-amber-500 text-amber-500";
-  return "bg-red-500 text-red-500";
+function getBreachStyle(breach: number): BreachStyle {
+  if (breach <= 5) {
+    return { barClass: "bg-green-500", textClass: "text-green-500" };
+  }
+  if (breach <= 15) {
+    return { barClass: "bg-amber-500", textClass: "text-amber-500" };
+  }
+  return { barClass: "bg-red-500", textClass: "text-red-500" };
 }
 
 function getProgressWidthClass(avg: number): string {
@@ -29,34 +38,38 @@ export default function BottleneckSteps({ onWorkflowSelect }: BottleneckStepsPro
       </div>
 
       <div className="flex flex-col gap-3">
-        {BOTTLENECK_DATA.map((item) => (
-          <div 
-            key={item.step}
-            onClick={() => onWorkflowSelect?.(item.step)}
-            className="cursor-pointer hover:bg-blue-50 p-2 rounded-lg transition-colors"
-          >
-            {/* Workflow name */}
-            <div className="text-sm font-semibold text-slate-800 mb-1">
-              {item.step}
-            </div>
+        {BOTTLENECK_DATA.map((item) => {
+          const breachStyle = getBreachStyle(item.breach);
 
-            {/* Progress bar */}
-            <div className="bg-slate-100 rounded-full h-3 overflow-hidden mb-1">
-              <div
-                className={`h-full rounded-full transition-all ${getProgressWidthClass(item.avg)} ${getBreachColorClass(item.breach).split(" ")[0]}`}
-              />
-            </div>
+          return (
+            <div
+              key={item.step}
+              onClick={() => onWorkflowSelect?.(item.step)}
+              className="cursor-pointer hover:bg-blue-50 p-2 rounded-lg transition-colors"
+            >
+              {/* Workflow name */}
+              <div className="text-sm font-semibold text-slate-800 mb-1">
+                {item.step}
+              </div>
 
-            {/* Stats row */}
-            <div className="flex gap-3 text-xs text-slate-500">
-              <span>{item.avg}h avg</span>
-              <span className={`font-semibold ${getBreachColorClass(item.breach).split(" ")[1]}`}>
-                · {item.breach}% breach
-              </span>
-              <span>· {item.tasks} tasks</span>
+              {/* Progress bar */}
+              <div className="bg-slate-100 rounded-full h-3 overflow-hidden mb-1">
+                <div
+                  className={`h-full rounded-full transition-all ${getProgressWidthClass(item.avg)} ${breachStyle.barClass}`}
+                />
+              </div>
+
+              {/* Stats row */}
+              <div className="flex gap-3 text-xs text-slate-500">
+                <span>{item.avg}h avg</span>
+                <span className={`font-semibold ${breachStyle.textClass}`}>
+                  · {item.breach}% breach
+                </span>
+                <span>· {item.tasks} tasks</span>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Legend */}
