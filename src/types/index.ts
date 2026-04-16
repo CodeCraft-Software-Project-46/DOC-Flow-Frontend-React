@@ -1,5 +1,6 @@
-// All TypeScript types used across the app
+// this object MUST have these fields
 //data structure definitions
+//interfaces are used to type checking
 
 export type ChartSource = "workflow" | "overall";
 export type ChartType = "bar" | "line" | "pie" | "donut";
@@ -80,7 +81,7 @@ export interface InstanceSummary { //for listing instances
 
 // Bottleneck step data
 export interface BottleneckStep { //for dashboard bottleneck chart
-  step: string;
+  workflow: string;
   avg: number;
   breach: number;
   tasks: number;

@@ -1,4 +1,4 @@
-// Workflow step-by-step flow visualization for bottleneck analysis
+// Workflow step-by-step flow visualization
 // Shows document progression through workflow steps with SLA metrics
 
 import { getWorkflowStepFlow } from "../../data/dummyData";
@@ -15,10 +15,10 @@ export default function WorkflowStepFlow({ workflow }: Props) {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-semibold text-slate-900">
-            Workflow Step Flow Analysis
+            Workflow Step Flow
           </h3>
           <p className="text-sm text-slate-500 mt-1">
-            Document progression and bottleneck identification
+            Document progression through workflow steps
           </p>
         </div>
         <div className="text-right">
@@ -70,12 +70,6 @@ export default function WorkflowStepFlow({ workflow }: Props) {
                     {step.slaMet} ({step.slaMetRate}%)
                   </span>
                 </div>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-600">SLA Breach:</span>
-                  <span className="font-semibold text-red-600">
-                    {step.slaBreached} ({step.slaBreachRate}%)
-                  </span>
-                </div>
               </div>
 
               {/* Visual Indicator for Bottleneck */}
@@ -114,61 +108,6 @@ export default function WorkflowStepFlow({ workflow }: Props) {
               % completion rate
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Bottleneck Analysis */}
-      <div className="mt-4 bg-slate-50 rounded-lg p-4">
-        <div className="text-xs font-medium text-slate-700 mb-2">
-          📊 Bottleneck Analysis
-        </div>
-        <div className="text-xs text-slate-600">
-          {(() => {
-            // Find all steps with high breach rates (>= 30%) or significant processing queue
-            const bottleneckSteps = flowData.steps.filter(
-              (step) => step.slaBreachRate >= 30 || step.processing > 0
-            );
-
-            if (bottleneckSteps.length === 0) {
-              return (
-                <span className="text-green-600">
-                  No significant bottlenecks detected. Workflow is flowing smoothly.
-                </span>
-              );
-            }
-
-            // Find steps with high breach rates
-            const highBreachSteps = flowData.steps.filter(
-              (step) => step.slaBreachRate >= 30 && step.received > 0
-            );
-
-            if (highBreachSteps.length > 0) {
-              const stepNames = highBreachSteps
-                .map((s) => `"${s.stepName}" (${s.slaBreachRate}% breach rate)`)
-                .join(", ");
-              
-              return (
-                <span className="text-red-600 font-medium">
-                  High SLA breach rates detected at: {stepNames}. Immediate attention required.
-                </span>
-              );
-            }
-
-            // Otherwise, show queue-based bottleneck
-            const maxQueue = flowData.steps.reduce((max, step) =>
-              step.processing > max.processing ? step : max
-            );
-
-            return (
-              <>
-                <span className="font-semibold text-orange-600">
-                  "{maxQueue.stepName}"
-                </span>{" "}
-                has the highest queue with {maxQueue.processing} document
-                {maxQueue.processing > 1 ? "s" : ""} currently processing.
-              </>
-            );
-          })()}
         </div>
       </div>
     </div>

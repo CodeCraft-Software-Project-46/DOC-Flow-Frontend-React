@@ -13,7 +13,6 @@
  * - Store workflow instance summaries and details
  * - Provide KPI calculation helper functions
  * - Generate chart-ready data
- * - Support workflow bottleneck analysis
  * - Provide static dashboard metrics
  */
 import type {
@@ -341,8 +340,6 @@ export const INSTANCE_DETAILS: Record<string, InstanceDetail> = {
   ...allInstances["Direct Payment"].details,
 };
 
-
-
 // ── Overall Dashboard static data ─────────────────────────────────────────────
 export const TREND_DATA: TrendPoint[] = [
   { day: "Mon", c: 74 }, { day: "Tue", c: 78 }, { day: "Wed", c: 80 },
@@ -350,10 +347,10 @@ export const TREND_DATA: TrendPoint[] = [
 ];
 
 export const BOTTLENECK_DATA: BottleneckStep[] = [
-  { step: "Purchase Order Approval", avg: 59, breach: 19, tasks: 16 },
-  { step: "Direct Payment", avg: 44, breach: 8, tasks: 12 },
-  { step: "GRN Processing", avg: 33, breach: 17, tasks: 12 },
-  { step: "SRN Workflow", avg: 14, breach: 11, tasks: 9 },
+  { workflow: "Purchase Order Approval", avg: 59, breach: 19, tasks: 16 },
+  { workflow: "Direct Payment", avg: 44, breach: 8, tasks: 12 },
+  { workflow: "GRN Processing", avg: 33, breach: 17, tasks: 12 },
+  { workflow: "SRN Workflow", avg: 14, breach: 11, tasks: 9 },
 ];
 
 export const USER_SLA: UserSLA[] = [
@@ -602,7 +599,7 @@ export function getOverallLiveKPI(): {
 }
 
 // ── Workflow step flow helper ──────────────────────────────────────────────────
-// Returns step-by-step document flow metrics for bottleneck analysis
+// Returns step-by-step document flow metrics
 export interface StepFlowMetrics {
   stepName: string;
   received: number;      // instances that reached this step
@@ -611,7 +608,6 @@ export interface StepFlowMetrics {
   slaMet: number;        // instances that met SLA at this step
   slaBreached: number;   // instances that breached SLA at this step
   slaMetRate: number;    // percentage (0-100)
-  slaBreachRate: number; // percentage (0-100)
 }
 
 export function getWorkflowStepFlow(workflow: string): {
@@ -652,7 +648,6 @@ export function getWorkflowStepFlow(workflow: string): {
     ).length;
 
     const slaMetRate = received > 0 ? Math.round((slaMet / received) * 100) : 0;
-    const slaBreachRate = received > 0 ? Math.round((slaBreached / received) * 100) : 0;
 
     return {
       stepName,
@@ -662,7 +657,6 @@ export function getWorkflowStepFlow(workflow: string): {
       slaMet,
       slaBreached,
       slaMetRate,
-      slaBreachRate,
     };
   });
 

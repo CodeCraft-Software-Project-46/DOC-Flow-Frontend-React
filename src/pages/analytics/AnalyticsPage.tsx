@@ -1,11 +1,8 @@
-// Main dashboard page — has two tabs: Overall Dashboard and Workflow Analytics
-// Displays system-wide and per-workflow KPIs with custom chart support
-
 import { useMemo, useRef, useState } from "react";
 import StatCard from "../../components/chartAnalytics/StatCard";
 import SLADonut from "../../components/chartAnalytics/SLADonut";
 import SLATrend from "../../components/chartAnalytics/SLATrend";
-import BottleneckSteps from "../../components/chartAnalytics/BottleneckSteps";
+import BottleneckSteps from "../../components/chartAnalytics/BottleneckWorkflows";
 import UserSLAList from "../../components/chartAnalytics/Userperformance";
 import CustomChartsSection from "../../components/chartAnalytics/CustomChartsSection";
 import InstanceDrilldown from "../../components/chartAnalytics/InstanceDrilldown";
@@ -24,7 +21,7 @@ type Tab = "overall" | "workflow";
 type TimeRange = "7d" | "30d" | "90d" | "custom";
 
 export const AnalyticsPage = () => {
-  const [tab, setTab] = useState<Tab>("overall");
+  const [tab, setTab] = useState<Tab>("overall"); //only allow values that match the Tab type.setTab("hello") are prevented by TypeScript 
   const [timeRange, setTimeRange] = useState<TimeRange>("30d");
   const [customFromDate, setCustomFromDate] = useState("");
   const [customToDate, setCustomToDate] = useState("");
@@ -35,29 +32,45 @@ export const AnalyticsPage = () => {
   // Workflow tab — selected workflow
   const [selectedWorkflow, setSelectedWorkflow] = useState(WORKFLOWS[0]);
 
-  const overallMainExportRef = useRef<HTMLDivElement>(null);
-  const workflowMainExportRef = useRef<HTMLDivElement>(null);
+  const overallMainExportRef = useRef<HTMLDivElement>(null); //export THIS exact section
+  const workflowMainExportRef = useRef<HTMLDivElement>(null);//this ref will point to a <div> element, innitially no div connected yet Because before render, there is no div yet
   const overallCustomChartsRef = useRef<HTMLDivElement>(null);
   const workflowCustomChartsRef = useRef<HTMLDivElement>(null);
+//   const refs = {
+//   overallMain: useRef<HTMLDivElement>(null),
+//   workflowMain: useRef<HTMLDivElement>(null),
+//   overallCharts: useRef<HTMLDivElement>(null),
+//   workflowCharts: useRef<HTMLDivElement>(null),
+// };
 
-  const workflowKPI = useMemo(
-    () => getWorkflowKPI(selectedWorkflow),
-    [selectedWorkflow]
-  );
+const handleTabChange = (newTab: Tab) => {
+  setTab(newTab);
+};
 
-  const overallLiveKPI = useMemo(() => getOverallLiveKPI(), []);
+const workflowKPI = useMemo(
+  () => getWorkflowKPI(selectedWorkflow),
+  [selectedWorkflow]
+);
+
+const overallLiveKPI = useMemo(
+  () => getOverallLiveKPI(),
+  []
+);
+
+const handleWorkflowSelect = (workflow: string) => {
+  setSelectedWorkflow(workflow);
+  setTab("workflow");
+};
 
   const overallSlaStatusCounts = useMemo(() => {
     let met = 0;
     let breached = 0;
-
     Object.values(INSTANCE_DETAILS).forEach((instance) => {
       instance.steps.forEach((step) => {
         if (step.status === "Met") met += 1;
         else if (step.status === "Breached") breached += 1;
       });
     });
-
     return {
       met,
       breached,
@@ -65,6 +78,7 @@ export const AnalyticsPage = () => {
     };
   }, []);
 
+  
   // Navigate to chart configuration page to create/edit charts
   function handleCreateChart() {
     window.location.href = "/analytics/chart-configuration";
@@ -103,7 +117,7 @@ export const AnalyticsPage = () => {
         {(["overall", "workflow"] as Tab[]).map((t) => (
           <button
             key={t}
-            onClick={() => setTab(t)}
+            onClick={() => handleTabChange(t)}
             className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
               tab === t
                 ? "border-blue-600 text-blue-700"
@@ -228,13 +242,8 @@ export const AnalyticsPage = () => {
 
             {/* bottleneck + user sections */}
             <div className="grid grid-cols-2 gap-4">
-              <BottleneckSteps 
-                onWorkflowSelect={(workflow) => {
-                  setSelectedWorkflow(workflow);
-                  setTab("workflow");
-                }}
-              />
-              <UserSLAList />
+              <BottleneckSteps onWorkflowSelect={handleWorkflowSelect} /> {/* I am passing a function called handleWorkflowSelect into BottleneckSteps not run just hand over... component Pass the handler to BottleneckSteps */}
+              <UserSLAList /> {/* onWorkflowSelect is a prop*/}
             </div>
           </div>
 
@@ -309,7 +318,7 @@ export const AnalyticsPage = () => {
               />
             </div>
 
-              {/* ── Workflow Step Flow Analysis ── */}
+              {/* ── Workflow Step Flow ── */}
               <WorkflowStepFlow workflow={selectedWorkflow} />
 
               {/* ── Instance Drill-down for selected workflow ── */}
