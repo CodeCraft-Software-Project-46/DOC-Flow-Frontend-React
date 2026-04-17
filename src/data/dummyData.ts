@@ -342,8 +342,8 @@ export const INSTANCE_DETAILS: Record<string, InstanceDetail> = {
 
 // ── Overall Dashboard static data ─────────────────────────────────────────────
 export const TREND_DATA: TrendPoint[] = [
-  { day: "Mon", compliance: 74 }, { day: "Tue", compliance: 78 }, { day: "Wed", compliance: 80 },
-  { day: "Thu", compliance: 82 }, { day: "Fri", compliance: 84 }, { day: "Sat", compliance: 83 }, { day: "Sun", compliance: 85 },
+  { day: "Mon", c: 74 }, { day: "Tue", c: 78 }, { day: "Wed", c: 80 },
+  { day: "Thu", c: 82 }, { day: "Fri", c: 84 }, { day: "Sat", c: 83 }, { day: "Sun", c: 85 },
 ];
 
 export const BOTTLENECK_DATA: BottleneckStep[] = [

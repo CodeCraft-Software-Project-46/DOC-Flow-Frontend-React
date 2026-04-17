@@ -13,7 +13,7 @@ export default function SLATrend() {
       <div className="text-xs text-slate-400 mt-1 mb-5">Daily compliance % (time)</div>
 
       <ResponsiveContainer width="100%" height={150}>
-        <LineChart data={TREND_DATA}> {/*main container of the <chart></chart>
+        <LineChart data={TREND_DATA}> {/*main container of the chart*/}
           <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" /> {/*background grid lines with light color and dashed style*/}
           <XAxis
             dataKey="day"
