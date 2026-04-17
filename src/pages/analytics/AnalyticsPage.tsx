@@ -245,7 +245,7 @@ export const AnalyticsPage = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-          
+              
               <StatCard   //Completed Tasks
                 icon="📊"
                 value={overallSlaStatusCounts.completedTasks.toString()}
