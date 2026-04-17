@@ -3,7 +3,7 @@ import StatCard from "../../components/chartAnalytics/StatCard";
 import SLADonut from "../../components/chartAnalytics/SLADonut";
 import SLATrend from "../../components/chartAnalytics/SLATrend";
 import BottleneckSteps from "../../components/chartAnalytics/BottleneckWorkflows";
-import UserSLAList from "../../components/chartAnalytics/Userperformance";
+import UserPerformance from "../../components/chartAnalytics/Userperformance";
 import CustomChartsSection from "../../components/chartAnalytics/CustomChartsSection";
 import InstanceDrilldown from "../../components/chartAnalytics/InstanceDrilldown";
 import WorkflowStepFlow from "../../components/chartAnalytics/WorkflowStepFlow";
@@ -245,7 +245,7 @@ export const AnalyticsPage = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              
+
               <StatCard   //Completed Tasks
                 icon="📊"
                 value={overallSlaStatusCounts.completedTasks.toString()}
@@ -272,7 +272,7 @@ export const AnalyticsPage = () => {
             {/* bottleneck + user sections */}
             <div className="grid grid-cols-2 gap-4">
               <BottleneckSteps onWorkflowSelect={handleWorkflowSelect} /> {/* I am passing a function called handleWorkflowSelect into BottleneckSteps not run just hand over... component Pass the handler to BottleneckSteps */}
-              <UserSLAList /> {/* onWorkflowSelect is a prop*/}
+              <UserPerformance /> {/* onWorkflowSelect is a prop*/}
             </div>
           </div>
 

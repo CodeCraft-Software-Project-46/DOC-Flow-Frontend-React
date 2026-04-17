@@ -42,7 +42,7 @@ export default function SLADonut() {
               data={data}                                                             // { name: "On Time", value: 10, color: "green" },
               cx={75}                                                                 //{ name: "Breached", value: 5, color: "red" }]
               cy={75}
-              innerRadius={45} //makes it donut inner radius > 0
+              innerRadius={50} //makes it donut inner radius > 0
               outerRadius={70}
               dataKey="value"
               startAngle={90}
