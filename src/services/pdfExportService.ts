@@ -1,13 +1,14 @@
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+//Do something outside React UI like logics
+import jsPDF from 'jspdf';//convert image → PDF
+import html2canvas from 'html2canvas'; //can only capture real DOM elements screenshot UI
 
-export async function exportElementAsPdf(element: HTMLElement, title: string): Promise<void> {
+export async function exportElementAsPdf(element: HTMLElement, title: string): Promise<void> { //THAT DIV, title for the PDF file name
   try {
     // Create a wrapper with metadata
     const wrapper = document.createElement('div');
     wrapper.style.padding = '20px';
     wrapper.style.background = '#ffffff';
-    wrapper.style.width = element.offsetWidth + 'px';
+    wrapper.style.width = element.offsetWidth + 'px'; //create a clean printable version
     
     const now = new Date().toLocaleString();
     
@@ -28,13 +29,13 @@ export async function exportElementAsPdf(element: HTMLElement, title: string): P
       (el as HTMLElement).style.display = 'none';
     });
     
-    wrapper.appendChild(clonedElement);
+    wrapper.appendChild(clonedElement);//Attach everything to the wrapper
     
     // Temporarily add to document
     wrapper.style.position = 'absolute';
     wrapper.style.left = '-9999px';
     wrapper.style.top = '0';
-    document.body.appendChild(wrapper);
+    document.body.appendChild(wrapper);//Temporarily add to DOM
     
     // Generate canvas from element
     const canvas = await html2canvas(wrapper, {
@@ -62,7 +63,7 @@ export async function exportElementAsPdf(element: HTMLElement, title: string): P
     pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
     heightLeft -= pageHeight;
     
-    // Add additional pages if needed
+    // Add additional pages if needed If content is long: It splits into pages
     while (heightLeft > 0) {
       position = heightLeft - imgHeight + 10;
       pdf.addPage();
@@ -79,3 +80,32 @@ export async function exportElementAsPdf(element: HTMLElement, title: string): P
     alert('Failed to generate PDF. Please try again.');
   }
 }
+
+// User clicks Export
+//         ↓
+// handleExportOverallMain()
+//         ↓
+// Get that DIV using ref
+//         ↓
+// Send to service
+//         ↓
+// Clone UI
+//         ↓
+// Convert to image
+//         ↓
+// Convert to PDF
+//         ↓
+// Download file
+
+//React → send data → Django → generate PDF → return file
+
+// Problems (important):
+// ❗ Quality depends on screen
+// ❗ Layout may break (scroll, overflow, charts)
+// ❗ Hard to customize PDF (headers, footers, page numbers)
+
+// Add backend PDF generation (WeasyPrint)
+// React UI → Django → HTML template → WeasyPrint → PDF
+
+// ReportLab
+// 👉 More control, but harder

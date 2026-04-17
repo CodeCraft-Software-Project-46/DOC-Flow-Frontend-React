@@ -18,13 +18,16 @@ import {
 } from "../../data/dummyData";
 
 type Tab = "overall" | "workflow";
-type TimeRange = "7d" | "30d" | "90d" | "custom";
+type TimeRange = "7d" | "30d" | "90d" | "custom" | "all";
 
 export const AnalyticsPage = () => {
-  const [tab, setTab] = useState<Tab>("overall"); //only allow values that match the Tab type.setTab("hello") are prevented by TypeScript 
+  ////only allow values that match the Tab type.setTab("hello") are prevented by TypeScript 
+  const [tab, setTab] = useState<Tab>("overall"); 
+
   const [timeRange, setTimeRange] = useState<TimeRange>("30d");
   const [customFromDate, setCustomFromDate] = useState("");
   const [customToDate, setCustomToDate] = useState("");
+  const [dateError, setDateError] = useState(""); //validation error for custom date range
   
   // Get shared charts from context — updates when charts are created/edited/deleted
   const { charts } = useCharts();
@@ -43,24 +46,24 @@ export const AnalyticsPage = () => {
 //   workflowCharts: useRef<HTMLDivElement>(null),
 // };
 
-const handleTabChange = (newTab: Tab) => {
-  setTab(newTab);
-};
+  const workflowKPI = useMemo(
+    () => getWorkflowKPI(selectedWorkflow),
+    [selectedWorkflow]
+  );
 
-const workflowKPI = useMemo(
-  () => getWorkflowKPI(selectedWorkflow),
-  [selectedWorkflow]
-);
+  const overallLiveKPI = useMemo( //for stat cards that always show live data, not affected by time range filter
+    () => getOverallLiveKPI(),
+    []
+  );
 
-const overallLiveKPI = useMemo(
-  () => getOverallLiveKPI(),
-  []
-);
+    const handleTabChange = (selectedTab: Tab) => {
+    setTab(selectedTab);
+  };
 
-const handleWorkflowSelect = (workflow: string) => {
-  setSelectedWorkflow(workflow);
-  setTab("workflow");
-};
+  const handleWorkflowSelect = (workflow: string) => {
+    setSelectedWorkflow(workflow);
+    setTab("workflow");
+  };
 
   const overallSlaStatusCounts = useMemo(() => {
     let met = 0;
@@ -85,8 +88,8 @@ const handleWorkflowSelect = (workflow: string) => {
   }
 
   function handleExportOverallMain() {
-    if (!overallMainExportRef.current) return;
-    void exportElementAsPdf(overallMainExportRef.current, "Overall Dashboard");
+    if (!overallMainExportRef.current) return;//If the element is NOT available, stop Because sometimes: component not loaded yet DOM not ready
+    void exportElementAsPdf(overallMainExportRef.current, "Overall Analytics");
   }
 
   function handleExportWorkflowMain() {
@@ -110,36 +113,49 @@ const handleWorkflowSelect = (workflow: string) => {
     );
   }
 
+  const validateDates = (from: string, to: string) => { //receives start and end date as strings in "YYYY-MM-DD" format
+  if (!from || !to) {
+    setDateError("Please select both dates");
+    return false;
+  }
+
+  if (new Date(to) < new Date(from)) {
+    setDateError("End date cannot be before start date");
+    return false;
+  }
+
+  setDateError("");
+  return true;
+};
+
   return (
     <div className="min-h-screen bg-slate-100 font-sans">
-      {/* ── Tab Bar ── */}
+      {/* ── Tab Bar overall or workflow ── */}
       <div className="bg-white border-b border-slate-200 px-8 flex -mt-2">
-        {(["overall", "workflow"] as Tab[]).map((t) => (
+        {(["overall", "workflow"] as Tab[]).map((t) => (////map loops through the array and creates UI for each item. So it runs twice create 2 buttons
           <button
-            key={t}
-            onClick={() => handleTabChange(t)}
+            key={t} //React needs a unique ID for each element in a list.
+            onClick={() => handleTabChange(t)}//handleTabChange("workflow") if that button is clicked
             className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
               tab === t
-                ? "border-blue-600 text-blue-700"
+                ? "border-blue-600 text-blue-700" //highlight the  relevant button 
                 : "border-transparent text-slate-500 hover:text-slate-700"
             }`}
           >
-            {t === "overall" ? "Overall Dashboard" : "Workflow Analytics"}
+            {t === "overall" ? "Overall Analytics" : "Workflow Analytics"}
           </button>
         ))}
       </div>
 
-      {/* ── Page Content ── */}
       <div className="max-w-7xl mx-auto px-6 py-2">
 
         {/* ══ OVERALL DASHBOARD TAB ══ */}
         {tab === "overall" && (
           <div className="space-y-5">
 
-            {/* Page heading */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between"> {/* Page heading */}
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Overall Dashboard</h2>
+                <h2 className="text-xl font-bold text-slate-900">Overall Analytics</h2>
                 <p className="text-sm text-slate-500 mt-1">
                   System-wide KPI monitoring across all workflows
                 </p>
@@ -152,31 +168,37 @@ const handleWorkflowSelect = (workflow: string) => {
               </button>
             </div>
 
-            <div ref={overallMainExportRef} className="space-y-5">
+            <div ref={overallMainExportRef} className="space-y-5"> 
               {/* Top stat cards — always live, not affected by time range */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4">  {/* stat cards */}
                 <StatCard
                   icon="📄"
                   value={overallLiveKPI.runningDocuments.toString()}
                   label="Running Documents"
-                  sub="Currently Active"
+                  description="Currently Active"
                   color="blue"
                 />
                 <StatCard
                   icon="⚠️"
                   value={overallLiveKPI.activeOverdueTasks.toString()}
                   label="Active Overdue Tasks"
-                  sub="Requires Immediate Attention"
+                  description="Requires Immediate Attention"
                   color="red"
                 />
               </div>
 
-              {/* Time range filter bar */}
-              <div className="bg-white rounded-xl shadow-sm px-5 py-3 flex items-center gap-3 flex-wrap">
+              <div className="bg-white rounded-xl shadow-sm px-5 py-3 flex items-center gap-3 flex-wrap">{/* Time range filter bar */}
               <span className="text-sm text-slate-500 font-medium">Time Range:</span>
               <select
                 value={timeRange}
-                onChange={(e) => setTimeRange(e.target.value as TimeRange)}
+                onChange={(e) => {
+                  const value = e.target.value as TimeRange;
+                  setTimeRange(value);
+
+                  if (value !== "custom") { //If user selects ANY option except custom: after the custom option is selected Then we clear previous error message
+                    setDateError("");
+                  }
+                }}
                 aria-label="Select analytics time range"
                 className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm bg-white text-slate-700 outline-none"
               >
@@ -184,35 +206,47 @@ const handleWorkflowSelect = (workflow: string) => {
                 <option value="30d">Last 30 Days</option>
                 <option value="90d">Last 90 Days</option>
                 <option value="custom">Custom Range</option>
+                <option value="all">All Time</option>
               </select>
+
               {timeRange === "custom" && (
                 <>
                   <span className="text-sm text-slate-500">From</span>
                   <input
                     type="date"
                     value={customFromDate}
-                    onChange={(e) => setCustomFromDate(e.target.value)}
-                    aria-label="Custom range start date"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setCustomFromDate(value); //stores "start date"
+                      validateDates(value, customToDate);
+                    }}
+                    aria-label="Custom range start date" //Screen readers (for visually impaired users) NOT visibleOnly for screen readers
                     className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm bg-white text-slate-700 outline-none"
                   />
                   <span className="text-sm text-slate-500">To</span>
                   <input
                     type="date"
                     value={customToDate}
-                    onChange={(e) => setCustomToDate(e.target.value)}
-                    min={customFromDate || undefined}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setCustomToDate(value);//stores "end date"
+                      validateDates(customFromDate, value);//whatever(start,end) date changes, that changed one should again send and get validated
+                    }}
+                    min={customFromDate || undefined} //customFromDate = "" → min=undefined empty can cause error. Once user selects a from date, that becomes the minimum allowed to prevent invalid range
                     aria-label="Custom range end date"
                     className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm bg-white text-slate-700 outline-none"
                   />
                 </>
               )}
               <span className="text-xs text-slate-400">— Filters all sections below</span>
+              {dateError && (
+                <span className="text-xs text-red-500">{dateError}</span>
+              )}
             </div>
 
-            {/* Period metric cards */}
             <div className="grid grid-cols-2 gap-4">
-              {/* Completed tasks*/}
-              <div className="bg-white rounded-2xl shadow-sm p-6">
+              
+              <div className="bg-white rounded-2xl shadow-sm p-6"> {/* Completed tasks*/} 
                 <div className="flex justify-between items-start">
                   <div>
                     <div className="text-4xl font-bold text-slate-900">{overallSlaStatusCounts.completedTasks}</div>
@@ -299,21 +333,21 @@ const handleWorkflowSelect = (workflow: string) => {
                 icon="📁"
                 value={workflowKPI.totalInstances.toString()}
                 label="Total Instances"
-                sub="Selected period"
+                description="Selected period"
                 color="blue"
               />
               <StatCard
                 icon="⏱"
                 value={workflowKPI.avgCompletionTime}
                 label="Avg Completion Time"
-                sub="Per instance"
+                description="Per instance"
                 color="blue"
               />
               <StatCard
                 icon="✅"
                 value={`${workflowKPI.slaCompliance}%`}
                 label="SLA Compliance"
-                sub="Overall rate"
+                description="Overall rate"
                 color="red"
               />
             </div>
