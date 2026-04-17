@@ -68,7 +68,7 @@ export const AnalyticsPage = () => {
   const overallSlaStatusCounts = useMemo(() => {
     let met = 0;
     let breached = 0;
-    Object.values(INSTANCE_DETAILS).forEach((instance) => {
+    Object.values(INSTANCE_DETAILS).forEach((instance) => { //Object.values converts your data into a list of instances
       instance.steps.forEach((step) => {
         if (step.status === "Met") met += 1;
         else if (step.status === "Breached") breached += 1;
@@ -77,7 +77,7 @@ export const AnalyticsPage = () => {
     return {
       met,
       breached,
-      completedTasks: met + breached,
+      completedTasks: met + breached, //return completed tasks as 
     };
   }, []);
 
@@ -245,27 +245,22 @@ export const AnalyticsPage = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              
-              <div className="bg-white rounded-2xl shadow-sm p-6"> {/* Completed tasks*/} 
-                <div className="flex justify-between items-start">
-                  <div>
-                    <div className="text-4xl font-bold text-slate-900">{overallSlaStatusCounts.completedTasks}</div>
-                    <div className="text-sm text-slate-500 mt-1">Completed Tasks</div>
-                  </div>
-                  <span className="text-green-500 text-sm font-semibold">▲ +{DASHBOARD_KPI.overall.completedTasksChange}%</span>
-                </div>
-              </div>
+          
+              <StatCard   //Completed Tasks
+                icon="📊"
+                value={overallSlaStatusCounts.completedTasks.toString()}
+                label="Completed Tasks"
+                description="Total finished tasks"
+                color="blue"
+              />
 
-              {/* SLA Compliance */}
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <div className="text-4xl font-bold text-slate-900">{DASHBOARD_KPI.overall.slaCompliance}%</div>
-                    <div className="text-sm text-slate-500 mt-1">SLA Compliance</div>
-                  </div>
-                  <span className="text-red-500 text-sm font-semibold">▼ {DASHBOARD_KPI.overall.slaComplianceChange}%</span>
-                </div>
-              </div>
+              <StatCard //SLA Compliance
+                icon="✅"
+                value={`${DASHBOARD_KPI.overall.slaCompliance}%`}
+                label="SLA Compliance"
+                description="Overall compliance rate"
+                color="red"
+              />
             </div>
 
             {/* SLA Charts */}

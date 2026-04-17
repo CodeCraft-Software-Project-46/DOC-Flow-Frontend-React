@@ -1,7 +1,7 @@
 // Reusable stat card used in both Overall Dashboard and Workflow Analytics
 
 interface StatCardProps { //prop means Data or functions passed from parent → child
-  icon: string;
+  icon: string; // optional icon prop to display an icon in the card
   value: string;
   label: string;
   description: string;
@@ -18,7 +18,7 @@ export default function StatCard({ icon, value, label, description, color, small
       <div
         className={`rounded-xl flex items-center justify-center flex-shrink-0 ${small ? "w-10 h-10 text-lg" : "w-12 h-12 text-2xl"} ${iconBgClass}`}
       >
-        {icon}
+        {icon || <div className="w-full h-full flex items-center justify-center">?</div>} {/* Show icon if provided, otherwise show a placeholder */}
       </div>
 
       {/* Text */}
