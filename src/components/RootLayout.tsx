@@ -1,4 +1,3 @@
-
 import { Outlet, useLocation, useNavigate } from "react-router"; 
 import { useState, useEffect } from "react";
 import Header from "./Header";
@@ -8,39 +7,54 @@ import Footer from "./Footer";
 export function RootLayout() {
     const navigate = useNavigate();
     const location = useLocation();
+    
+    // Track which page we are on for the Sidebar highlighting
     const [selectedKey, setSelectedKey] = useState<string>(location.pathname);
+    
+    // Manage mobile sidebar visibility
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
+    // Keep the highlighted button in sync if the URL changes
     useEffect(() => {
         setSelectedKey(location.pathname);
     }, [location.pathname]);
 
+    // Handle clicking a sidebar link
     const handleMenuClick = (key: string) => {
         setSelectedKey(key);
         navigate(key);
-        setIsSidebarOpen(false);
+        setIsSidebarOpen(false); // Auto-close on mobile
     };
 
     return (
         <div className="flex h-screen bg-gray-50">
+            {/* 1. The Dynamic Sidebar */}
             <Sidebar
                 isOpen={isSidebarOpen}
                 onClose={() => setIsSidebarOpen(false)}
                 selectedKey={selectedKey}
                 onMenuClick={handleMenuClick}
-                onLogout={() => {
-                    localStorage.removeItem("isAuthenticated");
-                    navigate("/");
-                }}
+                // Notice we deleted the onLogout prop! 
+                // The Sidebar talks directly to the AuthContext Vault now.
             />
-            <div className=" flex-1 flex flex-col h-screen overflow-hidden">
-                <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} currentPage={selectedKey} />
+            
+            {/* 2. The Main Application Area */}
+            <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                
+                {/* Your custom Header */}
+                <Header 
+                    onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} 
+                    currentPage={selectedKey} 
+                />
+                
+                {/* 3. The Outlet where your actual pages load */}
                 <main className="flex-1 overflow-auto p-4 md:p-6">
-                    <div className="bg-gray-50  shadow-sm p-2 md:p-6 min-h-full">
-                        {/* This is where the child routes (Dashboard, Documents) will render */}
+                    <div className="bg-gray-50 shadow-sm p-2 md:p-6 min-h-full">
                         <Outlet />
                     </div>
                 </main>
+                
+                {/* Your custom Footer */}
                 <Footer />
             </div>
         </div>
