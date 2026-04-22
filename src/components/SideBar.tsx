@@ -43,14 +43,49 @@ const Sidebar: React.FC<SidebarProps> = ({
     ];
 
     const configMenu = [
-        // Replace these strings with your actual Django permission codenames!
-        { name: "Dashboard Builder", path: "/dashboard-builder", icon: LayoutDashboard, permission: "can_build_dashboard" },
-        { name: "Analytics & Charts", path: "/analytics", icon: BarChart3, permission: "can_view_analytics" },
-        { name: "Document Types", path: "/document-types", icon: Folder, permission: "can_manage_docs" },
-        { name: "Workflows-Versions", path: "/workflow-version", icon: GitBranch, permission: "can_manage_workflows" },
-        { name: "Roles & Users", path: "/user", icon: Users, permission: "can_manage_users" },
-        { name: "Notifications", path: "/notifications", icon: Bell, badge: 3 }, // No permission = everyone sees it
-        { name: "Settings", path: "/settings", icon: Settings, permission: "can_view_config" },
+        { 
+            name: "Dashboard Builder", 
+            path: "/dashboard-builder", 
+            icon: LayoutDashboard, 
+            permission: "configure_dashboard" // Updated from can_build_dashboard
+        },
+        { 
+            name: "Analytics & Charts", 
+            path: "/analytics", 
+            icon: BarChart3, 
+            permission: "view_workflow_performance" // Updated from can_view_analytics
+        },
+        { 
+            name: "Document Types", 
+            path: "/document-types", 
+            icon: Folder, 
+            permission: "configure_document_types" // Updated from can_manage_docs
+        },
+        { 
+            name: "Workflows-Versions", 
+            path: "/workflow-version", 
+            icon: GitBranch, 
+            permission: "view_workflow" // Updated from can_manage_workflows
+        },
+        { 
+            name: "Roles & Users", 
+            path: "/user", 
+            icon: Users, 
+            permission: "view_users" // Updated from can_manage_users
+        },
+        { 
+            name: "Notifications", 
+            path: "/notifications", 
+            icon: Bell, 
+            badge: 3, 
+            permission: "can_manage_notifications" // Added the actual permission
+        },
+        { 
+            name: "Settings", 
+            path: "/settings", 
+            icon: Settings, 
+            permission: "configure_dashboard" // Using dashboard config as a proxy for settings
+        },
     ];
 
     // 4. The Magic Filter! 
