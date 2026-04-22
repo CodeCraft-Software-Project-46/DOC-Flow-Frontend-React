@@ -1,148 +1,206 @@
-import React, { useState, useContext } from 'react';
-import axios from 'axios';
-import { AuthContext } from '../context/AuthContext';
-import { X } from 'lucide-react'; // Assuming you use lucide-react for the close icon
+import React, { useState, useEffect } from "react";
+import { X } from "lucide-react";
+import axios from "axios"; 
 
-interface AddRuleModalProps {
+type AddRuleModalProps = {
     isOpen: boolean;
     onClose: () => void;
-    onRuleAdded: () => void; // Function to refresh the rules list after adding
-}
+    onRuleAdded: () => void;
+};
 
 export const AddRuleModal: React.FC<AddRuleModalProps> = ({ isOpen, onClose, onRuleAdded }) => {
-    const authContext = useContext(AuthContext);
-    const [name, setName] = useState('');
-    const [eventTrigger, setEventTrigger] = useState('TASK_ASSIGNED');
-    const [channel, setChannel] = useState('BOTH');
-    const [recipientInput, setRecipientInput] = useState('');
-    const [error, setError] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [ruleName, setRuleName] = useState("");
+    const [eventTrigger, setEventTrigger] = useState("TASK_ASSIGNED");
+    const [deliveryChannel, setDeliveryChannel] = useState("EMAIL_ONLY");
+    
+    const [selectedRecipients, setSelectedRecipients] = useState<string[]>([]);
+    const [options, setOptions] = useState<{ roles: string[], users: string[] }>({ roles: [], users: [] });
+    const [isLoadingOptions, setIsLoadingOptions] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
-    if (!isOpen) return null;
+    // Fetch options only when the modal opens
+    useEffect(() => {
+        if (isOpen) {
+            fetchOptions();
+            // Reset form state when opened
+            setRuleName("");
+            setEventTrigger("TASK_ASSIGNED");
+            setDeliveryChannel("EMAIL_ONLY");
+            setSelectedRecipients([]);
+        }
+    }, [isOpen]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
-        setIsSubmitting(true);
-
+    const fetchOptions = async () => {
+        setIsLoadingOptions(true);
         try {
-            // Convert comma-separated string into an array (e.g., "Role: Manager, User: admin")
-            const recipientsArray = recipientInput.split(',').map(r => r.trim()).filter(r => r !== '');
-
             const token = localStorage.getItem('access_token');
-            
-            // Sending POST request to the ListCreateAPIView you built in Django
-            await axios.post('http://127.0.0.1:8000/api/notifications/rules/', {
-                name: name,
-                event_trigger: eventTrigger,
-                channel: channel,
-                recipients: recipientsArray,
-                is_active: true
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+            const response = await axios.get("http://127.0.0.1:8000/api/notifications/recipient-options/", {
+                headers: { Authorization: `Bearer ${token}` }
             });
-
-            // Success! Close modal and tell the parent page to refresh the list
-            onRuleAdded();
-            onClose();
-            
-            // Reset form
-            setName('');
-            setRecipientInput('');
-        } catch (err: any) {
-            console.error("Failed to create rule:", err);
-            setError('Failed to create notification rule. Please check your inputs.');
+            setOptions(response.data);
+        } catch (error) {
+            console.error("Failed to fetch recipient options", error);
         } finally {
-            setIsSubmitting(false);
+            setIsLoadingOptions(false);
         }
     };
 
+    const handleAddRecipient = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const value = e.target.value;
+        if (value && !selectedRecipients.includes(value)) {
+            setSelectedRecipients([...selectedRecipients, value]);
+        }
+        e.target.value = ""; // Reset dropdown
+    };
+
+    const handleRemoveRecipient = (recipientToRemove: string) => {
+        setSelectedRecipients(selectedRecipients.filter(r => r !== recipientToRemove));
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSaving(true);
+        
+        try {
+            const token = localStorage.getItem('access_token');
+            // Format data exactly how your Django NotificationRuleSerializer expects it
+            const ruleData = {
+                name: ruleName,
+                event_trigger: eventTrigger,
+                channel: deliveryChannel,
+                // If Django expects a string list: ["Role: Admin", "User: Nesandu"]
+                recipients: selectedRecipients, 
+            };
+
+            await axios.post("http://127.0.0.1:8000/api/notifications/rules/", ruleData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            onRuleAdded(); // Refresh the list on the main page
+            onClose(); // Close the modal
+            
+        } catch (error) {
+            console.error("Failed to save rule", error);
+            alert("Failed to save notification rule.");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    if (!isOpen) return null;
+
     return (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
-                <div className="flex justify-between items-center p-5 border-b border-gray-100">
-                    <h2 className="text-lg font-semibold text-gray-800">Create Notification Rule</h2>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+                
+                <div className="flex items-center justify-between p-5 border-b border-gray-100">
+                    <h2 className="text-xl font-semibold text-gray-800">Create Notification Rule</h2>
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition">
                         <X size={20} />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-5 flex flex-col gap-4">
-                    {error && <div className="text-red-500 text-sm bg-red-50 p-3 rounded-lg">{error}</div>}
-
+                <form onSubmit={handleSubmit} className="p-5 space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Rule Name</label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             required
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
                             placeholder="e.g., Manager SLA Alert"
-                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            value={ruleName}
+                            onChange={(e) => setRuleName(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Event Trigger</label>
-                        <select 
+                        <select
                             value={eventTrigger}
                             onChange={(e) => setEventTrigger(e.target.value)}
-                            className="w-full p-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                         >
                             <option value="TASK_ASSIGNED">Task Assigned</option>
-                            <option value="SLA_REMINDER">SLA Reminder</option>
+                            <option value="DOCUMENT_APPROVED">Document Approved</option>
+                            <option value="DOCUMENT_REJECTED">Document Rejected</option>
                             <option value="SLA_BREACH">SLA Breach</option>
-                            <option value="WORKFLOW_COMPLETED">Workflow Completed</option>
-                            <option value="TASK_REJECTED">Task Rejected</option>
-                            <option value="DOCUMENT_UPLOADED">Document Uploaded</option>
-                            <option value="COMMENT_ADDED">Comment Added</option>
                         </select>
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Delivery Channel</label>
-                        <select 
-                            value={channel}
-                            onChange={(e) => setChannel(e.target.value)}
-                            className="w-full p-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                        <select
+                            value={deliveryChannel}
+                            onChange={(e) => setDeliveryChannel(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                         >
-                            <option value="BOTH">Email + In-App</option>
-                            <option value="EMAIL">Email Only</option>
-                            <option value="IN_APP">In-App Only</option>
+                            <option value="EMAIL_ONLY">Email Only</option>
+                            <option value="IN_APP_ONLY">In-App Only</option>
+                            <option value="BOTH">Both (Email & In-App)</option>
                         </select>
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Recipients</label>
-                        <input 
-                            type="text" 
-                            required
-                            value={recipientInput}
-                            onChange={(e) => setRecipientInput(e.target.value)}
-                            placeholder="e.g., Role: Manager, User: admin"
-                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                        />
-                        <p className="text-xs text-gray-500 mt-1">
-                            Separate tags with commas. Use "Role: [name]" or "User: [username]".
-                        </p>
+                        
+                        {selectedRecipients.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mb-2">
+                                {selectedRecipients.map((recipient) => (
+                                    <span key={recipient} className="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-1 flex items-center gap-1 text-sm rounded-md">
+                                        {recipient}
+                                        <button 
+                                            type="button" 
+                                            onClick={() => handleRemoveRecipient(recipient)}
+                                            className="text-blue-400 hover:text-blue-800"
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+
+                        <select
+                            onChange={handleAddRecipient}
+                            disabled={isLoadingOptions}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-gray-100"
+                        >
+                            <option value="">
+                                {isLoadingOptions ? "Loading options..." : "Select a Role or User..."}
+                            </option>
+                            
+                            {options.roles.length > 0 && (
+                                <optgroup label="--- Dynamic Roles ---">
+                                    {options.roles.map(role => (
+                                        <option key={role} value={role}>{role}</option>
+                                    ))}
+                                </optgroup>
+                            )}
+
+                            {options.users.length > 0 && (
+                                <optgroup label="--- Specific Users ---">
+                                    {options.users.map(user => (
+                                        <option key={user} value={user}>{user}</option>
+                                    ))}
+                                </optgroup>
+                            )}
+                        </select>
                     </div>
 
-                    <div className="mt-4 flex justify-end gap-3">
-                        <button 
-                            type="button" 
+                    <div className="flex items-center justify-end gap-3 pt-4 mt-2 border-t border-gray-100">
+                        <button
+                            type="button"
                             onClick={onClose}
-                            className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg"
+                            className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition"
                         >
                             Cancel
                         </button>
-                        <button 
-                            type="submit" 
-                            disabled={isSubmitting}
-                            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
+                        <button
+                            type="submit"
+                            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition disabled:bg-blue-300"
+                            disabled={!ruleName || selectedRecipients.length === 0 || isSaving}
                         >
-                            {isSubmitting ? 'Saving...' : 'Create Rule'}
+                            {isSaving ? "Saving..." : "Create Rule"}
                         </button>
                     </div>
                 </form>

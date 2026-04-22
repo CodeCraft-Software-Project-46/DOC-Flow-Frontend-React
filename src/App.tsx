@@ -16,6 +16,8 @@ import {WorkFlowInstances} from "./pages/workflow/WorkFlowInstances.tsx";
 import {AnalyticsPage} from "./pages/analytics/AnalyticsPage.tsx";
 import {DocumentTypesPage} from "./pages/documents/DocumentTypesPage.tsx";
 
+import NotificationsPage from "./pages/notifications/NotificationsPage";
+
 
 
 
@@ -44,6 +46,7 @@ export default function App() {
                         { path: "/settings", element: <SettingsPage /> },
                         { path: "/user", element: <UserPage /> },
                         { path: "/analytics", element: <AnalyticsPage/> },
+                        { path: "/notifications", element: <NotificationsPage /> },
 
                     ]
                 }

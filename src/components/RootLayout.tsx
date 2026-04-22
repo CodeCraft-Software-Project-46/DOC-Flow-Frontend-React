@@ -1,3 +1,5 @@
+// In React, the RootLayout is the Picture Frame. Its job is to hold the UI elements that should never disappear 
+// when the user navigates around your app—like the Sidebar on the left, the Header at the top, and the Footer at the bottom.
 import { Outlet, useLocation, useNavigate } from "react-router"; 
 import { useState, useEffect } from "react";
 import Header from "./Header";
