@@ -1,3 +1,4 @@
+/*
 import React from "react";
 import { type Role, SAMPLE_ROLES } from "../../../sampleData/RolesData.ts";
 
@@ -30,6 +31,79 @@ export const RoleCard: React.FC<RoleCardProps> = ({ role, onEdit, onDelete }) =>
         <div className="flex flex-wrap gap-1.5">
             {role.permissions.map((perm) => (
                 <span key={perm} className="text-xs text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full">{perm}</span>
+            ))}
+        </div>
+    </div>
+);*/
+
+import React from "react";
+import type { Role } from "../../model/Role";
+
+interface RoleCardProps {
+    role: Role;
+    onEdit: (r: Role) => void;
+    onDelete: (r: Role) => void;
+}
+
+export const RoleCard: React.FC<RoleCardProps> = ({
+                                                      role,
+                                                      onEdit,
+                                                      onDelete,
+                                                  }) => (
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col gap-3 hover:shadow-md transition">
+
+        {/* Header */}
+        <div className="flex items-start justify-between">
+
+            <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-center">
+                    🔐
+                </div>
+
+                <div>
+                    <h3 className="text-sm font-bold text-slate-800">
+                        {role.name}
+                    </h3>
+
+                    <p className="text-xs text-slate-400">
+                        {role.userCount ?? 0} user
+                        {(role.userCount ?? 0) !== 1 ? "s" : ""}
+                    </p>
+                </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-1">
+                <button
+                    onClick={() => onEdit(role)}
+                    className="p-1 hover:text-blue-600"
+                >
+                    ✏️
+                </button>
+
+                <button
+                    onClick={() => onDelete(role)}
+                    className="p-1 hover:text-red-500"
+                >
+                    🗑
+                </button>
+            </div>
+        </div>
+
+        {/* Description */}
+        <p className="text-sm text-slate-500">
+            {role.description || "No description"}
+        </p>
+
+        {/* Permissions */}
+        <div className="flex flex-wrap gap-1">
+            {role.permissions.map((perm) => (
+                <span
+                    key={perm}
+                    className="text-xs bg-slate-100 px-2 py-0.5 rounded-full"
+                >
+                    {perm.replace(/_/g, " ")}
+                </span>
             ))}
         </div>
     </div>
