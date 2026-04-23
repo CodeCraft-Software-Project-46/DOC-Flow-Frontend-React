@@ -70,12 +70,14 @@ export const UsersTab: React.FC<Props> = ({ roles, setRoles }) => {
         </div>
     );
 };*/
+/*
 
 import React, { useState } from "react";
 
 import { UserModal } from "./UserModal";
-import type { User } from "./User";
+
 import type {Role} from "../../../sampleData/RolesData.ts";
+import type {User} from "../../model/User.ts";
 
 interface Props {
     roles: Role[];
@@ -166,10 +168,10 @@ export const UsersTab: React.FC<Props> = ({ roles, setRoles }) => {
                     </p>
                 </div>
 
-                {/* search filter add */}
+                {/!* search filter add *!/}
                 <div className="flex items-center gap-2 flex-wrap">
 
-                    {/* search*/}
+                    {/!* search*!/}
                     <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">
                             🔍
@@ -191,7 +193,7 @@ export const UsersTab: React.FC<Props> = ({ roles, setRoles }) => {
                         )}
                     </div>
 
-                    {/* dropdown */}
+                    {/!* dropdown *!/}
                     <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">
                             👤
@@ -209,7 +211,7 @@ export const UsersTab: React.FC<Props> = ({ roles, setRoles }) => {
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">▾</span>
                     </div>
 
-                    {/* add btn */}
+                    {/!* add btn *!/}
                     <button
                         onClick={() => { setEditingUser(null); setShowModal(true); }}
                         className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition shadow-sm flex-shrink-0"
@@ -219,7 +221,7 @@ export const UsersTab: React.FC<Props> = ({ roles, setRoles }) => {
                 </div>
             </div>
 
-            {/* stats cards*/}
+            {/!* stats cards*!/}
             <div className="flex items-center gap-2 mb-5 flex-wrap">
                 {[
                     { label: "Total",  value: users.length,                              color: "bg-slate-100 text-slate-700" },
@@ -232,7 +234,7 @@ export const UsersTab: React.FC<Props> = ({ roles, setRoles }) => {
                 ))}
             </div>
 
-            {/* table*/}
+            {/!* table*!/}
             {filtered.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50">
                     <p className="text-3xl mb-3">👥</p>
@@ -247,7 +249,7 @@ export const UsersTab: React.FC<Props> = ({ roles, setRoles }) => {
                 </div>
             ) : (
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    {/* table header */}
+                    {/!* table header *!/}
                     <div className="grid grid-cols-[2fr_2.5fr_1.5fr_auto] gap-4 px-5 py-3 bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
                         <span>User</span>
                         <span>Email</span>
@@ -255,7 +257,7 @@ export const UsersTab: React.FC<Props> = ({ roles, setRoles }) => {
                         <span className="text-right pr-1">Actions</span>
                     </div>
 
-                    {/* row */}
+                    {/!* row *!/}
                     {filtered.map((u, idx) => (
                         <div
                             key={u.id}
@@ -263,7 +265,7 @@ export const UsersTab: React.FC<Props> = ({ roles, setRoles }) => {
                                 idx !== filtered.length - 1 ? "border-b border-slate-100" : ""
                             }`}
                         >
-                            {/* pp */}
+                            {/!* pp *!/}
                             <div className="flex items-center gap-3 min-w-0">
                                 <div className={`w-8 h-8 rounded-full ${avatarBg[idx % avatarBg.length]} flex items-center justify-center text-white text-xs font-bold flex-shrink-0`}>
                                     {initials(u.username)}
@@ -271,15 +273,15 @@ export const UsersTab: React.FC<Props> = ({ roles, setRoles }) => {
                                 <span className="text-sm font-semibold text-slate-800 truncate">{u.username}</span>
                             </div>
 
-                            {/* email */}
+                            {/!* email *!/}
                             <span className="text-sm text-slate-500 truncate">{u.email}</span>
 
-                            {/* role */}
+                            {/!* role *!/}
                             <span className={`text-xs font-semibold px-2.5 py-1 rounded-full w-fit ${roleBadge(u.role?.name)}`}>
                                 {u.role?.name ?? "—"}
                             </span>
 
-                            {/* actions */}
+                            {/!* actions *!/}
                             <div className="flex items-center gap-1.5 justify-end">
                                 <button
                                     onClick={() => handleEdit(u)}
@@ -299,7 +301,7 @@ export const UsersTab: React.FC<Props> = ({ roles, setRoles }) => {
                 </div>
             )}
 
-            {/* add modal */}
+            {/!* add modal *!/}
             {showModal && (
                 <UserModal
                     roles={roles}
@@ -309,5 +311,193 @@ export const UsersTab: React.FC<Props> = ({ roles, setRoles }) => {
                 />
             )}
         </>
+    );
+};*/
+
+import React, { useState } from "react";
+import type { User } from "../../model/User";
+import type { Role } from "../../model/Role";
+import { UserModal } from "./UserModal";
+import {userService} from "../../service/UserService.ts";
+
+interface Props {
+    users: User[];
+    setUsers: React.Dispatch<React.SetStateAction<User[]>>;
+    roles: Role[];
+    setRoles: React.Dispatch<React.SetStateAction<Role[]>>;
+    reloadUsers: () => Promise<void>;
+}
+
+export const UsersTab: React.FC<Props> = ({
+                                              users,
+                                              roles,
+                                              reloadUsers
+                                          }) => {
+    const [showModal, setShowModal] = useState(false);
+    const [editingUser, setEditingUser] = useState<User | null>(null);
+
+    const getRoleName = (roleId: string | null) =>
+        roles.find(r => r.id === roleId)?.name ?? "—";
+
+    const getRoleBadge = (name: string) => {
+        const colors: Record<string, string> = {
+            Admin: "bg-purple-100 text-purple-700",
+            Viewer: "bg-slate-100 text-slate-600",
+            Default: "bg-blue-100 text-blue-700"
+        };
+        return colors[name] || colors.Default;
+    };
+
+    const handleSave = async (data: any) => {
+        try {
+            if (editingUser) {
+                await userService.updateUser(editingUser.id, data);
+            } else {
+                await userService.createUser(data);
+            }
+
+            setShowModal(false);
+            setEditingUser(null);
+
+            //refresh from parent
+            await reloadUsers();
+
+        } catch (err) {
+            console.error("Save failed", err);
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        const ok = window.confirm("Delete this user?");
+        if (!ok) return;
+
+        try {
+            await userService.deleteUser(id);
+            await reloadUsers();
+
+        } catch (err) {
+            console.error("Delete failed", err);
+        }
+    };
+
+    return (
+        <div className="space-y-4">
+
+
+            <div className="flex justify-between items-center">
+                <div>
+                    <h2 className="text-xl font-bold text-slate-800">
+                        Users
+                        <span className="ml-2 text-sm text-slate-500">
+                            ({users.length})
+                        </span>
+                    </h2>
+                    <p className="text-sm text-slate-400">
+                        Manage system users and their roles
+                    </p>
+                </div>
+
+                <button
+                    onClick={() => {
+                        setEditingUser(null);
+                        setShowModal(true);
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl shadow-sm transition"
+                >
+                    + Add User
+                </button>
+            </div>
+
+
+            <div className="bg-white border rounded-2xl shadow-sm overflow-hidden">
+
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+
+                        <thead className="bg-slate-50 text-slate-500 uppercase text-xs">
+                        <tr>
+                            <th className="p-4 text-left">User</th>
+                            <th className="p-4 text-left">Name</th>
+                            <th className="p-4 text-left">Email</th>
+                            <th className="p-4 text-left">Role</th>
+                            <th className="p-4 text-left">Actions</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+
+                        {users.length === 0 ? (
+                            <tr>
+                                <td colSpan={5} className="text-center py-10 text-slate-400">
+                                    No users found
+                                </td>
+                            </tr>
+                        ) : (
+                            users.map(user => (
+                                <tr
+                                    key={user.id}
+                                    className="border-t hover:bg-slate-50 transition"
+                                >
+
+                                    <td className="p-4 font-medium text-slate-800">
+                                        {user.username}
+                                    </td>
+
+                                    <td className="p-4 text-slate-600">
+                                        {user.name}
+                                    </td>
+
+                                    <td className="p-4 text-slate-600">
+                                        {user.email}
+                                    </td>
+
+                                    <td className="p-4">
+                                        <span className={`px-2 py-1 text-xs rounded-full ${getRoleBadge(getRoleName(user.role))}`}>
+                                            {getRoleName(user.role)}
+                                        </span>
+                                    </td>
+
+                                    <td className="p-4 flex gap-2">
+
+                                        <button
+                                            onClick={() => {
+                                                setEditingUser(user);
+                                                setShowModal(true);
+                                            }}
+                                            className="px-3 py-1 text-xs rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                                        >
+                                            Edit
+                                        </button>
+
+                                        <button
+                                            onClick={() => handleDelete(user.id)}
+                                            className="px-3 py-1 text-xs rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition"
+                                        >
+                                            Delete
+                                        </button>
+
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+
+
+            {showModal && (
+                <UserModal
+                    initial={editingUser ?? undefined}
+                    onClose={() => {
+                        setShowModal(false);
+                        setEditingUser(null);
+                    }}
+                    onSubmit={handleSave}
+                />
+            )}
+        </div>
     );
 };
