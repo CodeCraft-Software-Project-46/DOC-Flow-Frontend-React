@@ -1,3 +1,4 @@
+/*
 import React from "react";
 import { type Role, SAMPLE_ROLES } from "../../../sampleData/RolesData.ts";
 
@@ -25,4 +26,67 @@ export const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({ role, onConfir
             </div>
         </div>
     </div>
-);
+);*/
+
+import React from "react";
+import type { Role } from "../../model/Role";
+
+interface DeleteRoleModalProps {
+    role: Role;
+    onConfirm: () => void;
+    onClose: () => void;
+}
+
+export const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
+                                                                    role,
+                                                                    onConfirm,
+                                                                    onClose,
+                                                                }) => {
+    return (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+
+            <div className="bg-white w-full max-w-sm rounded-2xl shadow-2xl">
+
+                {/* Body */}
+                <div className="px-6 pt-6 pb-4 text-center">
+
+                    <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        🗑
+                    </div>
+
+                    <h2 className="text-base font-bold text-slate-800 mb-1">
+                        Delete "{role.name}"?
+                    </h2>
+
+                    <p className="text-sm text-slate-500">
+                        This role has{" "}
+                        <strong>
+                            {role.userCount ?? 0} user
+                            {(role.userCount ?? 0) !== 1 ? "s" : ""}
+                        </strong>
+                        . This action cannot be undone.
+                    </p>
+                </div>
+
+                {/* Footer */}
+                <div className="px-6 py-4 border-t bg-slate-50 flex justify-end gap-3">
+
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 text-sm border rounded-lg"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        onClick={onConfirm}
+                        className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg"
+                    >
+                        Delete
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    );
+};
