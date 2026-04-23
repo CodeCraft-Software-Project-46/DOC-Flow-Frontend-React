@@ -41,6 +41,7 @@ import type { Role } from "../../model/Role";
 
 interface RoleCardProps {
     role: Role;
+    userCount:number;
     onEdit: (r: Role) => void;
     onDelete: (r: Role) => void;
 }
@@ -48,6 +49,7 @@ interface RoleCardProps {
 export const RoleCard: React.FC<RoleCardProps> = ({
                                                       role,
                                                       onEdit,
+                                                      userCount,
                                                       onDelete,
                                                   }) => (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col gap-3 hover:shadow-md transition">
@@ -66,8 +68,8 @@ export const RoleCard: React.FC<RoleCardProps> = ({
                     </h3>
 
                     <p className="text-xs text-slate-400">
-                        {role.userCount ?? 0} user
-                        {(role.userCount ?? 0) !== 1 ? "s" : ""}
+                        {userCount ?? 0} user
+                        {(userCount ?? 0) !== 1 ? "s" : ""}
                     </p>
                 </div>
             </div>

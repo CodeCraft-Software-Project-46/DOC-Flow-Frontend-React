@@ -80,92 +80,58 @@ export const RolesTab: React.FC<Props> = ({ roles, setRoles }) => {
     );
 };*/
 
-import React, { useEffect, useState } from "react";
+
+import React, { useState } from "react";
+import type { Role } from "../../model/Role";
+import type { User } from "../../model/User";
 import { RoleModal } from "./RoleModal";
 import { DeleteRoleModal } from "./DeleteRoleModal";
 import { RoleCard } from "./RoleCard";
 import { roleService } from "../../service/RoleService";
 
-import type { Role } from "../../model/Role";
+interface Props {
+    roles: Role[];
+    users: User[];
+    setRoles: React.Dispatch<React.SetStateAction<Role[]>>;
+    reloadRoles: () => Promise<void>;
+}
 
-export const RolesTab: React.FC = () => {
-    const [roles, setRoles] = useState<Role[]>([]);
-    const [loading, setLoading] = useState(false);
+export const RolesTab: React.FC<Props> = ({ roles, users, setRoles }) => {
 
     const [showCreate, setShowCreate] = useState(false);
     const [editTarget, setEditTarget] = useState<Role | null>(null);
     const [deleteTarget, setDeleteTarget] = useState<Role | null>(null);
 
-    // ✅ LOAD ALL ROLES
-    const loadRoles = async () => {
-        try {
-            setLoading(true);
-            const data = await roleService.getAll();
-            setRoles(data);
-        } catch (err) {
-            console.error("Failed to load roles", err);
-        } finally {
-            setLoading(false);
-        }
+    const getUserCount = (roleId: string) =>
+        users.filter(u => u.role === roleId).length;
+
+    const handleCreate = async (data: any) => {
+        await roleService.create(data);
+        const updated = await roleService.getAll();
+        setRoles(updated);
+        setShowCreate(false);
     };
 
-    useEffect(() => {
-        loadRoles();
-    }, []);
-
-    // ✅ CREATE ROLE
-    const handleCreate = async (data: {
-        name: string;
-        description: string;
-        permissions: string[];
-    }) => {
-        try {
-            await roleService.create(data);
-            await loadRoles();
-            setShowCreate(false);
-        } catch (err) {
-            console.error("Create failed", err);
-        }
-    };
-
-    // ✅ UPDATE ROLE
-    const handleEdit = async (data: {
-        name: string;
-        description: string;
-        permissions: string[];
-    }) => {
+    const handleEdit = async (data: any) => {
         if (!editTarget) return;
-
-        try {
-            await roleService.update(editTarget.id, data);
-            await loadRoles();
-            setEditTarget(null);
-        } catch (err) {
-            console.error("Update failed", err);
-        }
+        await roleService.update(editTarget.id, data);
+        const updated = await roleService.getAll();
+        setRoles(updated);
+        setEditTarget(null);
     };
 
-    // ✅ DELETE ROLE
     const handleDelete = async () => {
         if (!deleteTarget) return;
-
-        try {
-            await roleService.delete(deleteTarget.id);
-            await loadRoles();
-        } catch (err) {
-            console.error("Delete failed", err);
-        }
-
+        await roleService.delete(deleteTarget.id);
+        const updated = await roleService.getAll();
+        setRoles(updated);
         setDeleteTarget(null);
     };
 
     return (
         <>
-            {/* Header */}
             <div className="flex justify-between mb-4">
-                <h2 className="font-bold">
-                    Roles ({roles.length})
-                </h2>
+                <h2 className="font-bold">Roles ({roles.length})</h2>
 
                 <button
                     onClick={() => setShowCreate(true)}
@@ -175,39 +141,32 @@ export const RolesTab: React.FC = () => {
                 </button>
             </div>
 
-            {/* Loading */}
-            {loading && <p>Loading roles...</p>}
-
-            {/* Role List */}
+            {/* ROLE LIST */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {roles.map((role) => (
+                {roles.map(role => (
                     <RoleCard
                         key={role.id}
                         role={role}
                         onEdit={setEditTarget}
                         onDelete={setDeleteTarget}
+                        userCount={getUserCount(role.id)}
                     />
                 ))}
             </div>
 
-            {/* Create Modal */}
+            {/* MODALS */}
             {showCreate && (
-                <RoleModal
-                    onClose={() => setShowCreate(false)}
-                    onSubmit={handleCreate} // ✅ FIXED
-                />
+                <RoleModal onClose={() => setShowCreate(false)} onSubmit={handleCreate} />
             )}
 
-            {/* Edit Modal */}
             {editTarget && (
                 <RoleModal
                     initial={editTarget}
                     onClose={() => setEditTarget(null)}
-                    onSubmit={handleEdit} // ✅ FIXED
+                    onSubmit={handleEdit}
                 />
             )}
 
-            {/* Delete Modal */}
             {deleteTarget && (
                 <DeleteRoleModal
                     role={deleteTarget}
