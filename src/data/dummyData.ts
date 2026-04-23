@@ -19,7 +19,7 @@ import type {
   CustomChart, InstanceDetail, InstanceSummary,
   BottleneckStep, UserSLA, TrendPoint
 } from "../types";
-import type { WorkingHoursConfig } from "../services/workingHoursService";
+import type { WorkingHoursConfig } from "../types/index";
 
 // ══════════════════════════════════════════════════════════════════════════════
 // CONFIGURATION & METADATA

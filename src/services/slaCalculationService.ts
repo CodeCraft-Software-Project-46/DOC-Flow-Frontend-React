@@ -2,7 +2,7 @@
 // Calculates SLA breach/meet considering only working hours
 // Provides recovery analysis for ongoing documents
 
-import type { WorkingHoursConfig } from "./workingHoursService";
+import type { WorkingHoursConfig } from "../types/index";
 import { calculateWorkingHours, addWorkingHours, DEFAULT_WORKING_HOURS, getWorkingHoursPerDay } from "./workingHoursService";
 
 export interface SLACalculationResult {

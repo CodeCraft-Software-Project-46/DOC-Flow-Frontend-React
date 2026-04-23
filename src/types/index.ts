@@ -101,3 +101,11 @@ export interface TrendPoint {  //for trend charts
   day: string;
   c: number;
 }
+
+export interface WorkingHoursConfig {
+  workStartTime: string;
+  workEndTime: string;
+  workDays: number[];
+  holidays: string[];
+  timeZone?: string;
+}

@@ -1,258 +1,276 @@
-// Working Hours Configuration Modal
-// Allows users to customize company working hours, days, and holidays
+import { useState } from "react"; //React components re-render when state changes Without useState, your inputs would be static (not editable)
+import { X, Plus, Trash2 } from "lucide-react"; //reusable React icons delete btn
+import type { WorkingHoursConfig } from "../types"; //Ensures your config object always has:
+import {
+  getWorkingHoursPerDay,
+  validateWorkingHoursConfig,
+} from "../services/workingHoursService";
 
-import { useState } from "react";
-import { X, Plus, Trash2 } from "lucide-react";
-import type { WorkingHoursConfig } from "../services/workingHoursService";
-import { DEFAULT_WORKING_HOURS, getWorkingHoursPerDay, validateWorkingHoursConfig } from "../services/workingHoursService";
-
-interface WorkingHoursModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+interface Props { //Defines what parent sends to modal                      Parent controls data flow
+  isOpen: boolean; //whether modal should show
+  onClose: () => void; //what to do when closing 
   onSave: (config: WorkingHoursConfig) => void;
-  initialConfig?: WorkingHoursConfig;
+  initialConfig: WorkingHoursConfig | null;
+  saving: boolean;
 }
 
-const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+/* UI editable empty state */
+const EMPTY_CONFIG: WorkingHoursConfig = {    //UI fallback state i        f no config from backend (first time setup)
+  workStartTime: "",
+  workEndTime: "",
+  workDays: [],
+  holidays: [],
+  timeZone: "UTC",
+};
 
-export function WorkingHoursModal({ isOpen, onClose, onSave, initialConfig }: WorkingHoursModalProps) {
-  const [config, setConfig] = useState<WorkingHoursConfig>(initialConfig || DEFAULT_WORKING_HOURS);
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+export function WorkingHoursModal({
+  isOpen, //true       //when user click close modal runs onclose() then state change prop is again sent to modal isOpen=false and modal stops renderin.. modal asks parent and then closes
+  onClose,
+  onSave,
+  initialConfig,//null 
+  saving, //false
+}: Props) {
+
+  const [config, setConfig] = useState<WorkingHoursConfig>(
+    initialConfig ?? EMPTY_CONFIG  //initialConfig is null config=EMPTY_CONFIG instead (first time setup)     if its not null use config=initialConfig (editing existing config)           balla 
+  );
+
   const [newHoliday, setNewHoliday] = useState("");
-  const [holidayError, setHolidayError] = useState("");
-  const [errors, setErrors] = useState<string[]>([]);
-  const derivedHoursPerDay = getWorkingHoursPerDay(config);
+  const [errors, setErrors] = useState<string[]>([]); //Store validation error   This state will ALWAYS be an array of strings.   [404, true] ❌      "error" ❌ 
+
+  if (!isOpen) return null; //Don't render anything if modal is closed (parent controls this via isOpen prop)                                                                  balla
 
   const handleSave = () => {
-    const validation = validateWorkingHoursConfig(config);
-    if (!validation.valid) {
-      setErrors(validation.errors);
+    const result = validateWorkingHoursConfig(config);
+
+    if (!result.valid) {
+      setErrors(result.errors);
       return;
     }
-    onSave(config);
+
+    onSave(config);    //Pass the valid config back to parent via onSave prop (parent will handle API call and state update)     balla
     onClose();
   };
 
-  const toggleWorkDay = (dayNum: number) => {
-    setConfig((prev) => ({
-      ...prev,
-      workDays: prev.workDays.includes(dayNum)
-        ? prev.workDays.filter((d) => d !== dayNum)
-        : [...prev.workDays, dayNum].sort(),
+  const toggleWorkDay = (day: number) => {        //receive index
+    setConfig(prev => ({
+      ...prev, //keep all fields in prev stateunchanged
+      workDays: prev.workDays.includes(day)
+        ? prev.workDays.filter(d => d !== day) //already selected → REMOVE (keep only items that pass the condition)
+        : [...prev.workDays, day].sort(), //add new day and sort (e.g. [1,3] + day 2 → [1,2,3])
     }));
   };
+
 
   const addHoliday = () => {
-    if (!newHoliday) {
-      setHolidayError("Please select a holiday date.");
+    if (!newHoliday) {      //Prevent empty input
+      setErrors(["Please select a holiday date."]);
       return;
     }
 
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(newHoliday)) {
-      setHolidayError("Holiday date must be in YYYY-MM-DD format.");
+    if (config.holidays.includes(newHoliday)) { //Prevent duplicates
+      setErrors(["Holiday already exists."]);
       return;
     }
 
-    if (config.holidays.includes(newHoliday)) {
-      setHolidayError("This date is already added.");
-      return;
-    }
-
-    setConfig((prev) => ({
+    setConfig(prev => ({
       ...prev,
-      holidays: [...prev.holidays, newHoliday].sort(),
+      holidays: [...prev.holidays, newHoliday].sort(), //add new holiday and sort
     }));
+
     setNewHoliday("");
-    setHolidayError("");
+    setErrors([]);
   };
 
-  const removeHoliday = (holiday: string) => {
-    setConfig((prev) => ({
+  const removeHoliday = (holiday: string) => {                  
+    setConfig(prev => ({
       ...prev,
-      holidays: prev.holidays.filter((h) => h !== holiday),
+      holidays: prev.holidays.filter(h => h !== holiday),
     }));
-    setHolidayError("");
   };
 
-  if (!isOpen) return null;
+  const hours =              //every render calculate these values
+    config.workStartTime && config.workEndTime                      //if BOTH values are available go to getworkinghoursperday unless store 0
+      ? getWorkingHoursPerDay(config)
+      : 0;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+
       <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-slate-200">
-          <h2 className="text-xl font-bold text-slate-900">Working Hours Configuration</h2>
-          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded" title="Close dialog">
+
+        {/* HEADER */}
+        <div className="flex justify-between items-center p-6 border-b">
+          <h2 className="text-xl font-bold">
+            Working Hours Configuration
+          </h2>
+
+          <button
+            onClick={onClose}                  //close button
+            aria-label="Close modal"
+            title="Close"
+            className="p-2 hover:bg-gray-100 rounded"
+          >
             <X size={20} />
           </button>
         </div>
 
-        {/* Content */}
+        {/* CONTENT */}
         <div className="p-6 space-y-6">
-          {/* Errors */}
+
+          {/* ERRORS */}
           {errors.length > 0 && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="font-semibold text-red-900 mb-2">Validation Errors:</p>
-              <ul className="list-disc list-inside space-y-1">
-                {errors.map((error, i) => (
-                  <li key={i} className="text-red-700 text-sm">
-                    {error}
-                  </li>
-                ))}
-              </ul>
+            <div className="bg-red-50 border p-3 rounded">
+              {errors.map((e, i) => (
+                <p key={i} className="text-red-600 text-sm">{e}</p>
+              ))}
             </div>
           )}
 
-          {/* Working Time Window */}
+          {/* TIME */}
           <div>
-            <label className="block text-sm font-semibold text-slate-900 mb-3">
-              🕒 Working Time Window
-            </label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <p className="font-semibold text-sm mb-2">
+              Working Time
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-3">
+
               <div>
-                <label className="block text-xs text-slate-600 mb-1">Start Time</label>
+                <label htmlFor="start-time" className="text-xs block mb-1">
+                  Start Time
+                </label>
                 <input
+                  id="start-time"
                   type="time"
                   value={config.workStartTime}
-                  onChange={(e) => setConfig((prev) => ({ ...prev, workStartTime: e.target.value }))}
-                  className="border border-slate-300 rounded px-3 py-2 w-full"
-                  aria-label="Working day start time"
-                  title="Working day start time"
+                  onChange={(e) =>
+                    setConfig(prev => ({
+                      ...prev,       //spread operator. “Copy everything from the previous state” in config
+                      workStartTime: e.target.value, //workStartTime: current value from input overwrite that and keep everything else unchanged
+                    }))//update only 1 value in the config state object without affecting the others
+                  }
+                  className="border p-2 rounded w-full"
                 />
               </div>
+
               <div>
-                <label className="block text-xs text-slate-600 mb-1">End Time</label>
+                <label htmlFor="end-time" className="text-xs block mb-1">
+                  End Time
+                </label>
                 <input
+                  id="end-time"
                   type="time"
                   value={config.workEndTime}
-                  onChange={(e) => setConfig((prev) => ({ ...prev, workEndTime: e.target.value }))}
-                  className="border border-slate-300 rounded px-3 py-2 w-full"
-                  aria-label="Working day end time"
-                  title="Working day end time"
+                  onChange={(e) =>
+                    setConfig(prev => ({
+                      ...prev,
+                      workEndTime: e.target.value, 
+                    }))
+                  }
+                  className="border p-2 rounded w-full"
                 />
               </div>
+
             </div>
-            <p className="text-xs text-slate-500 mt-2">Derived working hours/day: {derivedHoursPerDay.toFixed(2)}h</p>
+
+            <p className="text-xs mt-2">
+              Hours/day: {hours.toFixed(2)}        {/*round to 2 decimals */}
+            </p>
           </div>
 
-          {/* Working Days */}
+          {/* DAYS */}
           <div>
-            <label className="block text-sm font-semibold text-slate-900 mb-3">
-              📅 Working Days
-            </label>
-            <div className="grid grid-cols-4 gap-2">
-              {DAYS.map((day, idx) => (
+            <p className="font-semibold text-sm mb-2">
+              Working Days
+            </p>
+
+            <div className="grid grid-cols-4 gap-2">              
+              {DAYS.map((d, i) => (   //looping through array & creates 7 buttons , sends index i (0–6) 
                 <button
-                  key={idx}
-                  onClick={() => toggleWorkDay(idx)}
-                  className={`py-2 px-3 rounded text-sm font-medium transition-colors ${
-                    config.workDays.includes(idx)
-                      ? "bg-blue-600 text-white"
-                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                  key={i}
+                  type="button"
+                  onClick={() => toggleWorkDay(i)}
+                  aria-label={`Toggle ${d}`}
+                  title={`Toggle ${d}`}
+                  className={`p-2 rounded ${
+                    config.workDays.includes(i)
+                      ? "bg-blue-600 text-white" //if workDays includes index i (0–6) means its selected so show blue background and white text
+                      : "bg-gray-100"
                   }`}
                 >
-                  {day.slice(0, 3)}
+                  {d}
                 </button>
               ))}
             </div>
-            <p className="text-xs text-slate-500 mt-2">
-              Selected: {config.workDays.map((d) => DAYS[d]).join(", ")}
-            </p>
           </div>
 
-          {/* Holidays */}
+          {/* HOLIDAYS */}
           <div>
-            <label className="block text-sm font-semibold text-slate-900 mb-3">
-              🎉 Holidays & Special Days
+            <label htmlFor="holiday-input" className="font-semibold text-sm mb-2 block">
+              Holidays
             </label>
 
-            {/* Add Holiday */}
-            <div className="flex gap-2 mb-3">
-              <label className="sr-only">Holiday date</label>
+            <div className="flex gap-2">
               <input
+                id="holiday-input"
                 type="date"
-                value={newHoliday}
-                onChange={(e) => {
-                  setNewHoliday(e.target.value);
-                  setHolidayError("");
-                }}
-                className="border border-slate-300 rounded px-3 py-2 flex-1"
-                aria-label="Holiday date"
+                value={newHoliday} //whts value on newHoliday state is displayed in input
+                onChange={(e) => setNewHoliday(e.target.value)}
+                className="border p-2 flex-1 rounded"
               />
-              <button
+
+              <button            //+ button
+                type="button"
                 onClick={addHoliday}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2 font-medium"
+                aria-label="Add holiday"
+                title="Add holiday"
+                className="bg-blue-600 text-white px-3 rounded flex items-center"
               >
-                <Plus size={16} /> Add
+                <Plus size={16} />
               </button>
             </div>
-            {holidayError && (
-              <p className="text-sm text-red-600 mb-3">{holidayError}</p>
-            )}
 
-            {/* Holiday List */}
-            {config.holidays.length > 0 ? (
-              <div className="space-y-2">
-                {config.holidays.map((holiday) => (
-                  <div key={holiday} className="flex items-center justify-between bg-slate-50 p-3 rounded border border-slate-200">
-                    <span className="text-slate-700 font-mono">{holiday}</span>
-                    <button
-                      onClick={() => removeHoliday(holiday)}
-                      className="text-red-600 hover:text-red-700 p-1"
-                      title={`Remove ${holiday}`}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-slate-500 italic">No holidays configured</p>
-            )}
+            <div className="mt-2 space-y-2">
+              {config.holidays.map((h) => (
+                <div
+                  key={h}
+                  className="flex justify-between bg-gray-100 p-2 rounded"
+                >
+                  <span>{h}</span>
 
-            <p className="text-xs text-slate-500 mt-3">
-              Total holidays: {config.holidays.length} days/year
-            </p>
-          </div>
-
-          {/* Summary */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm font-semibold text-blue-900 mb-2">📊 Working Hours Summary</p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div>
-                <p className="text-blue-700 font-mono">{derivedHoursPerDay.toFixed(2)}</p>
-                <p className="text-blue-600 text-xs">hours/day</p>
-              </div>
-              <div>
-                <p className="text-blue-700 font-mono">{config.workStartTime} - {config.workEndTime}</p>
-                <p className="text-blue-600 text-xs">daily window</p>
-              </div>
-              <div>
-                <p className="text-blue-700 font-mono">{config.workDays.length}</p>
-                <p className="text-blue-600 text-xs">days/week</p>
-              </div>
-              <div>
-                <p className="text-blue-700 font-mono">{(config.workDays.length * derivedHoursPerDay).toFixed(1)}</p>
-                <p className="text-blue-600 text-xs">hours/week</p>
-              </div>
+                  <button
+                    type="button"
+                    onClick={() => removeHoliday(h)}
+                    aria-label={`Remove holiday ${h}`}
+                    title="Remove holiday"
+                    className="text-red-600"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
+
         </div>
 
-        {/* Footer */}
-        <div className="flex justify-end gap-3 p-6 border-t border-slate-200 bg-slate-50">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-slate-700 bg-slate-200 hover:bg-slate-300 rounded font-medium"
-          >
+        {/* FOOTER */}
+        <div className="flex justify-end gap-2 p-4 border-t">
+          <button onClick={onClose}>
             Cancel
           </button>
+
           <button
             onClick={handleSave}
-            className="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded font-medium"
+            disabled={saving} //disable button while saving to prevent multiple clicks and API calls
+            className="bg-blue-600 text-white px-4 py-2 rounded"
           >
-            Save Configuration
+            {saving ? "Saving..." : "Save"}     {/*if saving=true show "Saving..." otherwise show "Save" in the button */}
           </button>
         </div>
+
       </div>
     </div>
   );
