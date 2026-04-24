@@ -14,6 +14,19 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+*.log
+
+# test and coverage output
+coverage/
+
+# cache directories
+.cache/
+.parcel-cache/
+.eslintcache
+*.tsbuildinfo
+
+# local-only overrides
+*.local
 
 # editor/system
 .vscode/
