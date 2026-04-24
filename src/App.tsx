@@ -17,7 +17,7 @@ import {AnalyticsPage} from "./pages/analytics/AnalyticsPage.tsx";
 import {DocumentTypesPage} from "./pages/documents/DocumentTypesPage.tsx";
 
 import NotificationsPage from "./pages/notifications/NotificationsPage";
-
+import AuditLogPage from './pages/audit-log/AuditLogPage';
 
 
 
@@ -47,6 +47,7 @@ export default function App() {
                         { path: "/user", element: <UserPage /> },
                         { path: "/analytics", element: <AnalyticsPage/> },
                         { path: "/notifications", element: <NotificationsPage /> },
+                        { path: "/audit-logs", element: <AuditLogPage />}
 
                     ]
                 }

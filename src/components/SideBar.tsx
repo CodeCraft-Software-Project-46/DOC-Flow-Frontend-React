@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import NotificationBell from './NotificationBell';
 import {
     LayoutDashboard,
     FileText,
@@ -11,6 +12,7 @@ import {
     Settings,
     HelpCircle,
     GitBranch,
+    History,
     LogOut // Added the logout icon!
 } from "lucide-react";
 import { AuthContext } from "../context/AuthContext"; // 1. Import the Vault
@@ -86,6 +88,12 @@ const Sidebar: React.FC<SidebarProps> = ({
             icon: Settings, 
             permission: "configure_dashboard" // Using dashboard config as a proxy for settings
         },
+        {
+            name: "Audit Logs",
+            path: "/audit-logs",
+            icon: History,
+            permission: "view_users"
+        }
     ];
 
     // 4. The Magic Filter! 

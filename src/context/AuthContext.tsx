@@ -3,11 +3,12 @@ import type { ReactNode } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
 // When we open JWT Token it must contain these fields, so we define an interface for it
-interface DecodedUser {
-    user_id: number;
+export interface DecodedUser {
+    user_id: string;
     username: string;
-    roles: string[];
+    roles: string[];     
     permissions: string[];
+    department?: string; 
 }
 
 // Shape of AuthContext. User is either a DecodedUser or null.
