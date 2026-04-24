@@ -23,7 +23,7 @@ export const SettingsPage = () => {
 
   /* Load config */
   useEffect(() => {             //Runs AFTER component loads  Without it → API runs on every render ❌
-    const fetchData = async () => {  //creates the function
+  const fetchData = async () => {  //creates the function
       try {
         const data = await getWorkingHours();    
         setConfig(data); // null if no record
