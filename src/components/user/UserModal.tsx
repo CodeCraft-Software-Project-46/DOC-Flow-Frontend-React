@@ -351,8 +351,6 @@ export const UserModal: React.FC<UserModalProps> = ({initial, onClose, onSubmit,
 import React, {useEffect, useState} from "react";
 import type {User} from "../../model/User";
 import type {Role} from "../../model/Role";
-import type {Department} from "../../model/Department";
-import {departmentService} from "../../service/DepartmentService";
 import {roleService} from "../../service/RoleService";
 
 interface Props {
@@ -378,14 +376,11 @@ export const UserModal: React.FC<Props> = ({
     const [address, setAddress] = useState(initial?.address ?? "");
 
     const [roleId, setRoleId] = useState<string | null>(initial?.role ?? null);
-    const [departmentId, setDepartmentId] = useState<string | null>(initial?.department ?? null);
 
-    const [departments, setDepartments] = useState<Department[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
     const [errors, setErrors] = useState<any>({});
 
     useEffect(() => {
-        departmentService.getAll().then(setDepartments);
         roleService.getAll().then(setRoles);
     }, []);
 
@@ -402,7 +397,6 @@ export const UserModal: React.FC<Props> = ({
         else if (!/^(?:\+94|0)?7\d{8}$/.test(contact.trim())) e.contact = "Invalid phone";
 
         if (!address.trim()) e.address = "Required";
-        if (!departmentId) e.department = "Select department";
         if (!roleId) e.role = "Select role";
 
         setErrors(e);
@@ -419,10 +413,9 @@ export const UserModal: React.FC<Props> = ({
             contact_number: contact,
             address,
             role: roleId,
-            department: departmentId,
         });
 
-        onClose();
+
     };
 
     const inputClass = (field: string) =>
@@ -484,20 +477,6 @@ export const UserModal: React.FC<Props> = ({
                         {errors.address && <p className="text-xs text-red-500">{errors.address}</p>}
                     </div>
 
-                    <div>
-                        <label className="text-sm font-semibold">Department *</label>
-                        <select
-                            value={departmentId ?? ""}
-                            onChange={e => setDepartmentId(e.target.value || null)}
-                            className={inputClass("department")}
-                        >
-                            <option value="">Select Department</option>
-                            {departments.map(dep => (
-                                <option key={dep.id} value={dep.id}>{dep.name}</option>
-                            ))}
-                        </select>
-                        {errors.department && <p className="text-xs text-red-500">{errors.department}</p>}
-                    </div>
 
                     <div>
                         <label className="text-sm font-semibold">Role *</label>
