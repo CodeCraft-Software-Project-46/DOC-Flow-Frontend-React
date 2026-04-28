@@ -319,6 +319,7 @@ import type { User } from "../../model/User";
 import type { Role } from "../../model/Role";
 import { UserModal } from "./UserModal";
 import {userService} from "../../service/UserService.ts";
+import Swal from "sweetalert2";
 
 interface Props {
     users: User[];
@@ -349,34 +350,78 @@ export const UsersTab: React.FC<Props> = ({
     };
 
     const handleSave = async (data: any) => {
+
+        const roleAlreadyUsed = users.some(
+            u => u.role === data.role && (!editingUser || u.id !== editingUser.id)
+        );
+
+        if (roleAlreadyUsed) {
+            Swal.fire("Error", "This role is already assigned to another user", "error");
+            return;
+        }
+
         try {
             if (editingUser) {
                 await userService.updateUser(editingUser.id, data);
+
+                Swal.fire("Updated!", "User updated successfully", "success");
             } else {
                 await userService.createUser(data);
+
+                Swal.fire("Created!", "User created successfully", "success");
             }
 
             setShowModal(false);
             setEditingUser(null);
-
-            //refresh from parent
             await reloadUsers();
 
-        } catch (err) {
-            console.error("Save failed", err);
+        } catch (err: any) {
+            console.error(err);
+
+            Swal.fire(
+                "Error",
+                err?.response?.data?.error || "Server error",
+                "error"
+            );
+
         }
     };
 
     const handleDelete = async (id: string) => {
-        const ok = window.confirm("Delete this user?");
-        if (!ok) return;
+        const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "This user will be permanently deleted.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#ef4444",
+            cancelButtonColor: "#6b7280",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "Cancel"
+        });
+
+        if (!result.isConfirmed) return;
 
         try {
             await userService.deleteUser(id);
+
+            Swal.fire({
+                icon: "success",
+                title: "Deleted!",
+                text: "User has been deleted successfully.",
+                timer: 1500,
+                showConfirmButton: false
+            });
+
             await reloadUsers();
 
         } catch (err) {
             console.error("Delete failed", err);
+
+            Swal.fire(
+                "Error",
+                "Failed to delete user. Please try again.",
+                "error"
+            );
         }
     };
 
