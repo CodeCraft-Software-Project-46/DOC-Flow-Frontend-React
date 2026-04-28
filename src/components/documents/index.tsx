@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
 import { Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-// 1. Import your new modal component
 import ManualUploadModal from '../../components/documents/ManualUploadModal';
 
-const DocumentPage: React.FC = () => {
-  // 2. Add the state to control the modal visibility
+const DocumentsPage = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Documents Dashboard</h1>
-        
-        {/* 3. Add the Upload Button */}
+        <h1 className="text-2xl font-bold text-gray-800">Documents</h1>
         <Button 
           type="primary" 
           icon={<PlusOutlined />} 
@@ -24,9 +20,8 @@ const DocumentPage: React.FC = () => {
         </Button>
       </div>
 
-      {/* ... (Whatever table or grid code you already have in this file stays here!) ... */}
+      {/* Your table or document grid would go here */}
 
-      {/* 4. Drop the hidden modal at the bottom of the component */}
       <ManualUploadModal 
         isOpen={isUploadModalOpen} 
         onClose={() => setIsUploadModalOpen(false)} 
@@ -35,4 +30,4 @@ const DocumentPage: React.FC = () => {
   );
 };
 
-export default DocumentPage;
+export default DocumentsPage;

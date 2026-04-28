@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
 import { RootLayout } from "./components/RootLayout";
 import {ProtectedRoute} from "./components/ProtectedRoute.tsx";
 
-import { DocumentPage } from "./pages/documents/DocumentPage";
+import  DocumentPage  from "./pages/documents/DocumentPage";
 import {SettingsPage} from "./pages/settings/SettingsPage.tsx";
 import {SignIn} from "./pages/signIn-signup/SignIn.tsx";
 import {DashboardSuperAdmin} from "./pages/dashboard/Dashboard-SuperAdmin.tsx";
