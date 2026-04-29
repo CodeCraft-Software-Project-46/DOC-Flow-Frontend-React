@@ -1,5 +1,7 @@
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
 
+
+
 // Layouts
 import { RootLayout } from "./components/RootLayout";
 import {ProtectedRoute} from "./components/ProtectedRoute.tsx";
@@ -16,15 +18,10 @@ import {WorkFlowInstances} from "./pages/workflow/WorkFlowInstances.tsx";
 import {AnalyticsPage} from "./pages/analytics/AnalyticsPage.tsx";
 import {DocumentTypesPage} from "./pages/documents/DocumentTypesPage.tsx";
 
-
-
-
 export default function App() {
     const routes = createBrowserRouter([
         // 1. Login Route
         { path: "/", element: <SignIn /> },
-
-
 
         // 2. Protected App Routes
         {
@@ -33,7 +30,6 @@ export default function App() {
                 {
                     element: <ProtectedRoute />, // Checks if user is logged in
                     children: [
-
                         { path: "/dashboard", element: <DashboardSuperAdmin /> },
                         { path: "/dashboard-builder", element: <DashBoardBuilder /> },
                         { path: "/document", element: <DocumentPage /> },
@@ -42,9 +38,10 @@ export default function App() {
                         { path: "/workflow-version", element: <WorkFlowVersionPage /> },
                         { path: "/instances", element: <WorkFlowInstances /> },
                         { path: "/settings", element: <SettingsPage /> },
+                        
+
                         { path: "/user", element: <UserPage /> },
                         { path: "/analytics", element: <AnalyticsPage/> },
-
                     ]
                 }
             ]

@@ -10,7 +10,7 @@ import {
     Bell,
     Settings,
     HelpCircle,
-    GitBranch
+    GitBranch,
 } from "lucide-react";
 
 
@@ -45,7 +45,6 @@ const Sidebar: React.FC<SidebarProps> = ({
         { name: "Roles & Users", path: "/user", icon: Users },
         { name: "Notifications", path: "/notifications", icon: Bell, badge: 3 },
         { name: "Settings", path: "/settings", icon: Settings },
-
     ];
 
     return (
