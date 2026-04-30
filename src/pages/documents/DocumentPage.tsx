@@ -27,7 +27,7 @@ interface DocumentRecord {
   source: string; // 'manual' or 'gdrive'
   current_status: string;
   ai_summary: string;
-  s3_url: string;
+  presigned_url: string;
   submitted_date: string;
 }
 
@@ -176,9 +176,9 @@ const DocumentPage: React.FC = () => {
         <Button 
           type="link" 
           icon={<EyeOutlined />} 
-          href={record.s3_url} 
+          href={record.presigned_url} 
           target="_blank"
-          disabled={!record.s3_url} // Disable if S3 upload failed
+          disabled={!record.presigned_url} // Disable if S3 upload failed
         >
           View Securely
         </Button>

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, Tag, Switch, message } from 'antd';
-import { PlusOutlined, FileTextOutlined } from '@ant-design/icons';
+import { Table, Button, Modal, Form, Input, Tag, Switch, Space, Popconfirm, message } from 'antd';
+import { PlusOutlined, FileTextOutlined, DeleteOutlined, StopOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
+
+
 
 // Define the TypeScript interface matching your MySQL table
 interface DocumentType {
@@ -60,6 +62,36 @@ export const DocumentTypesPage: React.FC = () => {
     }
   };
 
+// Function to Disable/Enable
+  const handleToggleStatus = async (record: any) => {
+    try {
+      // Assuming your database field is called 'is_active'. Adjust if it's 'status'
+      const updatedStatus = !record.is_active; 
+      
+      await axios.patch(`http://localhost:8000/api/documents/types/${record.id}/`, {
+        is_active: updatedStatus
+      });
+      
+      message.success(`Document type successfully ${updatedStatus ? 'enabled' : 'disabled'}!`);
+      fetchTypes(); // <-- Replace with whatever function fetches your table data
+    } catch (error) {
+      console.error("Failed to update status:", error);
+      message.error("Failed to update document type status.");
+    }
+  };
+
+  // Function to Delete
+  const handleDelete = async (id: number) => {
+    try {
+      await axios.delete(`http://localhost:8000/api/documents/types/${id}/`);
+      message.success('Document type deleted successfully!');
+      fetchTypes(); // <-- Replace with whatever function fetches your table data
+    } catch (error) {
+      console.error("Failed to delete:", error);
+      message.error("Failed to delete document type. It might be in use.");
+    }
+  };
+
   // Configure the Ant Design Table Columns
   const columns = [
     {
@@ -99,6 +131,37 @@ export const DocumentTypesPage: React.FC = () => {
           </Tag>
         );
       },
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_: any, record: any) => (
+        <Space size="middle">
+          {/* Disable / Enable Button */}
+          <Button 
+            type="link" 
+            onClick={() => handleToggleStatus(record)}
+            className={record.is_active ? "text-amber-500 hover:text-amber-600" : "text-green-500 hover:text-green-600"}
+            icon={record.is_active ? <StopOutlined /> : <CheckCircleOutlined />}
+          >
+            {record.is_active ? 'Disable' : 'Enable'}
+          </Button>
+
+          {/* Delete Button with Safety Confirmation */}
+          <Popconfirm
+            title="Delete Document Type"
+            description="Are you sure you want to permanently delete this type?"
+            onConfirm={() => handleDelete(record.id)}
+            okText="Yes, Delete"
+            cancelText="Cancel"
+            okButtonProps={{ danger: true }}
+          >
+            <Button type="link" danger icon={<DeleteOutlined />}>
+              Delete
+            </Button>
+          </Popconfirm>
+        </Space>
+      ),
     },
   ];
 
