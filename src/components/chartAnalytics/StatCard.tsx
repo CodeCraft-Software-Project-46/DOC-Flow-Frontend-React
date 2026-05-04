@@ -1,17 +1,17 @@
 // Reusable stat card used in both Overall Dashboard and Workflow Analytics
 
 interface StatCardProps { //prop means Data or functions passed from parent → child
-  icon: string; // optional icon prop to display an icon in the card
-  value: string;
+  icon?: string; // optional icon prop to display an icon in the card
+  value: string | number | null;
   label: string;
   description: string;
-  color: "blue" | "red";
+  color: "blue" | "red" | "green";
   small?: boolean; // smaller size for workflow tab
 }
 
 export default function StatCard({ icon, value, label, description, color, small = false }: StatCardProps) {
-  const iconBgClass = color === "blue" ? "bg-blue-100" : "bg-red-100"; //background color of the icon circle based on the color prop
-  const displayValue = value || "\u00A0";
+  const iconBgClass = color === "blue" ? "bg-blue-100" : color === "red" ? "bg-red-100" : "bg-green-100"; //background color of the icon circle based on the color prop
+  const displayValue = value !== undefined && value !== null ? String(value) : "\u00A0";
 
   return (
     <div className={`bg-white rounded-2xl shadow-sm flex items-center gap-4 ${small ? "p-4" : "p-6"}`}>
