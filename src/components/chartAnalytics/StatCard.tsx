@@ -11,6 +11,7 @@ interface StatCardProps { //prop means Data or functions passed from parent → 
 
 export default function StatCard({ icon, value, label, description, color, small = false }: StatCardProps) {
   const iconBgClass = color === "blue" ? "bg-blue-100" : "bg-red-100"; //background color of the icon circle based on the color prop
+  const displayValue = value || "\u00A0";
 
   return (
     <div className={`bg-white rounded-2xl shadow-sm flex items-center gap-4 ${small ? "p-4" : "p-6"}`}>
@@ -23,8 +24,8 @@ export default function StatCard({ icon, value, label, description, color, small
 
       {/* Text */}
       <div>
-        <div className={`font-bold text-slate-900 ${small ? "text-2xl" : "text-3xl"}`}>
-          {value}
+        <div className={`min-h-[2.75rem] font-bold text-slate-900 ${small ? "text-2xl" : "text-3xl"}`}>
+          {displayValue}
         </div>
         <div className="text-sm text-slate-500 font-medium">{label}</div>
         <div className="text-xs text-slate-400">{description}</div>

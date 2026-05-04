@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import StatCard from "../../components/chartAnalytics/StatCard";
 import SLADonut from "../../components/chartAnalytics/SLADonut";
 import SLATrend from "../../components/chartAnalytics/SLATrend";
@@ -11,11 +11,14 @@ import { useCharts } from "../../context/useCharts";
 import { exportElementAsPdf } from "../../services/pdfExportService";
 import {
   WORKFLOWS,
-  DASHBOARD_KPI,
-  INSTANCE_DETAILS,
   getWorkflowKPI,
-  getOverallLiveKPI,
 } from "../../data/dummyData";
+import {
+  fetchRunningDocuments,
+  fetchActiveOverdueTasks,
+  fetchCompletedTasks,
+  fetchSLACompliance,
+} from "../../services/analyticsApi";
 
 type Tab = "overall" | "workflow";
 type TimeRange = "7d" | "30d" | "90d" | "custom" | "all";
@@ -34,6 +37,13 @@ export const AnalyticsPage = () => {
   
   // Workflow tab — selected workflow
   const [selectedWorkflow, setSelectedWorkflow] = useState(WORKFLOWS[0]);
+  // 🔥 API states (NEW)
+const [runningDocs, setRunningDocs] = useState<number | null>(null);
+const [overdueTasks, setOverdueTasks] = useState<number | null>(null);
+const [completedTasks, setCompletedTasks] = useState<number | null>(null);
+const [slaCompliance, setSlaCompliance] = useState<number | null>(null);
+
+const [loading, setLoading] = useState(true);
 
   const overallMainExportRef = useRef<HTMLDivElement>(null); //export THIS exact section
   const workflowMainExportRef = useRef<HTMLDivElement>(null);//this ref will point to a <div> element, innitially no div connected yet Because before render, there is no div yet
@@ -51,10 +61,10 @@ export const AnalyticsPage = () => {
     [selectedWorkflow]
   );
 
-  const overallLiveKPI = useMemo( //for stat cards that always show live data, not affected by time range filter
-    () => getOverallLiveKPI(),
-    []
-  );
+  // const overallLiveKPI = useMemo( //for stat cards that always show live data, not affected by time range filter
+  //   () => getOverallLiveKPI(),
+  //   []
+  // );
 
     const handleTabChange = (selectedTab: Tab) => {
     setTab(selectedTab);
@@ -65,22 +75,53 @@ export const AnalyticsPage = () => {
     setTab("workflow");
   };
 
-  const overallSlaStatusCounts = useMemo(() => {
-    let met = 0;
-    let breached = 0;
-    Object.values(INSTANCE_DETAILS).forEach((instance) => { //Object.values converts your data into a list of instances
-      instance.steps.forEach((step) => {
-        if (step.status === "Met") met += 1;
-        else if (step.status === "Breached") breached += 1;
-      });
-    });
-    return {
-      met,
-      breached,
-      completedTasks: met + breached, //return completed tasks as 
-    };
-  }, []);
+  // const overallSlaStatusCounts = useMemo(() => {
+  //   let met = 0;
+  //   let breached = 0;
+  //   Object.values(INSTANCE_DETAILS).forEach((instance) => { //Object.values converts your data into a list of instances
+  //     instance.steps.forEach((step) => {
+  //       if (step.status === "Met") met += 1;
+  //       else if (step.status === "Breached") breached += 1;
+  //     });
+  //   });
+  //   return {
+  //     met,
+  //     breached,
+  //     completedTasks: met + breached, //return completed tasks as 
+  //   };
+  // }, []);
 
+  // 🔥 Fetch backend data
+useEffect(() => {
+  const loadData = async () => {
+    setLoading(true); // a ?? bif a is null or undefined → use b otherwise → use a 
+    try {
+      const running = await fetchRunningDocuments();
+      setRunningDocs(running.value);
+
+      const overdue = await fetchActiveOverdueTasks();
+      setOverdueTasks(overdue.count);
+
+      const completed = await fetchCompletedTasks();
+      setCompletedTasks(completed.count);
+
+      const sla = await fetchSLACompliance();
+      setSlaCompliance(sla.percentage);
+    } catch (error) {
+      console.error("Error fetching analytics data", error);
+
+      // IMPORTANT: keep UI clean (NOT zeros)
+      setRunningDocs(null);
+      setOverdueTasks(null);
+      setCompletedTasks(null);
+      setSlaCompliance(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  loadData();
+}, []);
   
   // Navigate to chart configuration page to create/edit charts
   function handleCreateChart() {
@@ -173,14 +214,14 @@ export const AnalyticsPage = () => {
               <div className="grid grid-cols-2 gap-4">  {/* stat cards */}
                 <StatCard
                   icon="📄"
-                  value={overallLiveKPI.runningDocuments.toString()}
+                  value={loading || runningDocs === null ? "—" : runningDocs.toString()} //loading "" error _ 
                   label="Running Documents"
                   description="Currently Active"
                   color="blue"
                 />
                 <StatCard
                   icon="⚠️"
-                  value={overallLiveKPI.activeOverdueTasks.toString()}
+                  value={loading || overdueTasks === null ? "—" : overdueTasks.toString()}
                   label="Active Overdue Tasks"
                   description="Requires Immediate Attention"
                   color="red"
@@ -248,7 +289,7 @@ export const AnalyticsPage = () => {
 
               <StatCard   //Completed Tasks
                 icon="📊"
-                value={overallSlaStatusCounts.completedTasks.toString()}
+                value={loading || completedTasks === null ? "—" : completedTasks.toString()}
                 label="Completed Tasks"
                 description="Total finished tasks"
                 color="blue"
@@ -256,7 +297,7 @@ export const AnalyticsPage = () => {
 
               <StatCard //SLA Compliance
                 icon="✅"
-                value={`${DASHBOARD_KPI.overall.slaCompliance}%`}
+                value={loading || slaCompliance === null ? "—" : `${slaCompliance}%`}
                 label="SLA Compliance"
                 description="Overall compliance rate"
                 color="red"
