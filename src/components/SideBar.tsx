@@ -79,7 +79,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             name: "Notifications", 
             path: "/notifications", 
             icon: Bell, 
-            badge: 3, 
             permission: "can_manage_notifications" // Added the actual permission
         },
         { 
@@ -184,12 +183,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                                                 <Icon size={18} />
                                                 {item.name}
                                             </div>
-
-                                            {item.badge && (
-                                                <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                                                    {item.badge}
-                                                </span>
-                                            )}
                                         </button>
                                     );
                                 })}

@@ -18,6 +18,8 @@ import {DocumentTypesPage} from "./pages/documents/DocumentTypesPage.tsx";
 
 import NotificationsPage from "./pages/notifications/NotificationsPage";
 import AuditLogPage from './pages/audit-log/AuditLogPage';
+import ForgotPassword from "./pages/signIn-signup/ForgotPassword.tsx";
+import ResetPasswordConfirm from "./pages/signIn-signup/ResetPasswordConfirm.tsx";
 
 
 
@@ -25,6 +27,9 @@ export default function App() {
     const routes = createBrowserRouter([
         // 1. Login Route
         { path: "/", element: <SignIn /> },
+        { path: "/forgot-password", element: <ForgotPassword /> },
+        { path: "/reset-password/:uid/:token", element: <ResetPasswordConfirm /> },
+        { path: "/login", element: <Navigate to="/" replace /> },
 
 
 
@@ -47,8 +52,7 @@ export default function App() {
                         { path: "/user", element: <UserPage /> },
                         { path: "/analytics", element: <AnalyticsPage/> },
                         { path: "/notifications", element: <NotificationsPage /> },
-                        { path: "/audit-logs", element: <AuditLogPage />}
-
+                        { path: "/audit-logs", element: <AuditLogPage />},
                     ]
                 }
             ]

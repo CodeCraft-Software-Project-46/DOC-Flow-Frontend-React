@@ -29,7 +29,7 @@ const AuditLogPage = () => {
                 setLoading(false);
             });
     }, []);
-    if (loading) return <div className="p-6 text-white">Loading system logs...</div>;
+    if (loading) return <div className="p-6 text-black">Loading system logs...</div>;
 
     return (
         <div className="p-6">

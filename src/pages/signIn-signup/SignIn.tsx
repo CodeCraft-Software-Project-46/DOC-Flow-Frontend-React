@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router'; //useNavigate: This tool acts as a t
                                             // "you call Maps('/dashboard'), and it instantly swaps the screen to the dashboard without a loading screen.
 import axios from 'axios'; // To make HTTP requests.
 import { AuthContext } from '../../context/AuthContext'; // Import our specific pipe
+import { Link } from 'react-router';
 
 export const SignIn: React.FC = () => { // React.FC means(typescript) this is a React Functional Component. It's a fancy way of saying "This is a piece of the UI that can be reused and has its own logic."
     const navigate = useNavigate();
@@ -61,9 +62,14 @@ export const SignIn: React.FC = () => { // React.FC means(typescript) this is a 
                     </Form.Item>
 
                     <Form.Item>
-                        <Form.Item name="remember" valuePropName="checked" noStyle>
-                            <Checkbox>Remember me</Checkbox>
-                        </Form.Item>
+                        <div className="flex items-center justify-between">
+                            <Form.Item name="remember" valuePropName="checked" noStyle>
+                                <Checkbox>Remember me</Checkbox>
+                            </Form.Item>
+                            <Link to="/forgot-password" className="text-sm text-blue-400 hover:text-blue-300 transition-colors">
+                                Forgot password?
+                            </Link>
+                        </div>
                     </Form.Item>
 
                     <Form.Item>
