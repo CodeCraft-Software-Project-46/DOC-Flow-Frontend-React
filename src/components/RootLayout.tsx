@@ -6,6 +6,7 @@ import Header from "./Header";
 import Sidebar from "./SideBar";
 import Footer from "./Footer";
 
+
 export function RootLayout() {
     const navigate = useNavigate();
     const location = useLocation();

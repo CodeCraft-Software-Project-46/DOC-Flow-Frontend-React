@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import NotificationBell from './NotificationBell';
+import { AuthContext } from "../context/AuthContext";
 import {
     LayoutDashboard,
     FileText,
@@ -13,9 +13,8 @@ import {
     HelpCircle,
     GitBranch,
     History,
-    LogOut // Added the logout icon!
+
 } from "lucide-react";
-import { AuthContext } from "../context/AuthContext"; // 1. Import the Vault
 
 type SidebarProps = {
     isOpen: boolean;
@@ -30,10 +29,10 @@ const Sidebar: React.FC<SidebarProps> = ({
     selectedKey,
     onMenuClick,
 }) => {
-    // 2. Tap into the Vault to get the user and the logout function
+    // 2. Tap into the Vault to get the user[cite: 7]
     const authContext = useContext(AuthContext);
     const user = authContext?.user;
-    const logout = authContext?.logout;
+
 
     // 3. Add 'permission' tags to your menus. 
     // If a menu doesn't have a permission tag, EVERYONE can see it.
@@ -207,15 +206,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                         >
                             <HelpCircle size={18} />
                             Help & Support
-                        </button>
-                        
-                        {/* THE LOGOUT BUTTON */}
-                        <button
-                            onClick={logout}
-                            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-400/80 hover:bg-red-500/10 hover:text-red-400 w-full transition"
-                        >
-                            <LogOut size={18} />
-                            Sign Out
                         </button>
                     </div>
                 </div>

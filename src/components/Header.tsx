@@ -1,6 +1,11 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import NotificationBell from "./NotificationBell";
+
+
+import { Dropdown, message, type MenuProps } from "antd"; 
+import { KeyOutlined, LogoutOutlined } from "@ant-design/icons";
+import { ChangePasswordModal } from "./ChangePasswordModal";
 
 type HeaderProps = {
     onToggleSidebar: () => void;
@@ -12,11 +17,37 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
     const authContext = useContext(AuthContext);
     const user = authContext?.user;
 
+    // State to handle Modal visibility
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     // Helper to get initials from the username for the avatar
     const getInitials = (name: string | undefined) => {
         if (!name) return "??";
         return name.substring(0, 2).toUpperCase();
     };
+
+    // Define the Dropdown Menu Items
+    const menuItems: MenuProps['items'] = [
+        {
+            key: 'change-password',
+            label: 'Change Password',
+            icon: <KeyOutlined />,
+            onClick: () => setIsModalOpen(true),
+        },
+        {
+            type: 'divider',
+        },
+        {
+            key: 'logout',
+            label: 'Logout',
+            icon: <LogoutOutlined />,
+            danger: true,
+            onClick: () => {
+                authContext?.logout(); // Trigger your existing logout logic
+                message.success("Logged out successfully");
+            },
+        },
+    ];
 
     return (
         <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -70,7 +101,11 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                     <div className="hover:bg-gray-100 rounded-lg transition-colors">
                         <NotificationBell />
                     </div>
-
+                    <Dropdown 
+                        menu={{ items: menuItems }} 
+                        trigger={['click']} 
+                        placement="bottomRight"
+                    >
                     {/* User Profile Summary */}
                     <div className="flex items-center gap-3 cursor-pointer p-2 hover:bg-gray-100 rounded-lg transition-colors group">
                         
@@ -104,8 +139,13 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                     </div>
+                    </Dropdown>
                 </div>
             </div>
+            <ChangePasswordModal 
+                visible={isModalOpen} 
+                onCancel={() => setIsModalOpen(false)} 
+            />
         </header>
     );
 };
