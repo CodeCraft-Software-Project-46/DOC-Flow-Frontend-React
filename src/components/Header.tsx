@@ -4,8 +4,8 @@ import NotificationBell from "./NotificationBell";
 
 
 import { Dropdown, message, type MenuProps } from "antd"; 
-import { KeyOutlined, LogoutOutlined } from "@ant-design/icons";
-import { ChangePasswordModal } from "./ChangePasswordModal";
+import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
+import { ProfileSettingsModal } from "./ProfileSettingsModal";
 
 type HeaderProps = {
     onToggleSidebar: () => void;
@@ -18,7 +18,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
     const user = authContext?.user;
 
     // State to handle Modal visibility
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
     // Helper to get initials from the username for the avatar
     const getInitials = (name: string | undefined) => {
@@ -29,10 +29,10 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
     // Define the Dropdown Menu Items
     const menuItems: MenuProps['items'] = [
         {
-            key: 'change-password',
-            label: 'Change Password',
-            icon: <KeyOutlined />,
-            onClick: () => setIsModalOpen(true),
+            key: 'profile-settings',
+            label: 'Profile Settings',
+            icon: <UserOutlined />,
+            onClick: () => setIsProfileModalOpen(true),
         },
         {
             type: 'divider',
@@ -43,7 +43,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             icon: <LogoutOutlined />,
             danger: true,
             onClick: () => {
-                authContext?.logout(); // Trigger your existing logout logic
+                authContext?.logout(); 
                 message.success("Logged out successfully");
             },
         },
@@ -142,9 +142,9 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                     </Dropdown>
                 </div>
             </div>
-            <ChangePasswordModal 
-                visible={isModalOpen} 
-                onCancel={() => setIsModalOpen(false)} 
+            <ProfileSettingsModal 
+                visible={isProfileModalOpen} 
+                onCancel={() => setIsProfileModalOpen(false)} 
             />
         </header>
     );
