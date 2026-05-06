@@ -1,24 +1,21 @@
-import { useMemo, useRef, useState, useEffect } from "react";
-import StatCard from "../../components/chartAnalytics/StatCard";
-import SLADonut from "../../components/chartAnalytics/SLADonut";
-import SLATrend from "../../components/chartAnalytics/SLATrend";
-import BottleneckSteps from "../../components/chartAnalytics/BottleneckWorkflows";
-import UserPerformance from "../../components/chartAnalytics/Userperformance";
-import CustomChartsSection from "../../components/chartAnalytics/CustomChartsSection";
+import { useMemo, useState } from "react";
+// import CustomChartsSection from "../../components/chartAnalytics/CustomChartsSection";
 import InstanceDrilldown from "../../components/chartAnalytics/InstanceDrilldown";
 import WorkflowStepFlow from "../../components/chartAnalytics/WorkflowStepFlow";
-import { useCharts } from "../../context/useCharts";
-import { exportElementAsPdf } from "../../services/pdfExportService";
 import {
   WORKFLOWS,
   getWorkflowKPI,
 } from "../../data/dummyData";
-import {
-  fetchRunningDocuments,
-  fetchActiveOverdueTasks,
-  fetchCompletedTasks,
-  fetchSLACompliance,
-} from "../../services/analyticsApi";
+import StatCard from "../../components/chartAnalytics/StatCard";
+import RunningDocumentsWidget from "../../components/widgets/overall/RunningDocumentsWidget";
+import ActiveOverdueTasksWidget from "../../components/widgets/overall/ActiveOverdueTasksWidget";
+import CompletedTasksWidget from "../../components/widgets/overall/CompletedTasksWidget";
+import SLAComplianceWidget from "../../components/widgets/overall/SLAComplianceWidget";
+
+import SlaDistributionWidget from "../../components/widgets/overall/SlaDistributionWidget";
+import BottleneckWorkflowsWidget from "../../components/widgets/overall/BottleneckWorkflowsWidget";
+import UserPerformanceWidget from "../../components/widgets/overall/UserPerformanceWidget";
+
 
 type Tab = "overall" | "workflow";
 type TimeRange = "7d" | "30d" | "90d" | "custom" | "all";
@@ -33,23 +30,16 @@ export const AnalyticsPage = () => {
   const [dateError, setDateError] = useState(""); //validation error for custom date range
   
   // Get shared charts from context — updates when charts are created/edited/deleted
-  const { charts } = useCharts();
+  // const { charts } = useCharts();
   
   // Workflow tab — selected workflow
   const [selectedWorkflow, setSelectedWorkflow] = useState(WORKFLOWS[0]);
-  // 🔥 API states (NEW)
-const [runningDocs, setRunningDocs] = useState<number | null>(null);
-const [overdueTasks, setOverdueTasks] = useState<number | null>(null);
-const [completedTasks, setCompletedTasks] = useState<number | null>(null);
-const [slaCompliance, setSlaCompliance] = useState<number | null>(null);
 
-const [loading, setLoading] = useState(true);
-
-  const overallMainExportRef = useRef<HTMLDivElement>(null); //export THIS exact section
-  const workflowMainExportRef = useRef<HTMLDivElement>(null);//this ref will point to a <div> element, innitially no div connected yet Because before render, there is no div yet
-  const overallCustomChartsRef = useRef<HTMLDivElement>(null);
-  const workflowCustomChartsRef = useRef<HTMLDivElement>(null);
-//   const refs = {
+//   const overallMainExportRef = useRef<HTMLDivElement>(null); //export THIS exact section
+//   const workflowMainExportRef = useRef<HTMLDivElement>(null);//this ref will point to a <div> element, innitially no div connected yet Because before render, there is no div yet
+//   const overallCustomChartsRef = useRef<HTMLDivElement>(null);
+//   const workflowCustomChartsRef = useRef<HTMLDivElement>(null);
+// //   const refs = {
 //   overallMain: useRef<HTMLDivElement>(null),
 //   workflowMain: useRef<HTMLDivElement>(null),
 //   overallCharts: useRef<HTMLDivElement>(null),
@@ -92,67 +82,67 @@ const [loading, setLoading] = useState(true);
   // }, []);
 
   // 🔥 Fetch backend data
-useEffect(() => {
-  const loadData = async () => {
-    setLoading(true); // a ?? bif a is null or undefined → use b otherwise → use a 
-    try {
-      const running = await fetchRunningDocuments();
-      setRunningDocs(running.value);
+// useEffect(() => {
+//   const loadData = async () => {
+//     setLoading(true); // a ?? bif a is null or undefined → use b otherwise → use a 
+//     try {
+//       const running = await fetchRunningDocuments();
+//       setRunningDocs(running.value);
 
-      const overdue = await fetchActiveOverdueTasks();
-      setOverdueTasks(overdue.count);
+//       const overdue = await fetchActiveOverdueTasks();
+//       setOverdueTasks(overdue.count);
 
-      const completed = await fetchCompletedTasks();
-      setCompletedTasks(completed.count);
+//       const completed = await fetchCompletedTasks();
+//       setCompletedTasks(completed.count);
 
-      const sla = await fetchSLACompliance();
-      setSlaCompliance(sla.percentage);
-    } catch (error) {
-      console.error("Error fetching analytics data", error);
+//       const sla = await fetchSLACompliance();
+//       setSlaCompliance(sla.percentage);
+//     } catch (error) {
+//       console.error("Error fetching analytics data", error);
 
-      // IMPORTANT: keep UI clean (NOT zeros)
-      setRunningDocs(null);
-      setOverdueTasks(null);
-      setCompletedTasks(null);
-      setSlaCompliance(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+//       // IMPORTANT: keep UI clean (NOT zeros)
+//       setRunningDocs(null);
+//       setOverdueTasks(null);
+//       setCompletedTasks(null);
+//       setSlaCompliance(null);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
 
-  loadData();
-}, []);
+//   loadData();
+// }, []);
   
   // Navigate to chart configuration page to create/edit charts
-  function handleCreateChart() {
-    window.location.href = "/analytics/chart-configuration";
-  }
+  // function handleCreateChart() {
+  //   window.location.href = "/analytics/chart-configuration";
+  // }
 
-  function handleExportOverallMain() {
-    if (!overallMainExportRef.current) return;//If the element is NOT available, stop Because sometimes: component not loaded yet DOM not ready
-    void exportElementAsPdf(overallMainExportRef.current, "Overall Analytics");
-  }
+  // function handleExportOverallMain() {
+  //   if (!overallMainExportRef.current) return;//If the element is NOT available, stop Because sometimes: component not loaded yet DOM not ready
+  //   void exportElementAsPdf(overallMainExportRef.current, "Overall Analytics");
+  // }
 
-  function handleExportWorkflowMain() {
-    if (!workflowMainExportRef.current) return;
-    void exportElementAsPdf(
-      workflowMainExportRef.current,
-      `Workflow Analytics - ${selectedWorkflow}`
-    );
-  }
+  // function handleExportWorkflowMain() {
+  //   if (!workflowMainExportRef.current) return;
+  //   void exportElementAsPdf(
+  //     workflowMainExportRef.current,
+  //     `Workflow Analytics - ${selectedWorkflow}`
+  //   );
+  // }
 
-  function handleExportOverallCustomCharts() {
-    if (!overallCustomChartsRef.current) return;
-    void exportElementAsPdf(overallCustomChartsRef.current, "Overall Dashboard - Custom Charts");
-  }
+  // function handleExportOverallCustomCharts() {
+  //   if (!overallCustomChartsRef.current) return;
+  //   void exportElementAsPdf(overallCustomChartsRef.current, "Overall Dashboard - Custom Charts");
+  // }
 
-  function handleExportWorkflowCustomCharts() {
-    if (!workflowCustomChartsRef.current) return;
-    void exportElementAsPdf(
-      workflowCustomChartsRef.current,
-      `Workflow Analytics - ${selectedWorkflow} - Custom Charts`
-    );
-  }
+  // function handleExportWorkflowCustomCharts() {
+  //   if (!workflowCustomChartsRef.current) return;
+  //   void exportElementAsPdf(
+  //     workflowCustomChartsRef.current,
+  //     `Workflow Analytics - ${selectedWorkflow} - Custom Charts`
+  //   );
+  // }
 
   const validateDates = (from: string, to: string) => { //receives start and end date as strings in "YYYY-MM-DD" format
   if (!from || !to) {
@@ -201,31 +191,22 @@ useEffect(() => {
                   System-wide KPI monitoring across all workflows
                 </p>
               </div>
+              {/* Export/custom chart controls are intentionally disabled for now.
               <button
                 onClick={handleExportOverallMain}
                 className="bg-slate-700 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
               >
                 Export PDF
-              </button>
+              </button> */}
             </div>
 
-            <div ref={overallMainExportRef} className="space-y-5"> 
+            {/* <div ref={overallMainExportRef} className="space-y-5">  */}
+            <div className="space-y-5">
               {/* Top stat cards — always live, not affected by time range */}
-              <div className="grid grid-cols-2 gap-4">  {/* stat cards */}
-                <StatCard
-                  icon="📄"
-                  value={loading || runningDocs === null ? "—" : runningDocs.toString()} //loading "" error _ 
-                  label="Running Documents"
-                  description="Currently Active"
-                  color="blue"
-                />
-                <StatCard
-                  icon="⚠️"
-                  value={loading || overdueTasks === null ? "—" : overdueTasks.toString()}
-                  label="Active Overdue Tasks"
-                  description="Requires Immediate Attention"
-                  color="red"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">  {/* stat cards */}
+
+      <RunningDocumentsWidget />
+      <ActiveOverdueTasksWidget />
               </div>
 
               <div className="bg-white rounded-xl shadow-sm px-5 py-3 flex items-center gap-3 flex-wrap">{/* Time range filter bar */}
@@ -283,51 +264,32 @@ useEffect(() => {
               {dateError && (
                 <span className="text-xs text-red-500">{dateError}</span>
               )}
-            </div>
+              </div>
 
-            <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
 
-              <StatCard   //Completed Tasks
-                icon="📊"
-                value={loading || completedTasks === null ? "—" : completedTasks.toString()}
-                label="Completed Tasks"
-                description="Total finished tasks"
-                color="blue"
-              />
+     <CompletedTasksWidget />
+      <SLAComplianceWidget />
 
-              <StatCard //SLA Compliance
-                icon="✅"
-                value={loading || slaCompliance === null ? "—" : `${slaCompliance}%`}
-                label="SLA Compliance"
-                description="Overall compliance rate"
-                color="red"
-              />
-            </div>
+              </div>
 
-            {/* SLA Charts */}
-            <div className="grid grid-cols-2 gap-4">
-              <SLADonut />
-              <SLATrend />
-            </div>
+              {/* SLA Charts */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
+      <SlaDistributionWidget />
+      {/* keep trend chart for later */}
+              </div>
 
-            {/* bottleneck + user sections */}
-            <div className="grid grid-cols-2 gap-4">
-              <BottleneckSteps onWorkflowSelect={handleWorkflowSelect} /> {/* I am passing a function called handleWorkflowSelect into BottleneckSteps not run just hand over... component Pass the handler to BottleneckSteps */}
-              <UserPerformance /> {/* onWorkflowSelect is a prop*/}
+              {/* bottleneck + user sections */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
+              <BottleneckWorkflowsWidget
+        onWorkflowSelect={handleWorkflowSelect}
+      /> {/* I am passing a function called handleWorkflowSelect into BottleneckSteps not run just hand over... component Pass the handler to BottleneckSteps */}
+              <UserPerformanceWidget />
+ {/* onWorkflowSelect is a prop*/}
+              </div>
             </div>
           </div>
 
-            {/* ── Custom Charts — Overall source only ── */}
-            <div ref={overallCustomChartsRef}>
-              <CustomChartsSection
-                charts={charts}
-                source="overall"
-                onCreateClick={handleCreateChart}
-                onExportClick={handleExportOverallCustomCharts}
-              />
-            </div>
-
-          </div>
         )}
 
         {/* ══ WORKFLOW ANALYTICS TAB ══ */}
@@ -343,12 +305,12 @@ useEffect(() => {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <button
+                {/* <button
                   onClick={handleExportWorkflowMain}
                   className="bg-slate-700 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
                 >
                   Export PDF
-                </button>
+                </button> */}
                 <select
                   value={selectedWorkflow}
                   onChange={(e) => setSelectedWorkflow(e.target.value)}
@@ -362,7 +324,7 @@ useEffect(() => {
               </div>
             </div>
 
-            <div ref={workflowMainExportRef} className="space-y-5">
+            <div className="space-y-5">
               {/* Workflow stat cards */}
               <div className="grid grid-cols-3 gap-4">
               <StatCard
@@ -396,7 +358,7 @@ useEffect(() => {
             </div>
 
             {/* ── Custom Charts — Workflow source only ── */}
-            <div ref={workflowCustomChartsRef}>
+            {/* <div ref={workflowCustomChartsRef}>
               <CustomChartsSection
                 charts={charts}
                 source="workflow"
@@ -404,7 +366,7 @@ useEffect(() => {
                 onCreateClick={handleCreateChart}
                 onExportClick={handleExportWorkflowCustomCharts}
               />
-            </div>
+            </div> */}
 
           </div>
         )}

@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import StatCard from "../../chartAnalytics/StatCard";
 import { fetchCompletedTasks } from "../../../services/analyticsApi";
+import type { CompletedTasksResponse } from "../../../types";
 
 export default function CompletedTasksWidget() {
-  const [value, setValue] = useState<number | null>(null);
+  const [data, setData] = useState<CompletedTasksResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     const load = async () => {
       try {
-        setLoading(true);
-        const res = await fetchCompletedTasks();
-        setValue(res.count);
+        const res: CompletedTasksResponse = await fetchCompletedTasks();
+        setData(res);
       } catch {
         setError(true);
       } finally {
@@ -23,17 +23,16 @@ export default function CompletedTasksWidget() {
     load();
   }, []);
 
+  const value = error ? "-" : data?.count ?? "-";
+
   return (
     <StatCard
       icon="📊"
-      value={
-        loading ? "Loading..."
-        : error ? "Error"
-        : value ?? "—"
-      }
+      value={value}
+      loading={loading}
       label="Completed Tasks"
-      description="Tasks Successfully Completed"
+      description={error ? "Unavailable" : "Tasks Successfully Completed"}
       color="blue"
     />
   );
-}
+} 

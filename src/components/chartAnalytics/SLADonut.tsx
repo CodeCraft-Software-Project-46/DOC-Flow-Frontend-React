@@ -3,16 +3,12 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { useEffect, useState } from "react";
 import { fetchSLADistribution } from "../../services/analyticsApi";
+import type { SLADistributionPoint } from "../../types";
 
 type SLAItem = {
   name: string;
   value: number;
   color: string;
-};
-
-type SLAApiItem = {
-  name: string;
-  value: number;
 };
 
 export default function SLADonut() {
@@ -32,7 +28,7 @@ useEffect(() => {
     try {
       const res = await fetchSLADistribution();
 
-      const raw = res?.data ?? res ?? [];
+      const raw = Array.isArray(res) ? res : res.data ?? [];
 
       if (!Array.isArray(raw)) {
         console.error("Invalid SLA API response:", raw);
@@ -40,7 +36,7 @@ useEffect(() => {
         return;
       }
 
-      const formatted: SLAItem[] = raw.map((item: SLAApiItem) => ({
+      const formatted: SLAItem[] = (raw as SLADistributionPoint[]).map((item) => ({
         name: item.name === "met" ? "On Time" : "Breached",
         value: item.value ?? 0,
         color: item.name === "met" ? "#22c55e" : "#ef4444",

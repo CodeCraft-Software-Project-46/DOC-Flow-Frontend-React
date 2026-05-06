@@ -1,39 +1,49 @@
 import { useEffect, useState } from "react";
 import StatCard from "../../chartAnalytics/StatCard";
 import { fetchActiveOverdueTasks } from "../../../services/analyticsApi";
+import type { ActiveOverdueTasksResponse } from "../../../types";
+import ActiveTasksDetails from "./ActiveTasksDetails";
 
 export default function ActiveOverdueTasksWidget() {
-  const [value, setValue] = useState<number | null>(null);
+  const [data, setData] = useState<ActiveOverdueTasksResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const load = async () => {
       try {
-        setLoading(true);
         const res = await fetchActiveOverdueTasks();
-        setValue(res.count);
+        setData(res);
       } catch {
         setError(true);
       } finally {
         setLoading(false);
       }
     };
-
     load();
   }, []);
 
+  const value = error ? "-" : data?.count ?? "-";
+
   return (
-    <StatCard
-      icon="⚠️"
-      value={
-        loading ? "Loading..."
-        : error ? "Error"
-        : value ?? "—"
-      }
-      label="Active Overdue Tasks"
-      description="Requires Immediate Attention"
-      color="red"
-    />
+    <>
+      <StatCard
+        icon="⚠️"
+        value={value}
+        loading={loading}
+        label="Active Overdue Tasks"
+        description={error ? "Unavailable" : "Needs Attention"}
+        color="red"
+        onClick={() => !loading && !error && setOpen(true)}
+      />
+
+      {open && (
+        <ActiveTasksDetails
+          onClose={() => setOpen(false)}
+          items={data?.tasks || []}
+        />
+      )}
+    </>
   );
 }

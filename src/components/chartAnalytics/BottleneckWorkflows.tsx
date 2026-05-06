@@ -2,6 +2,7 @@
 // import { getBreachStyle, getProgressPercentage } from "../../utils/bottleneckUtils";
 import { useEffect, useState } from "react";
 import { fetchBottlenecks } from "../../services/analyticsApi";
+import type { BottleneckWorkflow } from "../../types";
 
 
 interface BottleneckWorkflowsProps {
@@ -16,14 +17,6 @@ type BottleneckItem = {
   score: number; // ✅ ADD BOTTLENECK SCORE
 };
 
-type BottleneckApiItem = {
-  workflow_name?: string;
-  avg_completion_time_hours?: number;
-  breach_percentage?: number;
-  total_tasks?: number;
-  bottleneck_score?: number;
-};
-
 export default function BottleneckWorkflows({ onWorkflowSelect }: BottleneckWorkflowsProps) { //BottleneckWorkflows is a function component it receives one prop called onWorkflowSelect
   const [data, setData] = useState<BottleneckItem[]>([]); // ✅ MOVE HERE
   const [loading, setLoading] = useState(true);
@@ -33,14 +26,14 @@ export default function BottleneckWorkflows({ onWorkflowSelect }: BottleneckWork
       setLoading(true);
       try {
         const res = await fetchBottlenecks();
-        const raw = res?.data ?? res ?? [];
+        const raw = Array.isArray(res) ? res : res.data ?? [];
 
         if (!Array.isArray(raw)) {
           setData([]);
           return;
         }
 
-        const formatted: BottleneckItem[] = (raw as BottleneckApiItem[])
+        const formatted: BottleneckItem[] = (raw as BottleneckWorkflow[])
           .map((item) => ({
             workflow: item.workflow_name || "Unknown",
             avg: item.avg_completion_time_hours ?? 0,

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchUserPerformance } from "../../services/analyticsApi";
+import type { UserPerformanceItem } from "../../types";
 
 type User = {
   name: string;
@@ -7,14 +8,6 @@ type User = {
   avg: number;
   breaches: number;
   tasks: number;
-};
-
-type UserApiItem = {
-  user_name?: string;
-  sla_compliance?: number;
-  avg_completion_time_hours?: number;
-  breached_tasks?: number;
-  total_tasks?: number;
 };
 
 function getComplianceStyles(compliance: number) {
@@ -47,14 +40,14 @@ export default function UserPerformance() {
     const load = async () => {
       try {
         const res = await fetchUserPerformance();
-        const raw = res?.data ?? res ?? [];
+        const raw = Array.isArray(res) ? res : res.data ?? [];
 
         if (!Array.isArray(raw)) {
           setUsers([]);
           return;
         }
 
-        const formatted: User[] = (raw as UserApiItem[])
+        const formatted: User[] = (raw as UserPerformanceItem[])
           .map((item) => ({
             name: item.user_name || "Unknown",
             compliance: item.sla_compliance ?? 0,
@@ -102,7 +95,7 @@ export default function UserPerformance() {
               return (
                 <div
                   key={user.name}
-                  className={user.compliance < 50 ? "bg-red-50 p-2 rounded-lg" : ""}
+                  className="bg-white"
                 >
                   {/* Top Row */}
                   <div className="flex items-center justify-between mb-2">

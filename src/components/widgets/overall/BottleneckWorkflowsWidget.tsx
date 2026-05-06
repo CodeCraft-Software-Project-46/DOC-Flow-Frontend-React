@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import BottleneckSteps from "../../chartAnalytics/BottleneckWorkflows";
 import { fetchBottlenecks } from "../../../services/analyticsApi";
+import type { BottleneckWorkflowsResponse } from "../../../types";
 
-interface BottleneckWorkflowsWidgetProps {
-  onWorkflowSelect?: (workflowId: string) => void;
-}
+type BottleneckWorkflowsWidgetProps = {
+  onWorkflowSelect?: (workflow: string) => void;
+};
 
 export default function BottleneckWorkflowsWidget({ onWorkflowSelect }: BottleneckWorkflowsWidgetProps) {
-  const [data, setData] = useState<unknown[] | null>(null);
+  const [data, setData] = useState<BottleneckWorkflowsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -30,7 +31,7 @@ export default function BottleneckWorkflowsWidget({ onWorkflowSelect }: Bottlene
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm p-6 min-h-[200px] flex items-center justify-center text-sm text-slate-400">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 min-h-[200px] flex items-center justify-center text-sm text-slate-400">
         Loading bottlenecks...
       </div>
     );
@@ -38,8 +39,13 @@ export default function BottleneckWorkflowsWidget({ onWorkflowSelect }: Bottlene
 
   if (error || !data) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm p-6 min-h-[200px] flex items-center justify-center text-sm text-red-400">
-        Failed to load bottlenecks
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 min-h-[200px] flex flex-col justify-center gap-2">
+        <div className="font-semibold text-slate-900 text-base">
+          📊 System Bottleneck Workflows
+        </div>
+        <div className="text-sm text-slate-900">
+          Failed to load bottlenecks
+        </div>
       </div>
     );
   }

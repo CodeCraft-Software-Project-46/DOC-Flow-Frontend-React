@@ -1,40 +1,54 @@
 import { useEffect, useState } from "react";
 import StatCard from "../../chartAnalytics/StatCard";
 import { fetchRunningDocuments } from "../../../services/analyticsApi";
+import type {
+  RunningDocumentsApiResponse,
+  RunningDocumentsResponse,
+} from "../../../types";
+import RunningDocumentsDetails from "./RunningDocumentsDetails";
 
 export default function RunningDocumentsWidget() {
-  const [value, setValue] = useState<number | null>(null);
+  const [data, setData] = useState<RunningDocumentsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const load = async () => {
       try {
-        setLoading(true);
-        const res = await fetchRunningDocuments();
-        setValue(res.value);
-      } catch (e) {
-        console.error(e);
+        const res: RunningDocumentsApiResponse =
+          await fetchRunningDocuments();
+        const payload = "value" in res ? res.value : res;
+        setData(payload);
+      } catch {
         setError(true);
       } finally {
         setLoading(false);
       }
     };
-
     load();
   }, []);
 
+  const value = error ? "-" : data?.count ?? "-";
+
   return (
-    <StatCard
-      icon="📄"
-      value={
-        loading ? "Loading..."
-        : error ? "Error"
-        : value ?? "—"
-      }
-      label="Running Documents"
-      description="Currently Active"
-      color="blue"
-    />
+    <>
+      <StatCard
+        icon="📄"
+        value={value}
+        loading={loading}
+        label="Running Documents"
+        description={error ? "Unavailable" : "Currently Active"}
+        color="blue"
+        onClick={() => !loading && !error && setOpen(true)}
+      />
+
+      {open && (
+        <RunningDocumentsDetails
+          onClose={() => setOpen(false)}
+          items={data?.documents || []}
+        />
+      )}
+    </>
   );
 }

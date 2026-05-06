@@ -109,3 +109,111 @@ export interface WorkingHoursConfig {
   holidays: string[];
   timeZone?: string;
 }
+
+export interface RunningDocument {
+  instance_id: number | string;
+  instance_name: string;
+  workflow_id: number | string;
+  workflow_name: string;
+  document_id: number | string;
+  document_name: string;
+  status: string;
+  created_at: string;
+  running_hours: number;
+}
+
+export interface RunningDocumentsResponse {
+  count?: number;
+  documents?: RunningDocument[];
+}
+
+export type RunningDocumentsApiResponse =
+  | RunningDocumentsResponse
+  | { value: RunningDocumentsResponse };
+
+export interface ActiveOverdueTask {
+  task_id: number | string;
+  task_name: string;
+  due_at: string;
+  status: string;
+  role?: string;
+  department?: string;
+  workflow_name?: string;
+  instance_name?: string;
+  overdue_hours?: number;
+  overdue_days?: number;
+}
+
+export interface ActiveOverdueTasksResponse {
+  count?: number;
+  tasks?: ActiveOverdueTask[];
+}
+
+export interface UserPerformanceItem {
+  user_name?: string;
+  sla_compliance?: number;
+  avg_completion_time_hours?: number;
+  breached_tasks?: number;
+  total_tasks?: number;
+}
+
+export type UserPerformanceResponse =
+  | UserPerformanceItem[]
+  | { data?: UserPerformanceItem[] };
+
+export interface SLADistributionPoint {
+  name: "met" | "breached";
+  value: number;
+}
+
+export type SLADistributionResponse =
+  | SLADistributionPoint[]
+  | { data?: SLADistributionPoint[] };
+
+export interface BottleneckWorkflow {
+  workflow_name?: string;
+  avg_completion_time_hours?: number;
+  breach_percentage?: number;
+  total_tasks?: number;
+  bottleneck_score?: number;
+}
+
+export type BottleneckWorkflowsResponse =
+  | BottleneckWorkflow[]
+  | { data?: BottleneckWorkflow[] };
+
+// Component prop interfaces
+export type StatCardColor = "blue" | "red" | "green";
+
+export interface StatCardProps {
+  icon: React.ReactNode;
+  value: string | number | null;
+  label: string;
+  description?: string;
+  color: StatCardColor;
+  small?: boolean;
+  loading?: boolean;
+  onClick?: () => void;
+}
+
+export interface RunningDocumentsDetailsProps {
+  items: RunningDocument[];
+  onClose: () => void;
+}
+
+export interface ActiveTasksDetailsProps {
+  items: ActiveOverdueTask[];
+  onClose: () => void;
+}
+
+export interface CompletedTasksResponse {
+  count?: number;
+}
+
+export interface SLAComplianceResponse {
+  percentage?: number;
+  data?: {
+    percentage?: number;
+  };
+  value?: number;
+}
