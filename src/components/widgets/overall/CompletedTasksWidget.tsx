@@ -1,28 +1,13 @@
-import { useEffect, useState } from "react";
 import StatCard from "../../chartAnalytics/StatCard";
 import { fetchCompletedTasks } from "../../../services/analyticsApi";
 import type { CompletedTasksResponse } from "../../../types";
+import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery.ts";
 
 export default function CompletedTasksWidget() {
-  const [data, setData] = useState<CompletedTasksResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const { data, loading, error } =
+    useAnalyticsQuery<CompletedTasksResponse>(fetchCompletedTasks);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res: CompletedTasksResponse = await fetchCompletedTasks();
-        setData(res);
-      } catch {
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    load();
-  }, []);
-
+  // WHY: keeps UI stable even if backend fails
   const value = error ? "-" : data?.count ?? "-";
 
   return (
@@ -35,4 +20,4 @@ export default function CompletedTasksWidget() {
       color="blue"
     />
   );
-} 
+}

@@ -1,35 +1,21 @@
-import { useEffect, useState } from "react";
 import StatCard from "../../chartAnalytics/StatCard";
 import { fetchSLACompliance } from "../../../services/analyticsApi";
 import type { SLAComplianceResponse } from "../../../types";
+import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery";
 
 export default function SLAComplianceWidget() {
-  const [data, setData] = useState<SLAComplianceResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const { data, loading, error } =
+    useAnalyticsQuery<SLAComplianceResponse>(fetchSLACompliance);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res: SLAComplianceResponse = await fetchSLACompliance();
-        setData(res);
-      } catch (e) {
-        console.error("SLA compliance error:", e);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    load();
-  }, []);
-
-  // defensive mapping (backend may change shape)
+  /**
+   * WHY: backend response may come in multiple shapes,
+   * so we safely normalize using only known types (no any needed)
+   */
   const percent =
     data?.percentage ??
     data?.data?.percentage ??
     data?.value ??
-    null;
+    undefined;
 
   const value = error ? "-" : percent ?? "-";
 

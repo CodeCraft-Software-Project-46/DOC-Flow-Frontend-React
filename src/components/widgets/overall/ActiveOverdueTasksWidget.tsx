@@ -1,29 +1,17 @@
-import { useEffect, useState } from "react";
 import StatCard from "../../chartAnalytics/StatCard";
 import { fetchActiveOverdueTasks } from "../../../services/analyticsApi";
 import type { ActiveOverdueTasksResponse } from "../../../types";
 import ActiveTasksDetails from "./ActiveTasksDetails";
+import { useState } from "react";
+import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery.ts";
 
 export default function ActiveOverdueTasksWidget() {
-  const [data, setData] = useState<ActiveOverdueTasksResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const { data, loading, error } =
+    useAnalyticsQuery<ActiveOverdueTasksResponse>(fetchActiveOverdueTasks);
+
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await fetchActiveOverdueTasks();
-        setData(res);
-      } catch {
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, []);
-
+  // WHY: safe fallback so UI never breaks
   const value = error ? "-" : data?.count ?? "-";
 
   return (

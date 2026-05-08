@@ -1,35 +1,21 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import StatCard from "../../chartAnalytics/StatCard";
 import { fetchRunningDocuments } from "../../../services/analyticsApi";
-import type {
-  RunningDocumentsApiResponse,
-  RunningDocumentsResponse,
-} from "../../../types";
+import type { RunningDocumentsApiResponse, RunningDocumentsResponse } from "../../../types";
 import RunningDocumentsDetails from "./RunningDocumentsDetails";
+import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery.ts";
 
 export default function RunningDocumentsWidget() {
-  const [data, setData] = useState<RunningDocumentsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const { data, loading, error } =
+    useAnalyticsQuery<RunningDocumentsApiResponse>(fetchRunningDocuments);
+
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res: RunningDocumentsApiResponse =
-          await fetchRunningDocuments();
-        const payload = "value" in res ? res.value : res;
-        setData(payload);
-      } catch {
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, []);
+  // WHY: normalize backend response shape safely
+  const payload: RunningDocumentsResponse | null =
+    data && "value" in data ? data.value : data;
 
-  const value = error ? "-" : data?.count ?? "-";
+  const value = error ? "-" : payload?.count ?? "-";
 
   return (
     <>
@@ -46,7 +32,7 @@ export default function RunningDocumentsWidget() {
       {open && (
         <RunningDocumentsDetails
           onClose={() => setOpen(false)}
-          items={data?.documents || []}
+          items={payload?.documents || []}
         />
       )}
     </>
