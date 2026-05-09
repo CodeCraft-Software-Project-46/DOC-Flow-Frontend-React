@@ -1,5 +1,6 @@
 import React from "react";
-import type {Dashboard} from "../../pages/dashboard/DashBoardBuilder.tsx";
+import type {Dashboard} from "../../model/Dashboard.ts";
+
 
 
 
