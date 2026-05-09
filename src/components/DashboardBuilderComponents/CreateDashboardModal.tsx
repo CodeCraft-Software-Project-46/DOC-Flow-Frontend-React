@@ -246,9 +246,12 @@ export const CreateDashboardModal: React.FC<Props> = ({
     );
 };*/
 
+/*
 
 import  { useState, useEffect } from "react";
-import {getAccessibleWidgetIds, SAMPLE_ROLES} from "../../../sampleData/RolesData.ts";
+
+import {roleService} from "../../service/RoleService";
+import {dashboardService} from "../../service/DashbaordService.ts";
 
 
 
@@ -258,9 +261,19 @@ export function CreateDashboardModal({ isOpen, onClose, onSubmit }) {
     const [selectedRole, setSelectedRole] = useState("");
     const [errors, setErrors]           = useState({});
     const [touched, setTouched]         = useState({});
+    const [roles, setRoles] = useState([]);
 
+    const loadRoles = async () => {
+        try {
+            const data = await roleService.getAll();
+            setRoles(data);
+        } catch (err) {
+            console.error("Failed to load roles", err);
+        }
+    };
     useEffect(() => {
         if (!isOpen) {
+            loadRoles();
             setName(""); setDescription(""); setSelectedRole("");
             setErrors({}); setTouched({});
         }
@@ -290,7 +303,7 @@ export function CreateDashboardModal({ isOpen, onClose, onSubmit }) {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="bg-white w-[520px] rounded-2xl shadow-2xl p-6 space-y-5">
 
-                {/* Header */}
+                {/!* Header *!/}
                 <div className="flex justify-between items-start">
                     <div>
                         <h2 className="text-lg font-bold text-slate-800">Create New Dashboard</h2>
@@ -299,7 +312,7 @@ export function CreateDashboardModal({ isOpen, onClose, onSubmit }) {
                     <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-xl leading-none">✕</button>
                 </div>
 
-                {/* Name */}
+                {/!* Name *!/}
                 <div>
                     <label className={`block text-sm font-semibold mb-1 ${errors.name && touched.name ? "text-red-600" : "text-slate-700"}`}>
                         Dashboard Name *
@@ -321,7 +334,7 @@ export function CreateDashboardModal({ isOpen, onClose, onSubmit }) {
                     {errors.name && touched.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                 </div>
 
-                {/* Description */}
+                {/!* Description *!/}
                 <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-1">Description</label>
                     <textarea
@@ -332,7 +345,7 @@ export function CreateDashboardModal({ isOpen, onClose, onSubmit }) {
                     />
                 </div>
 
-                {/* Role Dropdown */}
+                {/!* Role Dropdown *!/}
                 <div>
                     <label className={`block text-sm font-semibold mb-1 ${errors.role && touched.role ? "text-red-600" : "text-slate-700"}`}>
                         Assign to Role *
@@ -347,7 +360,7 @@ export function CreateDashboardModal({ isOpen, onClose, onSubmit }) {
                             : "border-slate-200 focus:ring-2 focus:ring-blue-200 focus:border-blue-400"}`}
                     >
                         <option value="">-- Select a role --</option>
-                        {SAMPLE_ROLES.map(r => (
+                        {roles.map(r => (
                             <option key={r.id} value={r.name}>{r.name} — {r.description}</option>
                         ))}
                     </select>
@@ -359,13 +372,322 @@ export function CreateDashboardModal({ isOpen, onClose, onSubmit }) {
                     )}
                 </div>
 
-                {/* Footer */}
+                {/!* Footer *!/}
                 <div className="flex justify-end gap-3 pt-2">
                     <button onClick={onClose} className="px-4 py-2 text-sm border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600 font-medium transition">
                         Cancel
                     </button>
                     <button onClick={handleSubmit} className="px-5 py-2 text-sm bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-semibold transition shadow-sm">
                         Create & Open Builder →
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}*/
+/*
+
+import { useState, useEffect } from "react";
+import { roleService } from "../../service/RoleService";
+import { dashboardService } from "../../service/DashbaordService";
+
+export function CreateDashboardModal({ isOpen, onClose, onSubmit }) {
+    const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
+    const [selectedRole, setSelectedRole] = useState("");
+    const [roles, setRoles] = useState([]);
+
+    const [errors, setErrors] = useState({});
+    const [touched, setTouched] = useState({});
+
+    const [widgetCount, setWidgetCount] = useState(0);
+
+    // ✅ Load roles when modal opens
+    useEffect(() => {
+        if (isOpen) {
+            loadRoles();
+        } else {
+            // reset when closed
+            setName("");
+            setDescription("");
+            setSelectedRole("");
+            setErrors({});
+            setTouched({});
+            setWidgetCount(0);
+        }
+    }, [isOpen]);
+
+    const loadRoles = async () => {
+        try {
+            const data = await roleService.getAll();
+            setRoles(data);
+        } catch (err) {
+            console.error("Failed to load roles", err);
+        }
+    };
+
+    // ✅ Load widgets when role changes
+    useEffect(() => {
+        if (!selectedRole) return;
+
+        const loadWidgets = async () => {
+            try {
+                const res = await dashboardService.getAccessibleWidgetIds(selectedRole);
+                setWidgetCount(res.length);
+            } catch (err) {
+                console.error("Failed to load widgets", err);
+            }
+        };
+
+        loadWidgets();
+    }, [selectedRole]);
+
+    if (!isOpen) return null;
+
+    // ✅ Validation
+    const validate = () => {
+        const e = {};
+
+        if (!name.trim() || name.trim().length < 3) {
+            e.name = "Min 3 characters required.";
+        }
+
+        if (!selectedRole) {
+            e.role = "Please select a role.";
+        }
+
+        return e;
+    };
+
+    // ✅ Submit
+    const handleSubmit = () => {
+        setTouched({ name: true, role: true });
+
+        const e = validate();
+        setErrors(e);
+
+        if (Object.keys(e).length === 0) {
+            onSubmit({
+                name,
+                description,
+                role_id: selectedRole, // ✅ IMPORTANT
+            });
+
+            onClose();
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+
+            <div className="bg-white w-[520px] rounded-2xl shadow-2xl p-6 space-y-5">
+
+                {/!* Header *!/}
+                <div className="flex justify-between items-start">
+                    <div>
+                        <h2 className="text-lg font-bold text-slate-800">
+                            Create New Dashboard
+                        </h2>
+                        <p className="text-sm text-slate-500 mt-0.5">
+                            Define a dashboard template for a role.
+                        </p>
+                    </div>
+
+                    <button
+                        onClick={onClose}
+                        className="text-slate-400 hover:text-slate-600 text-xl"
+                    >
+                        ✕
+                    </button>
+                </div>
+
+                {/!* Name *!/}
+                <div>
+                    <label className={`block text-sm font-semibold mb-1 ${errors.name && touched.name ? "text-red-600" : "text-slate-700"}`}>
+                        Dashboard Name *
+                    </label>
+
+                    <input
+                        type="text"
+                        placeholder="e.g., Finance Team Dashboard"
+                        value={name}
+                        onChange={(e) => {
+                            setName(e.target.value);
+                            if (touched.name) {
+                                setErrors((p) => ({
+                                    ...p,
+                                    name: e.target.value.trim().length >= 3 ? "" : "Min 3 characters required.",
+                                }));
+                            }
+                        }}
+                        onBlur={() => setTouched((p) => ({ ...p, name: true }))}
+                        className={`w-full border rounded-xl px-3 py-2.5 text-sm outline-none transition
+                        ${errors.name && touched.name
+                            ? "border-red-400 focus:ring-2 focus:ring-red-200"
+                            : "border-slate-200 focus:ring-2 focus:ring-blue-200 focus:border-blue-400"
+                        }`}
+                    />
+
+                    {errors.name && touched.name && (
+                        <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+                    )}
+                </div>
+
+                {/!* Description *!/}
+                <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">
+                        Description
+                    </label>
+
+                    <textarea
+                        placeholder="Describe the dashboard purpose..."
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm h-20 focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none resize-none"
+                    />
+                </div>
+
+                {/!* Role *!/}
+                <div>
+                    <label className={`block text-sm font-semibold mb-1 ${errors.role && touched.role ? "text-red-600" : "text-slate-700"}`}>
+                        Assign to Role *
+                    </label>
+
+                    <select
+                        value={selectedRole}
+                        onChange={(e) => {
+                            setSelectedRole(e.target.value);
+                            setErrors((p) => ({ ...p, role: "" }));
+                        }}
+                        onBlur={() => setTouched((p) => ({ ...p, role: true }))}
+                        className={`w-full border rounded-xl px-3 py-2.5 text-sm outline-none transition
+                        ${errors.role && touched.role
+                            ? "border-red-400 focus:ring-2 focus:ring-red-200"
+                            : "border-slate-200 focus:ring-2 focus:ring-blue-200 focus:border-blue-400"
+                        }`}
+                    >
+                        <option value="">-- Select a role --</option>
+
+                        {roles.map((r) => (
+                            <option key={r.id} value={r.id}>
+                                {r.name} — {r.description}
+                            </option>
+                        ))}
+                    </select>
+
+                    {errors.role && touched.role && (
+                        <p className="text-red-500 text-xs mt-1">{errors.role}</p>
+                    )}
+
+                    {selectedRole && (
+                        <p className="text-xs text-slate-500 mt-1.5">
+                            <span className="font-semibold text-blue-600">
+                                {widgetCount}
+                            </span>{" "}
+                            widgets available for this role.
+                        </p>
+                    )}
+                </div>
+
+                {/!* Footer *!/}
+                <div className="flex justify-end gap-3 pt-2">
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 text-sm border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600 font-medium transition"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        onClick={handleSubmit}
+                        className="px-5 py-2 text-sm bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-semibold transition shadow-sm"
+                    >
+                        Create & Open Builder →
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    );
+}*/
+
+import { useState, useEffect } from "react";
+import { roleService } from "../../service/RoleService";
+
+export function CreateDashboardModal({ isOpen, onClose, onSubmit }) {
+    const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
+    const [selectedRole, setSelectedRole] = useState("");
+    const [roles, setRoles] = useState([]);
+
+    useEffect(() => {
+        if (isOpen) loadRoles();
+        else {
+            setName("");
+            setDescription("");
+            setSelectedRole("");
+        }
+    }, [isOpen]);
+
+    const loadRoles = async () => {
+        try {
+            const data = await roleService.getAll();
+            setRoles(data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleSubmit = () => {
+        if (!name || !selectedRole) return;
+
+        onSubmit({
+            name,
+            description,
+            role_id: selectedRole,
+        });
+
+        onClose();
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+            <div className="bg-white p-6 rounded-xl w-[400px] space-y-4">
+                <h2 className="font-bold">Create Dashboard</h2>
+
+                <input
+                    placeholder="Name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full border p-2 rounded"
+                />
+
+                <textarea
+                    placeholder="Description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="w-full border p-2 rounded"
+                />
+
+                <select
+                    value={selectedRole}
+                    onChange={(e) => setSelectedRole(e.target.value)}
+                    className="w-full border p-2 rounded"
+                >
+                    <option value="">Select Role</option>
+                    {roles.map((r) => (
+                        <option key={r.id} value={r.id}>
+                            {r.name}
+                        </option>
+                    ))}
+                </select>
+
+                <div className="flex justify-end gap-2">
+                    <button onClick={onClose}>Cancel</button>
+                    <button onClick={handleSubmit} className="bg-blue-600 text-white px-3 py-1 rounded">
+                        Create
                     </button>
                 </div>
             </div>
