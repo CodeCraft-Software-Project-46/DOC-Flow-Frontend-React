@@ -7,7 +7,7 @@ export default function RunningDocumentsDetails({ items, onClose }: Props) {
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[1100px] max-h-[90vh] overflow-hidden flex flex-col">
         {/* Premium Header */}
-        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 px-8 py-6 flex justify-between items-center">
+        <div className="bg-blue-600 px-8 py-6 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="bg-white/20 p-3 rounded-xl">
               <span className="text-2xl">📄</span>
@@ -35,20 +35,18 @@ export default function RunningDocumentsDetails({ items, onClose }: Props) {
             </div>
           ) : (
             <table className="w-full">
-              <thead className="bg-blue-100 border-b-2 border-blue-300 sticky top-0">
+              <thead className="bg-slate-100 border-b border-slate-300 sticky top-0">
                 <tr>
-                  <th className="text-left px-8 py-4 font-bold text-blue-900 text-sm uppercase tracking-wider">📋 Document</th>
-                  <th className="text-left px-8 py-4 font-bold text-blue-900 text-sm uppercase tracking-wider">⚙️ Workflow</th>
-                  <th className="text-left px-8 py-4 font-bold text-blue-900 text-sm uppercase tracking-wider">📌 Instance</th>
+                  <th className="text-left px-8 py-4 font-bold text-slate-700 text-sm uppercase tracking-wider">📋 Document</th>
+                  <th className="text-left px-8 py-4 font-bold text-slate-700 text-sm uppercase tracking-wider">⚙️ Workflow</th>
+                  <th className="text-left px-8 py-4 font-bold text-slate-700 text-sm uppercase tracking-wider">📌 Instance</th>
                 </tr>
               </thead>
               <tbody>
                 {items.map((item, i) => (
                   <tr
                     key={i}
-                    className={`border-b border-blue-100 hover:bg-blue-50 transition-all hover:shadow-md ${
-                      i % 2 === 0 ? "bg-white" : "bg-blue-50/30"
-                    }`}
+                    className="border-b border-slate-200 hover:bg-slate-50 transition-all"
                   >
                     <td className="px-8 py-5 text-sm">
                       <div className="font-semibold text-slate-900">{item.document_name}</div>
@@ -73,7 +71,7 @@ export default function RunningDocumentsDetails({ items, onClose }: Props) {
 
         {/* Footer */}
         {items.length > 0 && (
-          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border-t-2 border-blue-200 px-8 py-4 flex justify-between items-center">
+          <div className="bg-slate-50 border-t border-slate-200 px-8 py-4 flex justify-between items-center">
             <p className="text-sm text-slate-600">Total: <span className="font-bold text-blue-600">{items.length}</span> documents in process</p>
             <button
               onClick={onClose}

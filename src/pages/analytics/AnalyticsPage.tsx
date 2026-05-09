@@ -1,22 +1,19 @@
-import { useMemo, useState } from "react";
-// import CustomChartsSection from "../../components/chartAnalytics/CustomChartsSection";
-import InstanceDrilldown from "../../components/chartAnalytics/InstanceDrilldown";
-import WorkflowStepFlow from "../../components/chartAnalytics/WorkflowStepFlow";
-import {
-  WORKFLOWS,
-  getWorkflowKPI,
-} from "../../data/dummyData";
-import StatCard from "../../components/chartAnalytics/StatCard";
+import {useState,useEffect} from "react";
 import RunningDocumentsWidget from "../../components/widgets/overall/RunningDocumentsWidget";
 import ActiveOverdueTasksWidget from "../../components/widgets/overall/ActiveOverdueTasksWidget";
 import CompletedTasksWidget from "../../components/widgets/overall/CompletedTasksWidget";
 import SLAComplianceWidget from "../../components/widgets/overall/SLAComplianceWidget";
-
 import SlaDistributionWidget from "../../components/widgets/overall/SlaDistributionWidget";
 import BottleneckWorkflowsWidget from "../../components/widgets/overall/BottleneckWorkflowsWidget";
 import UserPerformanceWidget from "../../components/widgets/overall/UserPerformanceWidget";
-
-
+import TotalInstancesWidget from "../../components/widgets/workflow/TotalInstancesWidget";
+import AvgCompletionTimeWidget from "../../components/widgets/workflow/AvgCompletionTimeWidget";
+import SLAComplianceWidgetWorkflow from "../../components/widgets/workflow/SLAComplianceWidget";
+import { fetchWorkflows,fetchWorkflowSteps } from "../../services/analyticsApi";
+import InstanceDrilldownWidget from "../../components/widgets/workflow/InstanceDrilldownWidget";
+import type { WorkflowListItem, WorkflowStepFlowDetailResponse } from "../../types";
+import { useAnalyticsQuery } from "../../hooks/useAnalyticsQuery";
+import WorkflowStepFlowWidget from "../../components/widgets/workflow/WorkflowStepFlowWidget";
 type Tab = "overall" | "workflow";
 type TimeRange = "7d" | "30d" | "90d" | "custom" | "all";
 
@@ -33,37 +30,37 @@ export const AnalyticsPage = () => {
   // const { charts } = useCharts();
   
   // Workflow tab — selected workflow
-  const [selectedWorkflow, setSelectedWorkflow] = useState(WORKFLOWS[0]);
+  const [workflows, setWorkflows] = useState<WorkflowListItem[]>([]);
+  const [selectedWorkflowId, setSelectedWorkflowId] = useState<number | null>(null);
 
-//   const overallMainExportRef = useRef<HTMLDivElement>(null); //export THIS exact section
-//   const workflowMainExportRef = useRef<HTMLDivElement>(null);//this ref will point to a <div> element, innitially no div connected yet Because before render, there is no div yet
-//   const overallCustomChartsRef = useRef<HTMLDivElement>(null);
-//   const workflowCustomChartsRef = useRef<HTMLDivElement>(null);
-// //   const refs = {
-//   overallMain: useRef<HTMLDivElement>(null),
-//   workflowMain: useRef<HTMLDivElement>(null),
-//   overallCharts: useRef<HTMLDivElement>(null),
-//   workflowCharts: useRef<HTMLDivElement>(null),
-// };
-
-  const workflowKPI = useMemo(
-    () => getWorkflowKPI(selectedWorkflow),
-    [selectedWorkflow]
-  );
-
-  // const overallLiveKPI = useMemo( //for stat cards that always show live data, not affected by time range filter
-  //   () => getOverallLiveKPI(),
-  //   []
-  // );
-
-    const handleTabChange = (selectedTab: Tab) => {
+  const handleTabChange = (selectedTab: Tab) => {
     setTab(selectedTab);
   };
+const handleWorkflowSelect = (workflowName: string) => {
+  const workflow = workflows.find((w) => w.name === workflowName);
+  if (workflow) {
+    setSelectedWorkflowId(workflow.workflow_id);
+  }
+  setTab("workflow");
+};
 
-  const handleWorkflowSelect = (workflow: string) => {
-    setSelectedWorkflow(workflow);
-    setTab("workflow");
+useEffect(() => {
+  const loadWorkflows = async () => {
+    try {
+      const data = await fetchWorkflows();
+
+      setWorkflows(data);
+
+      if (data.length > 0) {
+        setSelectedWorkflowId(data[0].workflow_id);
+      }
+    } catch (error) {
+      console.error("Failed to load workflows", error);
+    }
   };
+
+  loadWorkflows();
+}, []);
 
   // const overallSlaStatusCounts = useMemo(() => {
   //   let met = 0;
@@ -158,6 +155,45 @@ export const AnalyticsPage = () => {
   setDateError("");
   return true;
 };
+
+
+function WorkflowStepFlowWrapper({
+  workflowId,
+}: {
+  workflowId: number | null;
+}) {
+  const { data, loading, error } = useAnalyticsQuery<WorkflowStepFlowDetailResponse | null>(
+    () => (workflowId === null ? Promise.resolve(null) : fetchWorkflowSteps(workflowId)),
+    [workflowId]
+  );
+
+  if (workflowId === null || loading) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm p-6 min-h-[260px]">
+        <div className="space-y-3 animate-pulse">
+          <div className="h-4 w-40 rounded bg-slate-200" />
+          <div className="h-24 rounded-xl bg-slate-50 border border-slate-100" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm p-6 min-h-[260px] text-slate-400">
+        Failed to load step flow
+      </div>
+    );
+  }
+
+  return (
+    <WorkflowStepFlowWidget
+      steps={data.steps ?? []}
+      totalInstances={data.total_instances ?? 0}
+      completedInstances={data.completed_instances ?? 0}
+    />
+  );
+}
 
   return (
     <div className="min-h-screen bg-slate-100 font-sans">
@@ -275,8 +311,8 @@ export const AnalyticsPage = () => {
 
               {/* SLA Charts */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
-      <SlaDistributionWidget />
-      {/* keep trend chart for later */}
+                <SlaDistributionWidget />
+                {/* keep trend chart for later */}
               </div>
 
               {/* bottleneck + user sections */}
@@ -295,8 +331,6 @@ export const AnalyticsPage = () => {
         {/* ══ WORKFLOW ANALYTICS TAB ══ */}
         {tab === "workflow" && (
           <div className="space-y-5">
-
-            {/* Page heading with workflow selector */}
             <div className="flex justify-between items-center">
               <div>
                 <h2 className="text-xl font-bold text-slate-900">Workflow Analytics</h2>
@@ -304,70 +338,37 @@ export const AnalyticsPage = () => {
                   Per-workflow performance and instance drill-down
                 </p>
               </div>
+
               <div className="flex items-center gap-2">
-                {/* <button
-                  onClick={handleExportWorkflowMain}
-                  className="bg-slate-700 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
-                >
-                  Export PDF
-                </button> */}
+                <span className="text-xs font-medium text-slate-500 whitespace-nowrap">Select Workflow:</span>
                 <select
-                  value={selectedWorkflow}
-                  onChange={(e) => setSelectedWorkflow(e.target.value)}
+                  value={selectedWorkflowId ?? ""}
+                  onChange={(e) =>
+                    setSelectedWorkflowId(e.target.value ? Number(e.target.value) : null)
+                  }
                   aria-label="Select workflow for analytics"
                   className="border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white text-slate-700 outline-none"
                 >
-                  {WORKFLOWS.map((w) => (
-                    <option key={w} value={w}>{w}</option>
+                  {workflows.map((workflow) => (
+                    <option key={workflow.workflow_id} value={workflow.workflow_id}>
+                      {workflow.name}
+                    </option>
                   ))}
                 </select>
               </div>
             </div>
 
             <div className="space-y-5">
-              {/* Workflow stat cards */}
-              <div className="grid grid-cols-3 gap-4">
-              <StatCard
-                icon="📁"
-                value={workflowKPI.totalInstances.toString()}
-                label="Total Instances"
-                description="Selected period"
-                color="blue"
-              />
-              <StatCard
-                icon="⏱"
-                value={workflowKPI.avgCompletionTime}
-                label="Avg Completion Time"
-                description="Per instance"
-                color="blue"
-              />
-              <StatCard
-                icon="✅"
-                value={`${workflowKPI.slaCompliance}%`}
-                label="SLA Compliance"
-                description="Overall rate"
-                color="red"
-              />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
+                <TotalInstancesWidget workflowId={selectedWorkflowId} />
+                <AvgCompletionTimeWidget workflowId={selectedWorkflowId} />
+                <SLAComplianceWidgetWorkflow workflowId={selectedWorkflowId} />
+              </div>
+
+              <WorkflowStepFlowWrapper workflowId={selectedWorkflowId} />
+
+              <InstanceDrilldownWidget workflowId={selectedWorkflowId} />
             </div>
-
-              {/* ── Workflow Step Flow ── */}
-              <WorkflowStepFlow workflow={selectedWorkflow} />
-
-              {/* ── Instance Drill-down for selected workflow ── */}
-              <InstanceDrilldown key={selectedWorkflow} workflow={selectedWorkflow} />
-            </div>
-
-            {/* ── Custom Charts — Workflow source only ── */}
-            {/* <div ref={workflowCustomChartsRef}>
-              <CustomChartsSection
-                charts={charts}
-                source="workflow"
-                workflow={selectedWorkflow}
-                onCreateClick={handleCreateChart}
-                onExportClick={handleExportWorkflowCustomCharts}
-              />
-            </div> */}
-
           </div>
         )}
 

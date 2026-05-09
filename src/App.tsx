@@ -15,7 +15,6 @@ import {DashBoardBuilder} from "./pages/dashboard/DashBoardBuilder.tsx";
 import {WorkFlowPage} from "./pages/workflow/WorkFlowPage.tsx";
 import {WorkFlowInstances} from "./pages/workflow/WorkFlowInstances.tsx";
 import {AnalyticsPage} from "./pages/analytics/AnalyticsPage.tsx";
-import {ChartConfigurationPage} from "./pages/analytics/chartConfigurationPage.tsx";
 import {DocumentTypesPage} from "./pages/documents/DocumentTypesPage.tsx";
 
 
@@ -46,7 +45,6 @@ export default function App() {
                         { path: "/settings", element: <SettingsPage /> },
                         { path: "/user", element: <UserPage /> },
                         { path: "/analytics", element: <AnalyticsPage/> },
-                        { path: "/analytics/chart-configuration", element: <ChartConfigurationPage /> },
 
                     ]
                 }

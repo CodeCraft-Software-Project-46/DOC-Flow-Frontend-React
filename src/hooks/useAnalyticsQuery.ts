@@ -1,40 +1,47 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-/**
- * Generic hook for analytics widgets
- * WHY: removes duplicate loading/error/fetch logic from every widget
- */
-export function useAnalyticsQuery<T>(apiCall: () => Promise<T>) {
+export function useAnalyticsQuery<T>(
+  queryFn: () => Promise<T>,
+  deps: unknown[] = []
+) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<unknown>(null);
+
+  const fnRef = useRef(queryFn);
 
   useEffect(() => {
-    let mounted = true;
+    fnRef.current = queryFn;
+  }, [queryFn]);
 
-    const load = async () => {
+  useEffect(() => {
+  let mounted = true;
+
+  const load = async () => {
+    try {
       setLoading(true);
-      setError(false);
 
-      try {
-        const res = await apiCall();
+      const result = await fnRef.current();
 
-        // WHY: prevent memory leaks if component unmounts
-        if (mounted) setData(res);
-      } catch (error) {
-        console.error("Analytics query failed:", error);
-        setError(true);
-      } finally {
-        if (mounted) setLoading(false);
+      if (mounted) {
+        setData(result);
+        setError(null);
       }
-    };
+    } catch (err) {
+      if (mounted) setError(err);
+    } finally {
+      if (mounted) setLoading(false);
+    }
+  };
 
-    load();
+  load();
 
-    return () => {
-      mounted = false;
-    };
-  }, [apiCall]);
+  return () => {
+    mounted = false;
+  };
+
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [...deps]);
 
   return { data, loading, error };
 }

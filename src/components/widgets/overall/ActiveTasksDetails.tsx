@@ -18,7 +18,7 @@ export default function ActiveTasksDetails({ items, onClose }: Props) {
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[1100px] max-h-[90vh] overflow-hidden flex flex-col">
         {/* Premium Header */}
-        <div className="bg-gradient-to-r from-red-600 via-red-500 to-orange-500 px-8 py-6 flex justify-between items-center">
+        <div className="bg-red-600 px-8 py-6 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="bg-white/20 p-3 rounded-xl">
               <span className="text-2xl">⚠️</span>
@@ -46,23 +46,21 @@ export default function ActiveTasksDetails({ items, onClose }: Props) {
             </div>
           ) : (
             <table className="w-full">
-              <thead className="bg-red-100 border-b-2 border-red-300 sticky top-0">
+              <thead className="bg-slate-100 border-b border-slate-300 sticky top-0">
                 <tr>
-                  <th className="text-left px-8 py-4 font-bold text-red-900 text-sm uppercase tracking-wider">✓ Task</th>
-                  <th className="text-left px-8 py-4 font-bold text-red-900 text-sm uppercase tracking-wider">⏱️ Overdue</th>
-                  <th className="text-left px-8 py-4 font-bold text-red-900 text-sm uppercase tracking-wider">👤 Role</th>
-                  <th className="text-left px-8 py-4 font-bold text-red-900 text-sm uppercase tracking-wider">🏢 Department</th>
-                  <th className="text-left px-8 py-4 font-bold text-red-900 text-sm uppercase tracking-wider">⚙️ Workflow</th>
-                  <th className="text-left px-8 py-4 font-bold text-red-900 text-sm uppercase tracking-wider">📌 Instance</th>
+                  <th className="text-left px-8 py-4 font-bold text-slate-700 text-sm uppercase tracking-wider">✓ Task</th>
+                  <th className="text-left px-8 py-4 font-bold text-slate-700 text-sm uppercase tracking-wider">⏱️ Overdue</th>
+                  <th className="text-left px-8 py-4 font-bold text-slate-700 text-sm uppercase tracking-wider">👤 Role</th>
+                  <th className="text-left px-8 py-4 font-bold text-slate-700 text-sm uppercase tracking-wider">🏢 Department</th>
+                  <th className="text-left px-8 py-4 font-bold text-slate-700 text-sm uppercase tracking-wider">⚙️ Workflow</th>
+                  <th className="text-left px-8 py-4 font-bold text-slate-700 text-sm uppercase tracking-wider">📌 Instance</th>
                 </tr>
               </thead>
               <tbody>
                 {items.map((item, i) => (
                   <tr
                     key={i}
-                    className={`border-b border-red-100 hover:bg-red-50 transition-all hover:shadow-md ${
-                      i % 2 === 0 ? "bg-white" : "bg-red-50/30"
-                    }`}
+                    className="border-b border-slate-200 hover:bg-slate-50 transition-all"
                   >
                     <td className="px-8 py-5 text-sm">
                       <div className="font-semibold text-slate-900">{item.task_name}</div>
@@ -74,12 +72,12 @@ export default function ActiveTasksDetails({ items, onClose }: Props) {
                        </span>
                      </td>
                     <td className="px-8 py-5 text-sm">
-                      <span className="inline-block bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-semibold">
+                      <span className="inline-block bg-slate-200 text-slate-700 px-3 py-1 rounded-full text-xs font-semibold">
                         {item.role || "-"}
                       </span>
                     </td>
                     <td className="px-8 py-5 text-sm">
-                      <span className="inline-block bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold">
+                      <span className="inline-block bg-slate-200 text-slate-700 px-3 py-1 rounded-full text-xs font-semibold">
                         {item.department || "-"}
                       </span>
                     </td>
