@@ -900,174 +900,717 @@ const DashboardCanvasPage: React.FC<Props> = ({ dashboard, onBack, onSave }) => 
 };
 
 export default DashboardCanvasPage;*/
-
+/*
 
 import { useState, useEffect, useCallback } from "react";
-import { WidgetLibrary }         from "./WidgetLibrary";
-import { Canvas }                from "./Canvas";
-import { ConfigPanel }           from "./ConfigPanel";
-import {DashboardPreviewPage} from "./DashBoardPreviewPage.tsx";
-
+import { WidgetLibrary } from "./WidgetLibrary";
+import { Canvas } from "./Canvas";
+import { ConfigPanel } from "./ConfigPanel";
+import { DashboardPreviewPage } from "./DashBoardPreviewPage.tsx";
 
 export function DashboardCanvasPage({ dashboard, onBack, onSave }) {
-    const [canvasItems, setCanvasItems] = useState([]);
+
+    const [canvasItems, setCanvasItems] = useState<any[]>([]);
     const [selectedUid, setSelectedUid] = useState(null);
-    const [isPreview,   setIsPreview]   = useState(false);
-    const [saved,       setSaved]       = useState(false);
+    const [isPreview, setIsPreview] = useState(false);
+    const [saved, setSaved] = useState(false);
 
     const selected = canvasItems.find(c => c.uid === selectedUid) ?? null;
 
-    // Load saved widgets when opening the editor
+    // Load saved dashboard widgets
     useEffect(() => {
-        if (dashboard.widgets && dashboard.widgets.length > 0) {
-            setCanvasItems(dashboard.widgets);
-        } else {
-            setCanvasItems([]);
-        }
+        setCanvasItems(dashboard.widgets || []);
     }, [dashboard]);
 
-    // Add widget from library
-    const handleAdd = useCallback((widget) => {
+    const handleAdd = useCallback((widget: any) => {
         if (canvasItems.find(c => c.id === widget.id)) return;
+
         const uid = Date.now() + Math.random();
-        setCanvasItems(prev => [...prev, { ...widget, uid }]);
-        setSelectedUid(uid);
+
+        setCanvasItems(prev => [
+            ...prev,
+            { ...widget, uid }
+        ]);
+
         setSaved(false);
     }, [canvasItems]);
 
-    const handleRemove = (uid) => {
+    const handleRemove = (uid: any) => {
         setCanvasItems(p => p.filter(c => c.uid !== uid));
-        if (selectedUid === uid) setSelectedUid(null);
         setSaved(false);
     };
 
-    const handleMoveUp = (uid) => {
-        setCanvasItems(p => {
-            const i = p.findIndex(c => c.uid === uid);
-            if (i <= 0) return p;
-            const n = [...p]; [n[i - 1], n[i]] = [n[i], n[i - 1]]; return n;
-        });
-        setSaved(false);
-    };
-
-    const handleMoveDown = (uid) => {
-        setCanvasItems(p => {
-            const i = p.findIndex(c => c.uid === uid);
-            if (i >= p.length - 1) return p;
-            const n = [...p]; [n[i], n[i + 1]] = [n[i + 1], n[i]]; return n;
-        });
-        setSaved(false);
-    };
-
-    const handleUpdate = (updated) => {
-        setCanvasItems(p => p.map(c => c.uid === updated.uid ? updated : c));
-        setSaved(false);
-    };
-
-    // Called from preview page when user hits "Save Layout"
-    // Receives widgets with updated gridX/gridY/cols/rows
-    const handlePreviewSave = (updatedWidgets) => {
-        setCanvasItems(updatedWidgets);
-        setSaved(false); // layout changed — mark main canvas as needing a save too
-    };
-
-    // Save all to parent (canvas widget list + any grid positions)
     const handleSave = () => {
         onSave({ ...dashboard, widgets: canvasItems });
         setSaved(true);
-        setTimeout(() => onBack(), 600);
+        setTimeout(() => onBack(), 500);
     };
 
-    // Preview mode
     if (isPreview) {
         return (
             <DashboardPreviewPage
                 dashboard={dashboard}
                 widgets={canvasItems}
                 onBack={() => setIsPreview(false)}
-                onSave={handlePreviewSave}
+                onSave={}
             />
         );
     }
 
     return (
-        <div className="flex flex-col min-h-screen bg-slate-100">
+        <div className="flex flex-col min-h-screen">
 
-            {/* Header*/}
-            <div className="bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between shadow-sm">
-                <div className="flex items-center gap-3">
-                    <button onClick={onBack} className="text-slate-400 hover:text-slate-700 text-lg transition">←</button>
-                    <div>
-                        <div className="flex items-center gap-2">
-                            <h1 className="text-sm font-bold text-slate-800">{dashboard.name}</h1>
-                            <span className="text-xs bg-amber-50 text-amber-600 border border-amber-200 px-2 py-0.5 rounded-full font-medium">Draft</span>
-                            <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">{dashboard.role}</span>
-                        </div>
-                        <p className="text-xs text-slate-400">{dashboard.description}</p>
-                    </div>
-                </div>
+            {/!* Widget Library → ONLY ROLE PASSED *!/}
+            <WidgetLibrary
+                role_id={dashboard.role_id}
+                onAdd={handleAdd}
+            />
 
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={() => setIsPreview(true)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition"
-                    >
-                        👁 Preview
-                    </button>
-                    <button
-                        onClick={handleSave}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white rounded-lg transition shadow-sm ${
-                            saved ? "bg-emerald-500" : "bg-blue-600 hover:bg-blue-700"
-                        }`}
-                    >
-                        {saved ? "✓ Saved!" : "💾 Save"}
-                    </button>
-                </div>
+            {/!* Canvas *!/}
+            <Canvas
+                items={canvasItems}
+                selectedUid={selectedUid}
+                onSelect={(item) => setSelectedUid(item.uid)}
+                onRemove={handleRemove}
+                onMoveUp={}
+                onMoveDown={}
+            />
+
+            {/!* Config *!/}
+            <ConfigPanel selected={selected} />
+
+            <button onClick={handleSave}>
+                {saved ? "Saved" : "Save"}
+            </button>
+
+        </div>
+    );
+}*/
+/*
+
+import { useState, useEffect, useCallback } from "react";
+import { WidgetLibrary } from "./WidgetLibrary";
+import { Canvas } from "./Canvas";
+import { DashboardPreviewPage } from "./DashBoardPreviewPage.tsx";
+import type { Dashboard } from "../../model/Dashboard.ts";
+import {dashboardService} from "../../service/DashbaordService.ts";
+
+
+interface Props {
+    dashboard: Dashboard;
+    onBack: () => void;
+    onSave: (d: Dashboard) => void;
+}
+
+export function DashboardCanvasPage({ dashboard, onBack, onSave }: Props) {
+
+    const [canvasItems, setCanvasItems] = useState<any[]>([]);
+    const [selectedUid, setSelectedUid] = useState<any>(null);
+    const [isPreview, setIsPreview] = useState(false);
+    const [saved, setSaved] = useState(false);
+    const [addedWidgetCodes, setAddedWidgetCodes] = useState<string[]>([]);
+
+
+
+    // Load saved dashboard widgets on mount
+  /!*  useEffect(() => {
+
+        // try local saved dashboard first
+        const savedDashboard = localStorage.getItem(
+            `dashboard-${dashboard.id}`
+        );
+
+        if (savedDashboard) {
+
+            const parsed = JSON.parse(savedDashboard);
+
+            setCanvasItems(parsed.widgets || []);
+
+        } else {
+
+            setCanvasItems(dashboard.widgets || []);
+        }
+
+    }, [dashboard]);*!/
+
+    useEffect(() => {
+        loadDashboards();
+    }, []);
+
+    const loadDashboards = async () => {
+        const res = await dashboardService.getDashboards();
+        setDashboards(res);
+    };
+
+    const handleAdd = useCallback((widget: any) => {
+
+        // ❌ block duplicate widget_code
+        if (addedWidgetCodes.includes(widget.widget_code)) {
+            return;
+        }
+
+        const uid = Date.now() + Math.random();
+
+        setCanvasItems(prev => [
+            ...prev,
+            { ...widget, uid }
+        ]);
+
+        // ✅ store widget_code in temp list
+        setAddedWidgetCodes(prev => [
+            ...prev,
+            widget.widget_code
+        ]);
+
+    }, [addedWidgetCodes]);
+ /!*   const handleUpdate = (updatedItem) => {
+        setCanvasItems((prev) =>
+            prev.map((item) =>
+                item.uid === updatedItem.uid ? updatedItem : item
+            )
+        );
+
+        setSaved(false);
+    };*!/
+
+    const handleRemove = (uid: any) => {
+
+        const removed = canvasItems.find(c => c.uid === uid);
+
+        if (removed?.widget_code) {
+            setAddedWidgetCodes(prev =>
+                prev.filter(code => code !== removed.widget_code)
+            );
+        }
+
+        setCanvasItems(prev => prev.filter(c => c.uid !== uid));
+
+        if (selectedUid === uid) setSelectedUid(null);
+    };
+
+    // implemented move up handler
+    const handleMoveUp = (uid: any) => {
+        setCanvasItems((prev) => {
+            const idx = prev.findIndex((c) => c.uid === uid);
+            if (idx <= 0) return prev;
+            const next = [...prev];
+            [next[idx - 1], next[idx]] = [next[idx], next[idx - 1]];
+            return next;
+        });
+        setSaved(false);
+    };
+
+    // implemented move down handler
+    const handleMoveDown = (uid: any) => {
+        setCanvasItems((prev) => {
+            const idx = prev.findIndex((c) => c.uid === uid);
+            if (idx === -1 || idx >= prev.length - 1) return prev;
+            const next = [...prev];
+            [next[idx], next[idx + 1]] = [next[idx + 1], next[idx]];
+            return next;
+        });
+        setSaved(false);
+    };
+
+    const handleSave = async () => {
+
+        const payload = {
+            dashboard_id: dashboard.id, // null if new
+
+            name: dashboard.name,
+            description: dashboard.description,
+            role_id: dashboard.role_id,
+
+            widgets: canvasItems.map(w => ({
+                widget_code: w.widget_code,
+                pos_x: w.pos_x,
+                pos_y: w.pos_y,
+                width: w.width,
+                height: w.height,
+            }))
+        };
+
+        const res = await dashboardService.saveDashboard(payload);
+
+        // IMPORTANT: assign backend ID if new dashboard
+        if (!dashboard.id && res.dashboard_id) {
+            dashboard.id = res.dashboard_id;
+        }
+
+        console.log("Saved dashboard:", res);
+    };
+
+    if (isPreview) {
+
+        return (
+            <DashboardPreviewPage
+                dashboard={dashboard}
+                widgets={canvasItems}
+
+                onBack={() => setIsPreview(false)}
+
+                onSave={(updatedWidgets) => {
+
+                    setCanvasItems(updatedWidgets);
+
+                    setIsPreview(false);
+                }}
+            />
+        );
+    }
+
+    return (
+        <div className="h-screen flex bg-slate-100">
+
+            {/!* LEFT — Widget Library *!/}
+            <div className="w-2/5 bg-white border-r">
+                <WidgetLibrary
+                    role_id={dashboard.role_id}
+                    onAdd={handleAdd}
+                    canvasItems={canvasItems}
+                />
             </div>
 
+            {/!* CENTER — Canvas *!/}
+            <div className="flex-1 flex flex-col w-3/5">
 
-            <div className="flex flex-1 overflow-hidden">
+                {/!* TOP BAR *!/}
+                <div className="flex justify-end gap-3 p-4 bg-white border-b">
 
-                {/* Widget Library */}
-                <div className="w-64 bg-white border-r border-slate-200 flex flex-col flex-shrink-0">
-                    <div className="px-4 py-3 border-b border-slate-100">
-                        <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Widget Library</h2>
-                    </div>
-                    <div className="flex-1 overflow-hidden p-3">
-                        <WidgetLibrary canvasItems={canvasItems} onAdd={handleAdd} role={dashboard.role} />
+                    <button
+                        onClick={() => setIsPreview(true)}
+                        className="px-4 py-2 border rounded-lg text-sm"
+                    >
+                        Preview
+                    </button>
+
+                    <button
+                        onClick={handleSave}
+                        className={`px-4 py-2 rounded-lg text-sm text-white ${
+                            saved ? "bg-green-500" : "bg-blue-600"
+                        }`}
+                    >
+                        {saved ? "✓ Saved" : "Save"}
+                    </button>
+
+                </div>
+
+                {/!* CANVAS *!/}
+                <div className="flex-1 p-6 overflow-auto ">
+                    <Canvas
+                        items={canvasItems}
+                        selectedUid={selectedUid}
+                        onSelect={(item) => setSelectedUid(item.uid)}
+                        onRemove={handleRemove}
+                        onMoveUp={handleMoveUp}
+                        onMoveDown={handleMoveDown}
+                    />
+                </div>
+
+            </div>
+
+            {/!* RIGHT — Config Panel *!/}
+           {/!* <div className="w-80 bg-white border-l">
+                <ConfigPanel selected={selected}
+                             onUpdate={handleUpdate}/>
+            </div>*!/}
+
+        </div>
+    );
+}*/
+
+import { useState, useEffect, useCallback } from "react";
+import { WidgetLibrary } from "./WidgetLibrary";
+import { Canvas } from "./Canvas";
+import { DashboardPreviewPage } from "./DashBoardPreviewPage.tsx";
+import type { Dashboard } from "../../model/Dashboard.ts";
+import { dashboardService } from "../../service/DashbaordService.ts";
+
+interface Props {
+    dashboard: Dashboard;
+    onBack: () => void;
+    onSave: (d: Dashboard) => void;
+}
+
+export function DashboardCanvasPage({
+                                        dashboard,
+                                        onBack,
+                                        onSave,
+                                    }: Props) {
+
+    const [canvasItems, setCanvasItems] =
+        useState<any[]>([]);
+
+    const [selectedWidgetCode, setSelectedWidgetCode] =
+        useState<string | null>(null);
+
+    const [isPreview, setIsPreview] =
+        useState(false);
+
+    const [saved, setSaved] =
+        useState(false);
+
+    const [addedWidgetCodes, setAddedWidgetCodes] =
+        useState<string[]>([]);
+
+    // LOAD DASHBOARD
+    useEffect(() => {
+
+        const loadDashboard = async () => {
+
+            try {
+
+                // EXISTING DASHBOARD
+                if (dashboard.id) {
+
+                    const fullDashboard =
+                        await dashboardService
+                            .getDashboard(
+                                dashboard.id
+                            );
+
+                    console.log(
+                        "✅ Loaded dashboard:"
+                    );
+
+                    console.log(fullDashboard);
+
+                    const widgets =
+                        fullDashboard.widgets || [];
+
+                    setCanvasItems(widgets);
+
+                    setAddedWidgetCodes(
+                        widgets.map(
+                            (w: any) =>
+                                w.widget_code
+                        )
+                    );
+
+                } else {
+
+                    // NEW DASHBOARD
+                    setCanvasItems([]);
+
+                    setAddedWidgetCodes([]);
+                }
+
+            } catch (err) {
+
+                console.error(
+                    "❌ Failed loading dashboard:",
+                    err
+                );
+            }
+        };
+
+        loadDashboard();
+
+    }, [dashboard.id]);
+
+    // ADD WIDGET
+    const handleAdd = useCallback(
+
+        (widget: any) => {
+
+            // BLOCK DUPLICATES
+            if (
+                addedWidgetCodes.includes(
+                    widget.widget_code
+                )
+            ) {
+
+                console.log(
+                    "⚠️ Widget already added"
+                );
+
+                return;
+            }
+
+            const newWidget = {
+
+                ...widget,
+
+                pos_x: 0,
+                pos_y: 0,
+
+                width:
+                    widget.min_width || 3,
+
+                height:
+                    widget.min_height || 2,
+            };
+
+            setCanvasItems((prev) => [
+                ...prev,
+                newWidget,
+            ]);
+
+            setAddedWidgetCodes((prev) => [
+                ...prev,
+                widget.widget_code,
+            ]);
+
+            setSaved(false);
+
+        },
+
+        [addedWidgetCodes]
+    );
+
+    // REMOVE
+    const handleRemove = (
+        widget_code: string
+    ) => {
+
+        setCanvasItems((prev) =>
+            prev.filter(
+                (c) =>
+                    c.widget_code !==
+                    widget_code
+            )
+        );
+
+        setAddedWidgetCodes((prev) =>
+            prev.filter(
+                (code) =>
+                    code !== widget_code
+            )
+        );
+
+        if (
+            selectedWidgetCode ===
+            widget_code
+        ) {
+            setSelectedWidgetCode(null);
+        }
+
+        setSaved(false);
+    };
+
+    // MOVE UP
+    const handleMoveUp = (
+        widget_code: string
+    ) => {
+
+        setCanvasItems((prev) => {
+
+            const idx =
+                prev.findIndex(
+                    (c) =>
+                        c.widget_code ===
+                        widget_code
+                );
+
+            if (idx <= 0) return prev;
+
+            const next = [...prev];
+
+            [next[idx - 1], next[idx]] = [
+                next[idx],
+                next[idx - 1],
+            ];
+
+            return next;
+        });
+
+        setSaved(false);
+    };
+
+    // MOVE DOWN
+    const handleMoveDown = (
+        widget_code: string
+    ) => {
+
+        setCanvasItems((prev) => {
+
+            const idx =
+                prev.findIndex(
+                    (c) =>
+                        c.widget_code ===
+                        widget_code
+                );
+
+            if (
+                idx === -1
+                || idx >= prev.length - 1
+            ) {
+                return prev;
+            }
+
+            const next = [...prev];
+
+            [next[idx], next[idx + 1]] = [
+                next[idx + 1],
+                next[idx],
+            ];
+
+            return next;
+        });
+
+        setSaved(false);
+    };
+
+    // SAVE
+    const handleSave = async () => {
+
+        const payload = {
+            name: dashboard.name,
+            description: dashboard.description,
+            role_id: dashboard.role_id,
+            status: dashboard.status,
+
+            widgets: canvasItems.map(w => ({
+                widget_code: w.widget_code,
+
+                pos_x: w.pos_x,
+                pos_y: w.pos_y,
+
+                width: w.width,
+                height: w.height,
+            }))
+        };
+
+        try {
+
+            let res;
+
+            // UPDATE
+            if (dashboard.id) {
+
+                res = await dashboardService.updateDashboard(
+                    dashboard.id,
+                    payload
+                );
+
+            }
+
+            // CREATE
+            else {
+
+                res = await dashboardService.saveDashboard(
+                    payload
+                );
+
+                // assign backend id
+                dashboard.id = res.dashboard_id;
+            }
+
+            console.log("Saved:", res);
+
+            setSaved(true);
+
+            setTimeout(() => {
+                onBack();
+            }, 500);
+
+        } catch (err) {
+
+            console.error(err);
+        }
+    };
+
+    // PREVIEW
+    if (isPreview) {
+
+        return (
+            <DashboardPreviewPage
+                dashboard={dashboard}
+                widgets={canvasItems}
+                onBack={() =>
+                    setIsPreview(false)
+                }
+                onSave={(
+                    updatedWidgets
+                ) => {
+
+                    setCanvasItems(
+                        updatedWidgets
+                    );
+
+                    setIsPreview(false);
+                }}
+            />
+        );
+    }
+
+    return (
+        <div className="h-screen flex bg-slate-100">
+
+            {/* LEFT */}
+            <div className="w-2/5 bg-white border-r">
+
+                <WidgetLibrary
+                    role_id={dashboard.role_id}
+                    onAdd={handleAdd}
+                    canvasItems={canvasItems}
+                />
+            </div>
+
+            {/* CENTER */}
+            <div className="flex-1 flex flex-col w-3/5">
+
+                {/* TOP BAR */}
+                <div className="flex justify-between items-center p-4 bg-white border-b">
+
+                    {/* BACK BUTTON */}
+                    <button
+                        onClick={onBack}
+                        className="px-4 py-2 border rounded-lg text-sm bg-white hover:bg-slate-50"
+                    >
+                        ← Back
+                    </button>
+
+                    <div className="flex gap-3">
+
+                        <button
+                            onClick={() =>
+                                setIsPreview(true)
+                            }
+                            className="px-4 py-2 border rounded-lg text-sm"
+                        >
+                            Preview
+                        </button>
+
+                        <button
+                            onClick={handleSave}
+                            className={`
+                                px-4 py-2 rounded-lg
+                                text-sm text-white
+                                ${
+                                saved
+                                    ? "bg-green-500"
+                                    : "bg-blue-600"
+                            }
+                            `}
+                        >
+                            {saved
+                                ? "✓ Saved"
+                                : "Save"}
+                        </button>
                     </div>
                 </div>
 
-                {/* Canvas */}
-                <div className="flex-1 flex flex-col overflow-hidden">
-                    <div className="px-6 py-2.5 border-b border-slate-200 bg-white flex items-center justify-between">
-                        <h2 className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                            Canvas — <span className="text-blue-600">{canvasItems.length}</span> widget{canvasItems.length !== 1 ? "s" : ""}
-                        </h2>
-                        <span className="text-xs bg-slate-100 text-slate-500 px-2.5 py-1 rounded-full">12-column grid</span>
-                    </div>
-                    <div className="flex-1 overflow-y-auto p-5">
-                        <Canvas
-                            items={canvasItems}
-                            selectedUid={selectedUid}
-                            onSelect={item => setSelectedUid(item.uid)}
-                            onMoveUp={handleMoveUp}
-                            onMoveDown={handleMoveDown}
-                            onRemove={handleRemove}
-                        />
-                    </div>
-                </div>
+                {/* CANVAS */}
+                <div className="flex-1 p-6 overflow-auto">
 
-                {/* Configuration Panel */}
-                <div className="w-60 bg-white border-l border-slate-200 flex flex-col flex-shrink-0">
-                    <div className="px-4 py-3 border-b border-slate-100">
-                        <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Configuration</h2>
-                    </div>
-                    <div className="flex-1 overflow-y-auto p-4">
-                        <ConfigPanel selected={selected} onUpdate={handleUpdate} />
-                    </div>
+                    <Canvas
+                        items={canvasItems}
+                        selectedWidgetCode={
+                            selectedWidgetCode
+                        }
+                        onSelect={(item) =>
+                            setSelectedWidgetCode(
+                                item.widget_code
+                            )
+                        }
+                        onRemove={handleRemove}
+                        onMoveUp={handleMoveUp}
+                        onMoveDown={
+                            handleMoveDown
+                        }
+                    />
                 </div>
-
             </div>
         </div>
     );
