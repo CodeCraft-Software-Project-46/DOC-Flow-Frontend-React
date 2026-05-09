@@ -114,13 +114,13 @@ export function DashboardList({ dashboards, onEdit, onDelete, onDuplicate }) {
                                 <StatusBadge status={d.status} />
                             </div>
                             <p className="text-xs text-slate-500 mt-0.5">{d.description}</p>
-                            <div className="flex items-center gap-3 mt-1 text-xs text-slate-400">
+                        {/*    <div className="flex items-center gap-3 mt-1 text-xs text-slate-400">
                                 <span>👤 {d.role}</span>
                                 <span>•</span>
                                 <span>🧩 {d.widgets?.length ?? 0} widgets</span>
                                 <span>•</span>
                                 <span>🕒 {d.updatedAt}</span>
-                            </div>
+                            </div>*/}
                         </div>
                     </div>
 
