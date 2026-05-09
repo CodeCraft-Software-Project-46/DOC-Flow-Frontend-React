@@ -1,0 +1,1 @@
+export const WIDGET_CATEGORIES = ["All", "Task", "Document", "SLA", "Analytics", "Notification", "Custom"];
