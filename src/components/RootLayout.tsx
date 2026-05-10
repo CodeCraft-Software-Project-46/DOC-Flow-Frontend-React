@@ -4,17 +4,13 @@ import { useState } from "react";
 import Header from "./Header";
 import Sidebar from "./SideBar";
 import Footer from "./Footer";
-import ChatBot from "./ChatBot";
+import ChatWidget from "./chatbot/ChatWidget";
 
 export function RootLayout() {
     const navigate = useNavigate();
     const location = useLocation();
     const selectedKey = location.pathname;
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-    
-    // Mock user data — replace with actual auth context in production
-    const [userRole] = useState<"admin" | "manager" | "user">("admin");
-    const [userWorkflows] = useState<string[]>(["Purchase Order Approval", "GRN Processing", "SRN Workflow", "Direct Payment"]);
 
     const handleMenuClick = (key: string) => {
         navigate(key);
@@ -44,7 +40,7 @@ export function RootLayout() {
                 <Footer />
             </div>
             {/* ChatBot RAG Assistant */}
-            <ChatBot userRole={userRole} userWorkflows={userWorkflows} />
+            <ChatWidget />
         </div>
     );
 }

@@ -14,6 +14,7 @@ import InstanceDrilldownWidget from "../../components/widgets/workflow/InstanceD
 import type { WorkflowListItem, WorkflowStepFlowDetailResponse } from "../../types";
 import { useAnalyticsQuery } from "../../hooks/useAnalyticsQuery";
 import WorkflowStepFlowWidget from "../../components/widgets/workflow/WorkflowStepFlowWidget";
+
 type Tab = "overall" | "workflow";
 type TimeRange = "7d" | "30d" | "90d" | "custom" | "all";
 
