@@ -33,9 +33,6 @@ export const AnalyticsPage = () => {
   const [customToDate, setCustomToDate] = useState("");
   const [dateError, setDateError] = useState(""); //validation error for custom date range
 
-  // Get shared charts from context — updates when charts are created/edited/deleted
-  // const { charts } = useCharts();
-
   // Workflow tab — selected workflow
   const [workflows, setWorkflows] = useState<WorkflowListItem[]>([]);
   const [selectedWorkflowId, setSelectedWorkflowId] = useState<number | null>(
