@@ -151,17 +151,17 @@ export function DashBoardBuilder() {
     );
 }*/
 
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
 
+import type {Dashboard} from "../../model/Dashboard.ts";
 
-import type { Dashboard } from "../../model/Dashboard.ts";
-
-import { dashboardService } from "../../service/DashbaordService.ts";
+import {dashboardService} from "../../service/DashbaordService.ts";
 import {DashboardCanvasPage} from "../../components/DashboardBuilderComponents/DashboardCanvasPage.tsx";
 import {StatsBar} from "../../components/DashboardBuilderComponents/StatsBar.tsx";
 import {DashboardList} from "../../components/DashboardBuilderComponents/DashboardList.tsx";
 import {CreateDashboardModal} from "../../components/DashboardBuilderComponents/CreateDashboardModal.tsx";
+import {roleService} from "../../service/RoleService.ts";
 
 export function DashBoardBuilder() {
 
@@ -179,7 +179,8 @@ export function DashBoardBuilder() {
         useState<Dashboard | null>(null);
 
     const [loading, setLoading] = useState(false);
-
+    const [roleFilter, setRoleFilter] = useState<string>("All");
+    const [roles, setRoles] = useState<any[]>([]);
     // LOAD ALL DASHBOARDS FROM BACKEND
     const loadDashboards = async () => {
 
@@ -207,14 +208,32 @@ export function DashBoardBuilder() {
             setLoading(false);
         }
     };
+    const loadRoles = async () => {
+
+        try {
+
+            const data =
+                await roleService.getAll();
+
+            setRoles(data);
+
+        } catch (err) {
+
+            console.error(
+                "❌ Failed to load roles",
+                err
+            );
+        }
+    };
 
     // LOAD ON PAGE OPEN
     useEffect(() => {
 
         loadDashboards();
-
+        loadRoles();
     }, []);
 
+    // FILTER
     // FILTER
     const filtered = dashboards.filter((d) => {
 
@@ -227,50 +246,46 @@ export function DashBoardBuilder() {
             statusFilter === "All"
             || d.status === statusFilter;
 
-        return matchSearch && matchStatus;
+        const matchRole =
+            roleFilter === "All"
+            || d.role_id === roleFilter;
+
+        return (
+            matchSearch &&
+            matchStatus &&
+            matchRole
+        );
     });
 
-    // CREATE NEW DASHBOARD
     const handleCreate = async (data: any) => {
 
         try {
 
             const payload = {
-
                 name: data.name,
                 description: data.description,
                 role_id: data.role_id,
-
-                status: "draft",
-
-                widgets: [],
+                status: "draft"
             };
 
-            console.log("🚀 Creating dashboard:");
-            console.log(payload);
+            const res = await dashboardService.saveDashboard(payload);
 
-            const savedDashboard =
-                await dashboardService.saveDashboard(
-                    payload
-                );
+            console.log("✅ Dashboard created:", res);
 
-            console.log("✅ Created dashboard:");
-            console.log(savedDashboard);
+            // create local dashboard object for editor
+            const newDashboard = {
+                id: res.dashboard_id,
+                ...payload,
+                widgets: []
+            };
 
-            // reload from backend
+            // open canvas editor
+            setCanvasDashboard(newDashboard);
+
             await loadDashboards();
 
-            setIsModalOpen(false);
-
-            // open editor with backend id
-            setCanvasDashboard(savedDashboard);
-
         } catch (err) {
-
-            console.error(
-                "❌ Create dashboard failed:",
-                err
-            );
+            console.error("❌ Create failed:", err);
         }
     };
 
@@ -310,54 +325,43 @@ export function DashBoardBuilder() {
     // DELETE
     const handleDelete = async (id: number) => {
 
-        try {
 
-           // await dashboardService.deleteDashboard(id);
 
-            await loadDashboards();
-
-        } catch (err) {
-
-            console.error(
-                "❌ Delete failed:",
-                err
-            );
-        }
     };
 
-    // DUPLICATE
-    const handleDuplicate = async (
-        d: Dashboard
+    const handleChangeStatus = async (
+        id: number,
+        status: string
     ) => {
 
         try {
 
-            const copyPayload = {
+            const res =
+                await dashboardService.changeDashboardStatus(
+                    id,
+                    status
+                );
 
-                name: `${d.name} (Copy)`,
-
-                description: d.description,
-
-                role_id: d.role_id,
-
-                status: "draft",
-
-                widgets: d.widgets || [],
-            };
-
-            await dashboardService.saveDashboard(
-                copyPayload
+            setDashboards(prev =>
+                prev.map(d =>
+                    d.id === id
+                        ? {...d, status}
+                        : d
+                )
             );
 
-            await loadDashboards();
+            alert(res.message);
+            loadDashboards()
 
-        } catch (err) {
+        } catch (err: any) {
 
-            console.error(
-                "❌ Duplicate failed:",
-                err
+            // ✅ backend error message
+            alert(
+                err?.error ||
+                "Failed to change status"
             );
         }
+
     };
 
     // OPEN CANVAS
@@ -402,44 +406,90 @@ export function DashBoardBuilder() {
             </div>
 
             {/* STATS */}
-            <StatsBar dashboards={dashboards} />
+            <StatsBar dashboards={dashboards}/>
 
             {/* FILTERS */}
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3 items-center">
 
+                {/* SEARCH */}
                 <input
-                    placeholder="Search..."
+                    placeholder="Search dashboards..."
                     value={search}
                     onChange={(e) =>
                         setSearch(e.target.value)
                     }
-                    className="border p-2 rounded"
+                    className="
+            border
+            px-3 py-2
+            rounded-lg
+            bg-white
+            text-sm
+            shadow-sm
+            w-60
+        "
                 />
 
-                {[
-                    "All",
-                    "active",
-                    "draft",
-                    "disabled",
-                ].map((s) => (
+                {/* STATUS FILTER */}
+                <select
+                    value={statusFilter}
+                    onChange={(e) =>
+                        setStatusFilter(e.target.value)
+                    }
+                    className="
+            border
+            px-3 py-2
+            rounded-lg
+            bg-white
+            text-sm
+            shadow-sm
+            min-w-[140px]
+        "
+                >
+                    <option value="All">
+                        All Status
+                    </option>
+                    <option value="active">
+                        Active
+                    </option>
+                    <option value="draft">
+                        Draft
+                    </option>
+                    <option value="disabled">
+                        Disabled
+                    </option>
+                </select>
 
-                    <button
-                        key={s}
-                        onClick={() =>
-                            setStatusFilter(s)
-                        }
-                        className={`
-                            px-3 py-1 border rounded
-                            ${
-                            statusFilter === s
-                                ? "bg-blue-600 text-white"
-                                : "bg-white"
-                        }
-                        `}
-                    >
-                        {s}
-                    </button>
-                ))}
+                {/* ROLE FILTER */}
+                <select
+                    value={roleFilter}
+                    onChange={(e) =>
+                        setRoleFilter(e.target.value)
+                    }
+                    className="
+              border
+        px-3 py-2
+        rounded-lg
+        bg-white
+        text-sm
+        text-slate-800
+        shadow-sm
+        min-w-[160px]
+        "
+                >
+                    <option value="All">
+                        All Roles
+                    </option>
+
+                    {roles.map((role) => (
+                        <option
+                            key={role.id}
+                            value={role.id}
+                        >
+                            {role.name}
+                        </option>
+                    ))}
+                </select>
+
             </div>
 
             {/* LOADING */}
@@ -455,7 +505,7 @@ export function DashBoardBuilder() {
                     dashboards={filtered}
                     onEdit={setCanvasDashboard}
                     onDelete={handleDelete}
-                    onDuplicate={handleDuplicate}
+                    onChangeStatus={handleChangeStatus}
                 />
             )}
 
