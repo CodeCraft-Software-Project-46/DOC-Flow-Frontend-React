@@ -1,6 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import axios from "axios"; 
+import axiosInstance from "../api/axiosInstance";
+
+// 1. Define the shape of a single option
+interface SelectOption {
+    value: string;
+    label: string;
+}
+
+// 2. Define the shape of the whole metadata object
+interface MetaOptions {
+    events: SelectOption[];
+    channels: SelectOption[];
+    roles: string[]; // Roles was just a list of strings in our backend
+}
 
 type AddRuleModalProps = {
     isOpen: boolean;
@@ -11,7 +25,7 @@ type AddRuleModalProps = {
 export const AddRuleModal: React.FC<AddRuleModalProps> = ({ isOpen, onClose, onRuleAdded }) => {
     const [ruleName, setRuleName] = useState("");
     const [eventTrigger, setEventTrigger] = useState("TASK_ASSIGNED");
-    const [deliveryChannel, setDeliveryChannel] = useState("EMAIL_ONLY");
+    const [deliveryChannel, setDeliveryChannel] = useState("EMAIL");
     
     const [selectedRecipients, setSelectedRecipients] = useState<string[]>([]);
     const [options, setOptions] = useState<{ roles: string[], users: string[] }>({ roles: [], users: [] });
@@ -25,7 +39,7 @@ export const AddRuleModal: React.FC<AddRuleModalProps> = ({ isOpen, onClose, onR
             // Reset form state when opened
             setRuleName("");
             setEventTrigger("TASK_ASSIGNED");
-            setDeliveryChannel("EMAIL_ONLY");
+            setDeliveryChannel("EMAIL");
             setSelectedRecipients([]);
         }
     }, [isOpen]);
@@ -87,6 +101,16 @@ export const AddRuleModal: React.FC<AddRuleModalProps> = ({ isOpen, onClose, onR
         }
     };
 
+    const [metaOptions, setMetaOptions] = useState<MetaOptions>({ events: [], channels: [], roles: [] });
+    // Fetch metadata on mount
+    useEffect(() => {
+        const fetchMetadata = async () => {
+            const res = await axiosInstance.get('/notifications/metadata/');
+            setMetaOptions(res.data);
+        };
+        fetchMetadata();
+    }, []);
+
     if (!isOpen) return null;
 
     return (
@@ -114,16 +138,20 @@ export const AddRuleModal: React.FC<AddRuleModalProps> = ({ isOpen, onClose, onR
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Event Trigger</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Event Trigger
+                        </label>
                         <select
                             value={eventTrigger}
                             onChange={(e) => setEventTrigger(e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                         >
-                            <option value="TASK_ASSIGNED">Task Assigned</option>
-                            <option value="DOCUMENT_APPROVED">Document Approved</option>
-                            <option value="DOCUMENT_REJECTED">Document Rejected</option>
-                            <option value="SLA_BREACH">SLA Breach</option>
+                            <option value="">Select an event...</option>
+                            {metaOptions.events.map((event) => (
+                                <option key={event.value} value={event.value}>
+                                    {event.label}
+                                </option>
+                            ))}
                         </select>
                     </div>
 
@@ -134,13 +162,11 @@ export const AddRuleModal: React.FC<AddRuleModalProps> = ({ isOpen, onClose, onR
                             onChange={(e) => setDeliveryChannel(e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                         >
-                            <option value="EMAIL_ONLY">Email Only</option>
+                            <option value="EMAIL">Email Only</option>
                             <option value="IN_APP_ONLY">In-App Only</option>
                             <option value="BOTH">Both (Email & In-App)</option>
                         </select>
                     </div>
-
-                    <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Recipients</label>
                         
                         {selectedRecipients.length > 0 && (
@@ -163,29 +189,20 @@ export const AddRuleModal: React.FC<AddRuleModalProps> = ({ isOpen, onClose, onR
                         <select
                             onChange={handleAddRecipient}
                             disabled={isLoadingOptions}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-gray-100"
+                            defaultValue=""
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-gray-100 transition-all cursor-pointer"
                         >
-                            <option value="">
-                                {isLoadingOptions ? "Loading options..." : "Select a Role or User..."}
+                            <option value="" disabled>
+                                {isLoadingOptions ? "Loading roles..." : "Select a Role..."}
                             </option>
                             
-                            {options.roles.length > 0 && (
-                                <optgroup label="--- Dynamic Roles ---">
-                                    {options.roles.map(role => (
-                                        <option key={role} value={role}>{role}</option>
-                                    ))}
-                                </optgroup>
-                            )}
-
-                            {options.users.length > 0 && (
-                                <optgroup label="--- Specific Users ---">
-                                    {options.users.map(user => (
-                                        <option key={user} value={user}>{user}</option>
-                                    ))}
-                                </optgroup>
-                            )}
+                            {/* Simplified mapping without optgroup */}
+                            {options.roles.map((role) => (
+                                <option key={role} value={role}>
+                                    {role}
+                                </option>
+                            ))}
                         </select>
-                    </div>
 
                     <div className="flex items-center justify-end gap-3 pt-4 mt-2 border-t border-gray-100">
                         <button
