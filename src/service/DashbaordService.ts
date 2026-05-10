@@ -67,4 +67,34 @@ export const dashboardService = {
 
         return await res.json();
     },
-};
+
+    async changeDashboardStatus(
+        dashboard_id: number,
+        status: string
+    ) {
+
+        const response = await fetch(
+            `${API}/changeDashboardStatus/${dashboard_id}/`,
+            {
+                method: "PUT",
+
+                headers: {
+                    "Content-Type": "application/json",
+                },
+
+                body: JSON.stringify({
+                    status,
+                }),
+            }
+        );
+
+        const data = await response.json();
+
+        // 🚨 throw backend error properly
+        if (!response.ok) {
+            throw data;
+        }
+
+        return data;
+    }
+}
