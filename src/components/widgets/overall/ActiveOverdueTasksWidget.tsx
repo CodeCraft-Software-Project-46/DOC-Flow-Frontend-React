@@ -12,7 +12,7 @@ export default function ActiveOverdueTasksWidget() {
   const [open, setOpen] = useState(false);
 
   // WHY: safe fallback so UI never breaks
-  const value = error ? "-" : data?.count ?? "-";
+  const value = error ? "-" : (data?.count ?? "-");
 
   return (
     <>

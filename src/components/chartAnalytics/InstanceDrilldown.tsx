@@ -10,8 +10,9 @@ interface InstanceDrilldownProps {
   workflow: string; // currently selected workflow name
 }
 
-export default function InstanceDrilldown({ workflow }: InstanceDrilldownProps) {
-
+export default function InstanceDrilldown({
+  workflow,
+}: InstanceDrilldownProps) {
   // Get instances for selected workflow
   const instanceList: InstanceSummary[] = INSTANCES[workflow] || [];
 
@@ -19,21 +20,24 @@ export default function InstanceDrilldown({ workflow }: InstanceDrilldownProps) 
   const [selId, setSelId] = useState<string>(instanceList[0]?.id || "");
 
   // Get full detail of selected instance
-  const detail     = INSTANCE_DETAILS[selId];
+  const detail = INSTANCE_DETAILS[selId];
   const instanceMeta = instanceList.find((i) => i.id === selId);
 
   if (!detail || !instanceMeta) return null;
 
   // Count breached steps
-  const breachCount = detail.steps.filter((s) => s.status === "Breached").length;
+  const breachCount = detail.steps.filter(
+    (s) => s.status === "Breached",
+  ).length;
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6">
-
       {/* Header row */}
       <div className="flex justify-between items-center mb-5">
         <div>
-          <div className="font-bold text-slate-900 text-base">Instance Drill-down</div>
+          <div className="font-bold text-slate-900 text-base">
+            Instance Drill-down
+          </div>
           <div className="text-xs text-slate-400 mt-1">
             Step-by-step SLA analysis for a specific document instance
           </div>
@@ -49,7 +53,9 @@ export default function InstanceDrilldown({ workflow }: InstanceDrilldownProps) 
             className="border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white outline-none"
           >
             {instanceList.map((i) => (
-              <option key={i.id} value={i.id}>{i.id}</option>
+              <option key={i.id} value={i.id}>
+                {i.id}
+              </option>
             ))}
           </select>
         </div>
@@ -63,20 +69,21 @@ export default function InstanceDrilldown({ workflow }: InstanceDrilldownProps) 
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-slate-50">
-              {["Step", "Assignee", "Time Taken", "SLA Target", "Status"].map((h) => (
-                <th
-                  key={h}
-                  className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide"
-                >
-                  {h}
-                </th>
-              ))}
+              {["Step", "Assignee", "Time Taken", "SLA Target", "Status"].map(
+                (h) => (
+                  <th
+                    key={h}
+                    className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide"
+                  >
+                    {h}
+                  </th>
+                ),
+              )}
             </tr>
           </thead>
           <tbody>
             {detail.steps.map((step) => (
               <tr key={step.name} className="border-t border-slate-100">
-
                 {/* Step name */}
                 <td className="px-4 py-3 text-sm font-semibold text-slate-800">
                   {step.name}
@@ -92,8 +99,8 @@ export default function InstanceDrilldown({ workflow }: InstanceDrilldownProps) 
                   {step.pending
                     ? "Pending"
                     : step.running
-                    ? `${step.timeTaken}h (running)`
-                    : `${step.timeTaken}h`}
+                      ? `${step.timeTaken}h (running)`
+                      : `${step.timeTaken}h`}
                 </td>
 
                 {/* SLA target */}
@@ -121,7 +128,6 @@ export default function InstanceDrilldown({ workflow }: InstanceDrilldownProps) 
                     </span>
                   )}
                 </td>
-
               </tr>
             ))}
           </tbody>
@@ -135,7 +141,6 @@ export default function InstanceDrilldown({ workflow }: InstanceDrilldownProps) 
           <strong className="text-red-500">{breachCount}</strong>
         </span>
       </div>
-
     </div>
   );
 }

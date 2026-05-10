@@ -1,8 +1,12 @@
 // Renders a pie or donut chart for status distribution metric
 
 import {
-  PieChart, Pie, Cell,
-  Tooltip, ResponsiveContainer, Legend
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
 } from "recharts";
 import type { CustomChart } from "../../types";
 
@@ -12,7 +16,6 @@ interface PieChartWidgetProps {
 }
 
 export default function PieChartWidget({ chart, data }: PieChartWidgetProps) {
-
   // Map slice colors in order: good → warning → critical
   const sliceColors = [
     chart.colors.good,
@@ -38,17 +41,14 @@ export default function PieChartWidget({ chart, data }: PieChartWidgetProps) {
           endAngle={-270}
         >
           {data.map((_, index) => (
-            <Cell
-              key={index}
-              fill={sliceColors[index % sliceColors.length]}
-            />
+            <Cell key={index} fill={sliceColors[index % sliceColors.length]} />
           ))}
         </Pie>
         <Tooltip
           contentStyle={{
             fontSize: 12,
             borderRadius: 8,
-            border: "1px solid #e2e8f0"
+            border: "1px solid #e2e8f0",
           }}
           formatter={(value?: number | string) => [value ?? 0, "Value"]}
         />

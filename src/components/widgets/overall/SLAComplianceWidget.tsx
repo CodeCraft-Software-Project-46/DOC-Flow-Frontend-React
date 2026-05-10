@@ -12,12 +12,9 @@ export default function SLAComplianceWidget() {
    * so we safely normalize using only known types (no any needed)
    */
   const percent =
-    data?.percentage ??
-    data?.data?.percentage ??
-    data?.value ??
-    undefined;
+    data?.percentage ?? data?.data?.percentage ?? data?.value ?? undefined;
 
-  const value = error ? "-" : percent ?? "-";
+  const value = error ? "-" : (percent ?? "-");
 
   return (
     <StatCard

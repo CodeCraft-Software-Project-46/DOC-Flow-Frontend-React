@@ -12,14 +12,11 @@ export default function ChatWidget() {
 
   const [loading, setLoading] = useState(false);
 
-  const [messages, setMessages] = useState<
-    ChatMessage[]
-  >([
+  const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "1",
       role: "assistant",
-      content:
-        "Hi 👋 Ask me anything about workflows!",
+      content: "Hi 👋 Ask me anything about workflows!",
     },
   ]);
 
@@ -30,16 +27,12 @@ export default function ChatWidget() {
       content: text,
     };
 
-    setMessages((prev) => [
-      ...prev,
-      userMessage,
-    ]);
+    setMessages((prev) => [...prev, userMessage]);
 
     try {
       setLoading(true);
 
-      const answer =
-        await sendChatMessage(text);
+      const answer = await sendChatMessage(text);
 
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
@@ -47,29 +40,23 @@ export default function ChatWidget() {
         content: answer,
       };
 
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (error: unknown) {
+      let errorMessage = "Unable to connect to chatbot server.";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
       setMessages((prev) => [
         ...prev,
-        assistantMessage,
+        {
+          id: (Date.now() + 2).toString(),
+          role: "assistant",
+          content: errorMessage,
+        },
       ]);
-    } catch (error: unknown) {
-
-  let errorMessage =
-    "Unable to connect to chatbot server.";
-
-  if (error instanceof Error) {
-    errorMessage = error.message;
-  }
-
-  setMessages((prev) => [
-    ...prev,
-    {
-      id: (Date.now() + 2).toString(),
-      role: "assistant",
-      content: errorMessage,
-    },
-  ]);
-
-} finally { 
+    } finally {
       setLoading(false);
     }
   };
@@ -85,38 +72,21 @@ export default function ChatWidget() {
 
       {open && (
         <div className="fixed bottom-24 right-5 w-[350px] h-[500px] bg-white rounded-xl shadow-2xl flex flex-col overflow-hidden z-50">
-
           <div className="bg-blue-600 text-white p-4 flex justify-between items-center">
-            <h2 className="font-semibold">
-              AI Assistant
-            </h2>
+            <h2 className="font-semibold">AI Assistant</h2>
 
-            <button
-              onClick={() => setOpen(false)}
-            >
-              ✕
-            </button>
+            <button onClick={() => setOpen(false)}>✕</button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-3 bg-gray-50">
             {messages.map((message) => (
-              <ChatMessageComponent
-                key={message.id}
-                message={message}
-              />
+              <ChatMessageComponent key={message.id} message={message} />
             ))}
 
-            {loading && (
-              <div className="text-sm text-gray-400">
-                Typing...
-              </div>
-            )}
+            {loading && <div className="text-sm text-gray-400">Typing...</div>}
           </div>
 
-          <ChatInput
-            onSend={handleSend}
-            loading={loading}
-          />
+          <ChatInput onSend={handleSend} loading={loading} />
         </div>
       )}
     </>

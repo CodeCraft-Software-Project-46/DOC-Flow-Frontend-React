@@ -14,17 +14,21 @@ export default function AvgCompletionTimeWidget({
   const isReady = workflowId !== null;
 
   const queryFn = useCallback(
-    () => (workflowId === null ? Promise.resolve(null) : fetchWorkflowAvgTime(workflowId)),
-    [workflowId]
+    () =>
+      workflowId === null
+        ? Promise.resolve(null)
+        : fetchWorkflowAvgTime(workflowId),
+    [workflowId],
   );
 
-  const { data, loading, error } =
-    useAnalyticsQuery(queryFn, [workflowId]);
+  const { data, loading, error } = useAnalyticsQuery(queryFn, [workflowId]);
 
   return (
     <StatCard
       icon="⏱"
-      value={error || !isReady ? "-" : `${data?.avg_completion_time_hours ?? "-"}h`}
+      value={
+        error || !isReady ? "-" : `${data?.avg_completion_time_hours ?? "-"}h`
+      }
       label="Avg Completion Time"
       description={error || !isReady ? "Unavailable" : "Per instance"}
       color="blue"

@@ -26,7 +26,5 @@ export default function BottleneckWorkflowsWidget({ onWorkflowSelect }: Props) {
     );
   }
 
-  return (
-    <BottleneckSteps onWorkflowSelect={onWorkflowSelect} />
-  );
+  return <BottleneckSteps onWorkflowSelect={onWorkflowSelect} />;
 }

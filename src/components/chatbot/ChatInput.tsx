@@ -5,10 +5,7 @@ interface Props {
   loading: boolean;
 }
 
-export default function ChatInput({
-  onSend,
-  loading,
-}: Props) {
+export default function ChatInput({ onSend, loading }: Props) {
   const [text, setText] = useState("");
 
   const handleSend = () => {
@@ -26,9 +23,7 @@ export default function ChatInput({
         value={text}
         placeholder="Ask something..."
         onChange={(e) => setText(e.target.value)}
-        onKeyDown={(e) =>
-          e.key === "Enter" && handleSend()
-        }
+        onKeyDown={(e) => e.key === "Enter" && handleSend()}
         className="flex-1 border rounded-lg px-3 py-2 text-sm outline-none"
       />
 

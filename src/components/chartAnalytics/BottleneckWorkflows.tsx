@@ -4,9 +4,8 @@ import { useEffect, useState } from "react";
 import { fetchBottlenecks } from "../../services/analyticsApi";
 import type { BottleneckWorkflow } from "../../types";
 
-
 interface BottleneckWorkflowsProps {
-  onWorkflowSelect?: (workflow: string) => void;//onWorkflowSelect is just a prop name ?. just safely checks if the function exists before calling it
+  onWorkflowSelect?: (workflow: string) => void; //onWorkflowSelect is just a prop name ?. just safely checks if the function exists before calling it
 } //If this prop is provided, it must be a function that takes a string and returns nothing
 
 type BottleneckItem = {
@@ -17,16 +16,20 @@ type BottleneckItem = {
   score: number; // ✅ ADD BOTTLENECK SCORE
 };
 
-export default function BottleneckWorkflows({ onWorkflowSelect }: BottleneckWorkflowsProps) { //BottleneckWorkflows is a function component it receives one prop called onWorkflowSelect
+export default function BottleneckWorkflows({
+  onWorkflowSelect,
+}: BottleneckWorkflowsProps) {
+  //BottleneckWorkflows is a function component it receives one prop called onWorkflowSelect
+  void onWorkflowSelect;
   const [data, setData] = useState<BottleneckItem[]>([]); // ✅ MOVE HERE
   const [loading, setLoading] = useState(true);
 
- useEffect(() => {
+  useEffect(() => {
     const load = async () => {
       setLoading(true);
       try {
         const res = await fetchBottlenecks();
-        const raw = Array.isArray(res) ? res : res.data ?? [];
+        const raw = Array.isArray(res) ? res : (res.data ?? []);
 
         if (!Array.isArray(raw)) {
           setData([]);
@@ -76,59 +79,68 @@ export default function BottleneckWorkflows({ onWorkflowSelect }: BottleneckWork
     return "w-0";
   }
 
-  return (////now the child can use the parent’s function. handleWorkflowSelect 
+  return (
+    ////now the child can use the parent’s function. handleWorkflowSelect
     <div className="bg-white rounded-2xl shadow-sm p-6">
-      <div className="font-semibold text-slate-900 text-base">📊 System Bottleneck Workflows</div>
+      <div className="font-semibold text-slate-900 text-base">
+        📊 System Bottleneck Workflows
+      </div>
       <div className="text-xs text-slate-400 mt-1 mb-5">
-        Workflows with Highest Bottleneck Scores (based on avg time, breach rate, and task volume)
+        Workflows with Highest Bottleneck Scores (based on avg time, breach
+        rate, and task volume)
       </div>
 
-      <div className="flex flex-col gap-3 min-h-[160px]"> {/*BOTTLENECK_DATA is your dummy data array*/}
+      <div className="flex flex-col gap-3 min-h-[160px]">
+        {" "}
+        {/*BOTTLENECK_DATA is your dummy data array*/}
         {loading ? (
-        <div className="flex items-center justify-center min-h-[160px] text-xs text-slate-400">
-          Loading workflows...
-        </div>
-      ) : data.length === 0 ? (
-        <div className="flex items-center justify-center min-h-[160px] text-xs text-slate-400">
-          No data available
-        </div>
-      ) : (
-        data.map((item) => { /*.map() means: item=  go through each item in the array one by one*/
-          const style = getScoreStyle(item.score);
-          const widthClass = getScoreWidthClass(item.score);
-        
-          return (
-            <div
-              key={item.workflow} /*this component receives props and those props must follow BottleneckWorkflowsProps*/
-              onClick={() => onWorkflowSelect?.(item.workflow)}     /*run this function when user clicks this div onWorkflowSelect("GRN Processing")  handleWorkflowSelect("GRN Processing")  */
-              className="cursor-pointer hover:bg-blue-50 p-2 rounded-lg transition-colors"
-            >
-              {/* Workflow name */}
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-semibold text-slate-800">
-                  {item.workflow}
-                </span>
-                <span className={`text-xs font-bold ${style.text}`}>
-                  {(item.score * 100).toFixed(0)}%
-                </span>
-              </div>
+          <div className="flex items-center justify-center min-h-[160px] text-xs text-slate-400">
+            Loading workflows...
+          </div>
+        ) : data.length === 0 ? (
+          <div className="flex items-center justify-center min-h-[160px] text-xs text-slate-400">
+            No data available
+          </div>
+        ) : (
+          data.map((item) => {
+            /*.map() means: item=  go through each item in the array one by one*/
+            const style = getScoreStyle(item.score);
+            const widthClass = getScoreWidthClass(item.score);
 
-              {/* Progress bar */}
-              <div className="bg-slate-100 rounded-full h-3 overflow-hidden mb-2">
-                <div
-                  className={`h-full rounded-full transition-all ${style.bar} ${widthClass}`}
-                />
-              </div>
+            return (
+              <div
+                key={
+                  item.workflow
+                } /*this component receives props and those props must follow BottleneckWorkflowsProps*/
+                className="p-2 rounded-lg transition-colors"
+              >
+                {/* Workflow name */}
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-sm font-semibold text-slate-800">
+                    {item.workflow}
+                  </span>
+                  <span className={`text-xs font-bold ${style.text}`}>
+                    {(item.score * 100).toFixed(0)}%
+                  </span>
+                </div>
 
-              {/* Stats row */}
-              <div className="text-xs text-slate-500 flex gap-3">
-                <span>{item.avg}h avg</span>
-                <span>· {item.breach}% breach</span>
-                <span>· {item.tasks} tasks</span>
+                {/* Progress bar */}
+                <div className="bg-slate-100 rounded-full h-3 overflow-hidden mb-2">
+                  <div
+                    className={`h-full rounded-full transition-all ${style.bar} ${widthClass}`}
+                  />
+                </div>
+
+                {/* Stats row */}
+                <div className="text-xs text-slate-500 flex gap-3">
+                  <span>{item.avg}h avg</span>
+                  <span>· {item.breach}% breach</span>
+                  <span>· {item.tasks} tasks</span>
+                </div>
               </div>
-            </div>
-          );
-        }))}
+            );
+          })
+        )}
       </div>
 
       {/* Legend */}

@@ -8,7 +8,7 @@ export default function CompletedTasksWidget() {
     useAnalyticsQuery<CompletedTasksResponse>(fetchCompletedTasks);
 
   // WHY: keeps UI stable even if backend fails
-  const value = error ? "-" : data?.count ?? "-";
+  const value = error ? "-" : (data?.count ?? "-");
 
   return (
     <StatCard

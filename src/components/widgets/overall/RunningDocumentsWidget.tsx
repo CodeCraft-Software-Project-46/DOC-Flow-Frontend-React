@@ -1,7 +1,10 @@
 import { useState } from "react";
 import StatCard from "../../chartAnalytics/StatCard";
 import { fetchRunningDocuments } from "../../../services/analyticsApi";
-import type { RunningDocumentsApiResponse, RunningDocumentsResponse } from "../../../types";
+import type {
+  RunningDocumentsApiResponse,
+  RunningDocumentsResponse,
+} from "../../../types";
 import RunningDocumentsDetails from "./RunningDocumentsDetails";
 import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery.ts";
 
@@ -15,7 +18,7 @@ export default function RunningDocumentsWidget() {
   const payload: RunningDocumentsResponse | null =
     data && "value" in data ? data.value : data;
 
-  const value = error ? "-" : payload?.count ?? "-";
+  const value = error ? "-" : (payload?.count ?? "-");
 
   return (
     <>

@@ -9,14 +9,14 @@ export default function StatCard({
   color,
   small = false,
   loading = false,
-  onClick
+  onClick,
 }: StatCardProps) {
   const iconBg =
     color === "blue"
       ? "bg-blue-100"
       : color === "red"
-      ? "bg-red-100"
-      : "bg-green-100";
+        ? "bg-red-100"
+        : "bg-green-100";
 
   return (
     <div
@@ -36,9 +36,11 @@ export default function StatCard({
       <div>
         <div className="text-3xl font-bold text-slate-900">
           {loading ? (
-            <span className="text-3xl font-bold text-slate-400 animate-pulse">…</span>
+            <span className="text-3xl font-bold text-slate-400 animate-pulse">
+              …
+            </span>
           ) : (
-            value ?? "—"
+            (value ?? "—")
           )}
         </div>
         <div className="text-sm text-slate-500 font-medium">{label}</div>

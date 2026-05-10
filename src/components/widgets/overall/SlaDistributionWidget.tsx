@@ -3,8 +3,7 @@ import { fetchSLADistribution } from "../../../services/analyticsApi";
 import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery";
 
 export default function SlaDistributionWidget() {
-  const { data, loading, error } =
-    useAnalyticsQuery(fetchSLADistribution);
+  const { data, loading, error } = useAnalyticsQuery(fetchSLADistribution);
 
   if (loading) {
     return (

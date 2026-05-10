@@ -10,18 +10,18 @@ interface Props {
   workflowId: number | null;
 }
 
-export default function SLAComplianceWidget({
-  workflowId,
-}: Props) {
+export default function SLAComplianceWidget({ workflowId }: Props) {
   const isReady = workflowId !== null;
 
   const queryFn = useCallback(
-    () => (workflowId === null ? Promise.resolve(null) : fetchWorkflowSLACompliance(workflowId)),
-    [workflowId]
+    () =>
+      workflowId === null
+        ? Promise.resolve(null)
+        : fetchWorkflowSLACompliance(workflowId),
+    [workflowId],
   );
 
-  const { data, loading, error } =
-    useAnalyticsQuery(queryFn, [workflowId]);
+  const { data, loading, error } = useAnalyticsQuery(queryFn, [workflowId]);
 
   return (
     <StatCard

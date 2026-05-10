@@ -14,17 +14,19 @@ export default function TotalInstancesWidget({
   const isReady = workflowId !== null;
 
   const queryFn = useCallback(
-    () => (workflowId === null ? Promise.resolve(null) : fetchWorkflowTotalInstances(workflowId)),
-    [workflowId]
+    () =>
+      workflowId === null
+        ? Promise.resolve(null)
+        : fetchWorkflowTotalInstances(workflowId),
+    [workflowId],
   );
 
-  const { data, loading, error } =
-    useAnalyticsQuery(queryFn, [workflowId]);
+  const { data, loading, error } = useAnalyticsQuery(queryFn, [workflowId]);
 
   return (
     <StatCard
       icon="📁"
-      value={error || !isReady ? "-" : data?.value ?? "-"}
+      value={error || !isReady ? "-" : (data?.value ?? "-")}
       label="Total Instances"
       description={error || !isReady ? "Unavailable" : "Selected workflow"}
       color="blue"

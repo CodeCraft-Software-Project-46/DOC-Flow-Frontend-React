@@ -32,7 +32,6 @@ function getComplianceWidthClass(compliance: number) {
 }
 
 export default function UserPerformance() {
-
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -40,7 +39,7 @@ export default function UserPerformance() {
     const load = async () => {
       try {
         const res = await fetchUserPerformance();
-        const raw = Array.isArray(res) ? res : res.data ?? [];
+        const raw = Array.isArray(res) ? res : (res.data ?? []);
 
         if (!Array.isArray(raw)) {
           setUsers([]);
@@ -80,54 +79,52 @@ export default function UserPerformance() {
 
       <div className="flex flex-col gap-5 min-h-[160px]">
         {loading ? (
-            <div className="flex items-center min-h-[160px] text-xs text-slate-400">
-              Loading users...
-            </div>
-          ) : users.length === 0 ? (
-            <div className="flex items-center min-h-[160px] text-xs text-slate-400">
-              No user data available
-            </div>
-          ) : (
-            users.map((user, index) => {
-              const styles = getComplianceStyles(user.compliance);
-              const widthClass = getComplianceWidthClass(user.compliance);
+          <div className="flex items-center min-h-[160px] text-xs text-slate-400">
+            Loading users...
+          </div>
+        ) : users.length === 0 ? (
+          <div className="flex items-center min-h-[160px] text-xs text-slate-400">
+            No user data available
+          </div>
+        ) : (
+          users.map((user, index) => {
+            const styles = getComplianceStyles(user.compliance);
+            const widthClass = getComplianceWidthClass(user.compliance);
 
-              return (
-                <div
-                  key={user.name}
-                  className="bg-white"
-                >
-                  {/* Top Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-slate-400 w-5">
-                        #{index + 1}
-                      </span>
-                      <span className="text-sm font-semibold text-slate-800">
-                        {user.name}
-                      </span>
-                    </div>
-
-                    <span className={`text-sm font-bold ${styles.text}`}>
-                      {user.compliance}%
+            return (
+              <div key={user.name} className="bg-white">
+                {/* Top Row */}
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-slate-400 w-5">
+                      #{index + 1}
+                    </span>
+                    <span className="text-sm font-semibold text-slate-800">
+                      {user.name}
                     </span>
                   </div>
 
-                  {/* Progress Bar */}
-                  <div className="bg-slate-100 rounded-full h-2.5 overflow-hidden mb-1">
-                    <div
-                      className={`h-full rounded-full transition-all ${styles.bar} ${widthClass}`}
-                    />
-                  </div>
-
-                  {/* Stats */}
-                  <div className="text-xs text-slate-400">
-                    {user.avg}h avg · {user.breaches} breaches · {user.tasks} tasks
-                  </div>
+                  <span className={`text-sm font-bold ${styles.text}`}>
+                    {user.compliance}%
+                  </span>
                 </div>
-              );
-            })
-          )}
+
+                {/* Progress Bar */}
+                <div className="bg-slate-100 rounded-full h-2.5 overflow-hidden mb-1">
+                  <div
+                    className={`h-full rounded-full transition-all ${styles.bar} ${widthClass}`}
+                  />
+                </div>
+
+                {/* Stats */}
+                <div className="text-xs text-slate-400">
+                  {user.avg}h avg · {user.breaches} breaches · {user.tasks}{" "}
+                  tasks
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
 
       {/* Legend */}

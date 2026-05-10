@@ -25,10 +25,10 @@ export default function InstanceDrilldownWidget({
     return fetchWorkflowInstances(workflowId);
   }, [workflowId]);
 
-  const {
-    data: instancesData,
-    loading: instancesLoading,
-  } = useAnalyticsQuery<WorkflowInstancesApiResponse>(instancesQuery, [workflowId]);
+  const { data: instancesData, loading: instancesLoading } =
+    useAnalyticsQuery<WorkflowInstancesApiResponse>(instancesQuery, [
+      workflowId,
+    ]);
 
   const instanceList = useMemo(() => instancesData ?? [], [instancesData]);
   const effectiveSelectedInstance =
@@ -67,16 +67,24 @@ export default function InstanceDrilldownWidget({
     <div className="bg-white rounded-xl shadow-sm p-5">
       <div className="flex items-start justify-between gap-4 mb-4">
         <div>
-          <div className="font-semibold text-slate-900">Instance Drill-down (Task Flow)</div>
-          <div className="text-xs text-slate-400 mt-1">Step-by-step SLA analysis for a specific document instance</div>
+          <div className="font-semibold text-slate-900">
+            Instance Drill-down (Task Flow)
+          </div>
+          <div className="text-xs text-slate-400 mt-1">
+            Step-by-step SLA analysis for a specific document instance
+          </div>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs font-medium text-slate-500 whitespace-nowrap">Select Instance:</span>
+          <span className="text-xs font-medium text-slate-500 whitespace-nowrap">
+            Select Instance:
+          </span>
           <select
             value={effectiveSelectedInstance ?? ""}
             onChange={(e) =>
-              setSelectedInstance(e.target.value ? Number(e.target.value) : null)
+              setSelectedInstance(
+                e.target.value ? Number(e.target.value) : null,
+              )
             }
             aria-label="Select workflow instance"
             className="w-40 border border-slate-200 rounded-lg px-2 py-1.5 text-sm bg-white text-slate-700 outline-none"
@@ -90,7 +98,7 @@ export default function InstanceDrilldownWidget({
         </div>
       </div>
 
-        {/* ===============================
+      {/* ===============================
           LOADING / ERROR
         =============================== */}
       {Boolean(drilldownError) && (
@@ -103,7 +111,6 @@ export default function InstanceDrilldownWidget({
       {drilldownData && (
         <div className="overflow-x-auto">
           <table className="w-full text-sm border border-slate-200 rounded-lg">
-
             <thead className="bg-slate-100 text-slate-600">
               <tr>
                 <th className="p-2 text-left">Step</th>
@@ -117,28 +124,21 @@ export default function InstanceDrilldownWidget({
 
             <tbody>
               {drilldownData.map((task, index) => {
-
                 const isRunning =
                   task.status === "running" || task.status === "pending";
 
                 return (
                   <tr
                     key={index}
-                    className={`border-t ${
-                      isRunning ? "bg-yellow-50" : ""
-                    }`}
+                    className={`border-t ${isRunning ? "bg-yellow-50" : ""}`}
                   >
-                    <td className="p-2 font-medium">
-                      {task.task_name}
-                    </td>
+                    <td className="p-2 font-medium">{task.task_name}</td>
 
                     <td className="p-2">
                       {task.assigned_user ?? "Unassigned"}
                     </td>
 
-                    <td className="p-2">
-                      {task.assigned_role ?? "-"}
-                    </td>
+                    <td className="p-2">{task.assigned_role ?? "-"}</td>
 
                     <td className="p-2">
                       {task.time_taken_hours !== null
@@ -146,9 +146,7 @@ export default function InstanceDrilldownWidget({
                         : "Running / Pending"}
                     </td>
 
-                    <td className="p-2">
-                      {task.sla_hours}h
-                    </td>
+                    <td className="p-2">{task.sla_hours}h</td>
 
                     <td className="p-2">
                       <span
@@ -156,8 +154,8 @@ export default function InstanceDrilldownWidget({
                           task.sla_status === "breached"
                             ? "text-red-600 font-semibold"
                             : task.sla_status === "met"
-                            ? "text-green-600 font-semibold"
-                            : "text-slate-500"
+                              ? "text-green-600 font-semibold"
+                              : "text-slate-500"
                         }
                       >
                         {task.sla_status}
@@ -167,7 +165,6 @@ export default function InstanceDrilldownWidget({
                 );
               })}
             </tbody>
-
           </table>
         </div>
       )}

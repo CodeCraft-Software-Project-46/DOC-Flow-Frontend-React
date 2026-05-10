@@ -23,36 +23,38 @@ export default function SLADonut() {
         : "bg-slate-400";
   }
 
-useEffect(() => {
-  const load = async () => {
-    try {
-      const res = await fetchSLADistribution();
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetchSLADistribution();
 
-      const raw = Array.isArray(res) ? res : res.data ?? [];
+        const raw = Array.isArray(res) ? res : (res.data ?? []);
 
-      if (!Array.isArray(raw)) {
-        console.error("Invalid SLA API response:", raw);
+        if (!Array.isArray(raw)) {
+          console.error("Invalid SLA API response:", raw);
+          setData([]);
+          return;
+        }
+
+        const formatted: SLAItem[] = (raw as SLADistributionPoint[]).map(
+          (item) => ({
+            name: item.name === "met" ? "On Time" : "Breached",
+            value: item.value ?? 0,
+            color: item.name === "met" ? "#22c55e" : "#ef4444",
+          }),
+        );
+
+        setData(formatted);
+      } catch (err) {
+        console.error("Failed to load SLA distribution", err);
         setData([]);
-        return;
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const formatted: SLAItem[] = (raw as SLADistributionPoint[]).map((item) => ({
-        name: item.name === "met" ? "On Time" : "Breached",
-        value: item.value ?? 0,
-        color: item.name === "met" ? "#22c55e" : "#ef4444",
-      }));
-
-      setData(formatted);
-    } catch (err) {
-      console.error("Failed to load SLA distribution", err);
-      setData([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  load();
-}, []);
+    load();
+  }, []);
 
   // // Aggregate COMPLETED step statuses (Met or Breached only) across all instances
   // let met = 0;
@@ -73,7 +75,6 @@ useEffect(() => {
   //   { name: "On Time", value: met, color: "#22c55e" },
   //   { name: "Breached", value: breached, color: "#ef4444" },
   // ].filter(item => item.value > 0); // Remove empty categories met = 10 breached = 0 => only show met
-
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6">
@@ -97,19 +98,26 @@ useEffect(() => {
           <div className="flex items-center gap-8">
             <ResponsiveContainer width={160} height={160}>
               <PieChart>
-                <Pie                                                                       //data = [
-                  data={data}                                                             // { name: "On Time", value: 10, color: "green" },
-                  cx={75}                                                                 //{ name: "Breached", value: 5, color: "red" }]
+                <Pie //data = [
+                  data={data} // { name: "On Time", value: 10, color: "green" },
+                  cx={75} //{ name: "Breached", value: 5, color: "red" }]
                   cy={75}
                   innerRadius={50} //makes it donut inner radius > 0
                   outerRadius={70}
                   dataKey="value"
                   startAngle={90}
-                  endAngle={-270}  //clockwise full circle because default is anti-clockwise and we want to start from top (90) and go full circle back to top (-270)
-                > {/*Recharts does NOT care about: color: "#22c55e" you must explicitly say <Cell fill={entry.color} /> */} 
-                  {data.map((item, index) => (  //item means one item in the array item = { name: "On Time", value: 10, color: "#22c55e" }     //<Cell fill="green" /> first slice green, second slice red
-                    <Cell key={index} fill={item.color} /> //Each slice gets its own color from the data array          //<Cell fill="red" />     
-                  ))}
+                  endAngle={-270} //clockwise full circle because default is anti-clockwise and we want to start from top (90) and go full circle back to top (-270)
+                >
+                  {" "}
+                  {/*Recharts does NOT care about: color: "#22c55e" you must explicitly say <Cell fill={entry.color} /> */}
+                  {data.map(
+                    (
+                      item,
+                      index, //item means one item in the array item = { name: "On Time", value: 10, color: "#22c55e" }     //<Cell fill="green" /> first slice green, second slice red
+                    ) => (
+                      <Cell key={index} fill={item.color} /> //Each slice gets its own color from the data array          //<Cell fill="red" />
+                    ),
+                  )}
                 </Pie>
               </PieChart>
             </ResponsiveContainer>
@@ -127,7 +135,7 @@ useEffect(() => {
                     </span>
                   </div>
                   <div className="text-2xl font-bold text-slate-900 mt-1">
-                    {item.value} {/*count*/} 
+                    {item.value} {/*count*/}
                   </div>
                 </div>
               ))}

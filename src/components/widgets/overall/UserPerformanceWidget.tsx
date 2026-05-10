@@ -3,8 +3,7 @@ import { fetchUserPerformance } from "../../../services/analyticsApi";
 import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery";
 
 export default function UserPerformanceWidget() {
-  const { data, loading, error } =
-    useAnalyticsQuery(fetchUserPerformance);
+  const { data, loading, error } = useAnalyticsQuery(fetchUserPerformance);
 
   if (loading) {
     return (

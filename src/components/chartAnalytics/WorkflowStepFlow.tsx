@@ -76,7 +76,8 @@ export default function WorkflowStepFlow({ workflow }: Props) {
               {step.processing > 0 && (
                 <div className="mt-3 pt-3 border-t border-slate-200">
                   <div className="text-xs text-orange-600 font-medium">
-                    ⚠️ {step.processing} document{step.processing > 1 ? "s" : ""} waiting
+                    ⚠️ {step.processing} document
+                    {step.processing > 1 ? "s" : ""} waiting
                   </div>
                 </div>
               )}
@@ -102,7 +103,8 @@ export default function WorkflowStepFlow({ workflow }: Props) {
             <div className="text-xs text-green-700 mt-1">
               {flowData.totalInstances > 0
                 ? Math.round(
-                    (flowData.completedInstances / flowData.totalInstances) * 100
+                    (flowData.completedInstances / flowData.totalInstances) *
+                      100,
                   )
                 : 0}
               % completion rate
