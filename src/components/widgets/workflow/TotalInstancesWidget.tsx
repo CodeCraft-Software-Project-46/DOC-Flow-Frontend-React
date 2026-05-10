@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import StatCard from "../../chartAnalytics/StatCard";
+import StatCard from "../../StatCard";
 
 import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery";
 

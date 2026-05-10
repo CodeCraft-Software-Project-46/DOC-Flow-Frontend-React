@@ -1,4 +1,4 @@
-import StatCard from "../../chartAnalytics/StatCard";
+import StatCard from "../../StatCard";
 import { fetchSLACompliance } from "../../../services/analyticsApi";
 import type { SLAComplianceResponse } from "../../../types";
 import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery";

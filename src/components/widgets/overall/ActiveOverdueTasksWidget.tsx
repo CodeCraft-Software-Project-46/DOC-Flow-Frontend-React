@@ -1,4 +1,4 @@
-import StatCard from "../../chartAnalytics/StatCard";
+import StatCard from "../../StatCard.tsx";
 import { fetchActiveOverdueTasks } from "../../../services/analyticsApi";
 import type { ActiveOverdueTasksResponse } from "../../../types";
 import ActiveTasksDetails from "./ActiveTasksDetails";

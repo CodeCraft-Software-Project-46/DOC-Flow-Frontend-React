@@ -1,5 +1,5 @@
 // Reusable stat card used in both Overall Dashboard and Workflow Analytics
-import type { StatCardProps } from "../../types";
+import type { StatCardProps } from "../types";
 
 export default function StatCard({
   icon,

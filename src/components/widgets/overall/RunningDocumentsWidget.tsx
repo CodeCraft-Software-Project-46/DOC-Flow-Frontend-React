@@ -1,5 +1,5 @@
 import { useState } from "react";
-import StatCard from "../../chartAnalytics/StatCard";
+import StatCard from "../../StatCard.tsx";
 import { fetchRunningDocuments } from "../../../services/analyticsApi";
 import type {
   RunningDocumentsApiResponse,

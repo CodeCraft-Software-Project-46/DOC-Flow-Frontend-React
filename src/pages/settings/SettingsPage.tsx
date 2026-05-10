@@ -2,10 +2,7 @@ import { useState, useEffect } from "react";
 import { WorkingHoursModal } from "../../components/WorkingHoursModal";
 import type { WorkingHoursConfig } from "../../types";
 
-import {
-  getWorkingHours,
-  saveWorkingHours,
-} from "../../api/WorkingHoursAPI";
+import { getWorkingHours, saveWorkingHours } from "../../api/WorkingHoursAPI";
 
 import { getWorkingHoursPerDay } from "../../services/workingHoursService";
 
@@ -22,10 +19,12 @@ export const SettingsPage = () => {
   const [loading, setLoading] = useState(true);
 
   /* Load config */
-  useEffect(() => {             //Runs AFTER component loads  Without it → API runs on every render ❌
-  const fetchData = async () => {  //creates the function
+  useEffect(() => {
+    //Runs AFTER component loads  Without it → API runs on every render ❌
+    const fetchData = async () => {
+      //creates the function
       try {
-        const data = await getWorkingHours();    
+        const data = await getWorkingHours();
         setConfig(data); // null if no record
       } catch (error) {
         console.error("Error loading working hours:", error);
@@ -34,7 +33,7 @@ export const SettingsPage = () => {
         setLoading(false);
       }
     };
-    fetchData();        //calls the function we just created
+    fetchData(); //calls the function we just created
   }, []);
 
   /* Save handler */
@@ -55,7 +54,8 @@ export const SettingsPage = () => {
   }
 
   /* EMPTY STATE */
-  if (!config) {                 //No data in DB
+  if (!config) {
+    //No data in DB
     return (
       <div className="p-4 text-gray-600">
         No working hours configured yet.
@@ -65,13 +65,12 @@ export const SettingsPage = () => {
         >
           Configure
         </button>
-
         <WorkingHoursModal
           isOpen={isModalOpen} //isModalOpen=true            isOpen=true is sent to modal as prop
-          onClose={() => setIsModalOpen(false)}// passing function refence but here if child wants to run he can run....  onClose={setIsModalOpen(false)} // ❌ executes immediately 
+          onClose={() => setIsModalOpen(false)} // passing function refence but here if child wants to run he can run....  onClose={setIsModalOpen(false)} // ❌ executes immediately
           onSave={handleSave}
           initialConfig={null}
-          saving={saving} //saving =false 
+          saving={saving} //saving =false
         />
       </div>
     );
@@ -81,18 +80,15 @@ export const SettingsPage = () => {
 
   return (
     <div className="max-w-4xl space-y-5">
-
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Settings
-        </h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Settings</h2>
         <p className="text-gray-600">
-          Configure company working hours and holidays used for SLA calculations.
+          Configure company working hours and holidays used for SLA
+          calculations.
         </p>
       </div>
 
       <div className="bg-white border border-slate-200 rounded-lg p-4">
-
         <div className="flex justify-between items-start">
           <div>
             <h3 className="text-lg font-semibold text-slate-900">
@@ -113,10 +109,9 @@ export const SettingsPage = () => {
 
         {/* STATS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
-
           <Stat
             label="Hours / Day"
-            value={`${Math.floor(hoursPerDay)}h ${Math.round((hoursPerDay % 1) * 60)}m`}  //convert decimal hours to hours and minutes format (e.g. 8.5 → "8h 30m")
+            value={`${Math.floor(hoursPerDay)}h ${Math.round((hoursPerDay % 1) * 60)}m`} //convert decimal hours to hours and minutes format (e.g. 8.5 → "8h 30m")
           />
 
           <Stat
@@ -124,10 +119,7 @@ export const SettingsPage = () => {
             value={`${config.workStartTime} - ${config.workEndTime}`}
           />
 
-          <Stat
-            label="Special Holidays"
-            value={config.holidays.length}
-          />
+          <Stat label="Special Holidays" value={config.holidays.length} />
         </div>
 
         {/* WORKING DAYS */}
@@ -137,10 +129,9 @@ export const SettingsPage = () => {
             {formatWorkDays(config.workDays)}
           </p>
         </div>
-
       </div>
 
-      <WorkingHoursModal  //SettingsPage is parent and modal is child
+      <WorkingHoursModal //SettingsPage is parent and modal is child
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSave}
