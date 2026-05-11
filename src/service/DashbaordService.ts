@@ -116,5 +116,32 @@ export const dashboardService = {
         }
 
         return data;
-    }
+    },
+    // GET ACTIVE DASHBOARD FOR ROLE
+    async getActiveDashboard(role_id: number | string | null) {
+
+        if (!role_id) {
+            throw new Error("role_id is required");
+        }
+
+        const response = await fetch(
+            `${API}/getActiveDashboard/${role_id}/`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw data;
+        }
+
+        return data;
+    },
+
+
 }
