@@ -96,5 +96,25 @@ export const dashboardService = {
         }
 
         return data;
+    },
+    async deleteDashboard(dashboard_id: number) {
+
+        const response = await fetch(
+            `${API}/deleteDashboard/${dashboard_id}/`,
+            {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw data;
+        }
+
+        return data;
     }
 }
