@@ -162,6 +162,7 @@ import {StatsBar} from "../../components/DashboardBuilderComponents/StatsBar.tsx
 import {DashboardList} from "../../components/DashboardBuilderComponents/DashboardList.tsx";
 import {CreateDashboardModal} from "../../components/DashboardBuilderComponents/CreateDashboardModal.tsx";
 import {roleService} from "../../service/RoleService.ts";
+import Swal from "sweetalert2";
 
 export function DashBoardBuilder() {
 
@@ -324,15 +325,58 @@ export function DashBoardBuilder() {
 
     // DELETE
     const handleDelete = async (id: number) => {
+        const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to recover this dashboard!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#6b7280",
+            confirmButtonText: "Yes, delete it!",
+        });
 
+        if (!result.isConfirmed) return;
 
+        try {
+            await dashboardService.deleteDashboard(id);
 
+            await loadDashboards();
+
+            Swal.fire({
+                title: "Deleted!",
+                text: "Dashboard has been deleted.",
+                icon: "success",
+                timer: 1500,
+                showConfirmButton: false,
+            });
+
+        } catch (err: any) {
+            Swal.fire({
+                title: "Error!",
+                text: err?.error || "Delete failed",
+                icon: "error",
+            });
+        }
     };
+
+
 
     const handleChangeStatus = async (
         id: number,
         status: string
     ) => {
+
+        const result = await Swal.fire({
+            title: "Change Dashboard Status?",
+            text: `Are you sure you want to change status to "${status}"?`,
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#6b7280",
+            confirmButtonText: "Yes, change it",
+        });
+
+        if (!result.isConfirmed) return;
 
         try {
 
@@ -345,21 +389,30 @@ export function DashBoardBuilder() {
             setDashboards(prev =>
                 prev.map(d =>
                     d.id === id
-                        ? {...d, status}
+                        ? { ...d, status }
                         : d
                 )
             );
 
-            alert(res.message);
-            loadDashboards()
+            await loadDashboards();
+
+            Swal.fire({
+                title: "Success!",
+                text: res.message,
+                icon: "success",
+                timer: 1500,
+                showConfirmButton: false,
+            });
 
         } catch (err: any) {
 
-            // ✅ backend error message
-            alert(
-                err?.error ||
-                "Failed to change status"
-            );
+            Swal.fire({
+                title: "Error!",
+                text:
+                    err?.error ||
+                    "Failed to change status",
+                icon: "error",
+            });
         }
 
     };
