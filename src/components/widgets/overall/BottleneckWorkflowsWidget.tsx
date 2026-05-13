@@ -2,7 +2,7 @@
 // import { getBreachStyle, getProgressPercentage } from "../../utils/bottleneckUtils";
 
 import { useEffect, useState } from "react";
-import { fetchBottlenecks } from "../../../services/analyticsApi";
+import { fetchBottlenecks } from "../../../services/api/analyticsApi";
 import type { BottleneckWorkflow } from "../../../types";
 
 interface BottleneckWorkflowsProps {

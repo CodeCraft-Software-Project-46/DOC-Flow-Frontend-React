@@ -1,5 +1,5 @@
 import StatCard from "../../StatCard";
-import { fetchSLACompliance } from "../../../services/analyticsApi";
+import { fetchSLACompliance } from "../../../services/api/analyticsApi";
 import type { SLAComplianceResponse } from "../../../types";
 import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery";
 

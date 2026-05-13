@@ -1,6 +1,6 @@
 import { useState } from "react";
 import StatCard from "../../StatCard.tsx";
-import { fetchRunningDocuments } from "../../../services/analyticsApi";
+import { fetchRunningDocuments } from "../../../services/api/analyticsApi";
 import type {
   RunningDocumentsApiResponse,
   RunningDocumentsResponse,

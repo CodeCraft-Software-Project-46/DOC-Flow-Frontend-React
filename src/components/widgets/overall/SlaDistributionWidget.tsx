@@ -2,7 +2,7 @@
 
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { useEffect, useState } from "react";
-import { fetchSLADistribution } from "../../../services/analyticsApi";
+import { fetchSLADistribution } from "../../../services/api/analyticsApi";
 import type { SLADistributionPoint } from "../../../types";
 
 type SLAItem = {

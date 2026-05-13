@@ -1,4 +1,4 @@
-import API from "./api";
+import API from "./axios";
 import type {
   ActiveOverdueTasksResponse,
   BottleneckWorkflowsResponse,
@@ -14,7 +14,7 @@ import type {
   WorkflowSLAComplianceApiResponse,
   WorkflowStepFlowDetailResponse,
   WorkflowTotalInstancesValueResponse,
-} from "../types";
+} from "../../types";
 
 // 🔹 Running Documents
 export const fetchRunningDocuments = async (): Promise<RunningDocumentsApiResponse> => {

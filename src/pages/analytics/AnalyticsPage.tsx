@@ -14,7 +14,7 @@ import InstanceDrilldownWidget from "../../components/widgets/workflow/InstanceD
 import {
   fetchWorkflows,
   fetchWorkflowSteps,
-} from "../../services/analyticsApi";
+} from "../../services/api/analyticsApi";
 import type {
   WorkflowListItem,
   WorkflowStepFlowDetailResponse,

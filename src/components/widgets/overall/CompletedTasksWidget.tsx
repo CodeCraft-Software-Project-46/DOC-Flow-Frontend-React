@@ -1,5 +1,5 @@
 import StatCard from "../../StatCard.tsx";
-import { fetchCompletedTasks } from "../../../services/analyticsApi";
+import { fetchCompletedTasks } from "../../../services/api/analyticsApi";
 import type { CompletedTasksResponse } from "../../../types";
 import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery.ts";
 

@@ -4,7 +4,7 @@ import StatCard from "../../StatCard";
 
 import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery";
 
-import { fetchWorkflowTotalInstances } from "../../../services/analyticsApi";
+import { fetchWorkflowTotalInstances } from "../../../services/api/analyticsApi";
 
 export default function TotalInstancesWidget({
   workflowId,

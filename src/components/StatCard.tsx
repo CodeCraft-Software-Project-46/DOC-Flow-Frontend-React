@@ -1,6 +1,12 @@
 // Reusable stat card used in both Overall Dashboard and Workflow Analytics
 import type { StatCardProps } from "../types";
 
+const ICON_BG_MAP = {
+  blue: "bg-blue-100",
+  red: "bg-red-100",
+  green: "bg-green-100",
+} as const;
+
 export default function StatCard({
   icon,
   value,
@@ -11,12 +17,7 @@ export default function StatCard({
   loading = false,
   onClick,
 }: StatCardProps) {
-  const iconBg =
-    color === "blue"
-      ? "bg-blue-100"
-      : color === "red"
-        ? "bg-red-100"
-        : "bg-green-100";
+  const iconBg = ICON_BG_MAP[color];
 
   return (
     <div
@@ -43,7 +44,9 @@ export default function StatCard({
             (value ?? "—")
           )}
         </div>
+
         <div className="text-sm text-slate-500 font-medium">{label}</div>
+
         {description && (
           <div className="text-xs text-slate-400">{description}</div>
         )}

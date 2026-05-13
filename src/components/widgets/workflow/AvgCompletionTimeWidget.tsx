@@ -4,7 +4,7 @@ import StatCard from "../../StatCard";
 
 import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery";
 
-import { fetchWorkflowAvgTime } from "../../../services/analyticsApi";
+import { fetchWorkflowAvgTime } from "../../../services/api/analyticsApi";
 
 export default function AvgCompletionTimeWidget({
   workflowId,
