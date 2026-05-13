@@ -9,17 +9,17 @@ import UserPerformanceWidget from "../../components/widgets/overall/UserPerforma
 import TotalInstancesWidget from "../../components/widgets/workflow/TotalInstancesWidget";
 import AvgCompletionTimeWidget from "../../components/widgets/workflow/AvgCompletionTimeWidget";
 import SLAComplianceWidgetWorkflow from "../../components/widgets/workflow/SLAComplianceWidget";
+import WorkflowStepFlowWidget from "../../components/widgets/workflow/WorkflowStepFlowWidget";
+import InstanceDrilldownWidget from "../../components/widgets/workflow/InstanceDrilldownWidget";
 import {
   fetchWorkflows,
   fetchWorkflowSteps,
 } from "../../services/analyticsApi";
-import InstanceDrilldownWidget from "../../components/widgets/workflow/InstanceDrilldownWidget";
 import type {
   WorkflowListItem,
   WorkflowStepFlowDetailResponse,
 } from "../../types";
 import { useAnalyticsQuery } from "../../hooks/useAnalyticsQuery";
-import WorkflowStepFlowWidget from "../../components/widgets/workflow/WorkflowStepFlowWidget";
 
 type Tab = "overall" | "workflow";
 type TimeRange = "7d" | "30d" | "90d" | "custom" | "all";
@@ -29,19 +29,19 @@ export const AnalyticsPage = () => {
   const [tab, setTab] = useState<Tab>("overall");
 
   const [timeRange, setTimeRange] = useState<TimeRange>("30d");
+
   const [customFromDate, setCustomFromDate] = useState("");
   const [customToDate, setCustomToDate] = useState("");
   const [dateError, setDateError] = useState(""); //validation error for custom date range
 
   // Workflow tab — selected workflow
   const [workflows, setWorkflows] = useState<WorkflowListItem[]>([]);
-  const [selectedWorkflowId, setSelectedWorkflowId] = useState<number | null>(
-    null,
-  );
+  const [selectedWorkflowId, setSelectedWorkflowId] = useState<number | null>(null,);
 
   const handleTabChange = (selectedTab: Tab) => {
     setTab(selectedTab);
   };
+  
   const handleWorkflowSelect = (workflowName: string) => {
     const workflow = workflows.find((w) => w.name === workflowName);
     if (workflow) {
@@ -54,9 +54,7 @@ export const AnalyticsPage = () => {
     const loadWorkflows = async () => {
       try {
         const data = await fetchWorkflows();
-
         setWorkflows(data);
-
         if (data.length > 0) {
           setSelectedWorkflowId(data[0].workflow_id);
         }
@@ -64,7 +62,6 @@ export const AnalyticsPage = () => {
         console.error("Failed to load workflows", error);
       }
     };
-
     loadWorkflows();
   }, []);
 
@@ -74,12 +71,10 @@ export const AnalyticsPage = () => {
       setDateError("Please select both dates");
       return false;
     }
-
     if (new Date(to) < new Date(from)) {
       setDateError("End date cannot be before start date");
       return false;
     }
-
     setDateError("");
     return true;
   };
@@ -127,6 +122,7 @@ export const AnalyticsPage = () => {
   }
 
   return (
+    
     <div className="min-h-screen bg-slate-100 font-sans">
       {/* ── Tab Bar overall or workflow ── */}
       <div className="bg-white border-b border-slate-200 px-8 flex -mt-2">

@@ -18,7 +18,7 @@ import type {
 
 // 🔹 Running Documents
 export const fetchRunningDocuments = async (): Promise<RunningDocumentsApiResponse> => {
-  const res = await API.get("/api/analytics/widgets/running-documents/");
+  const res = await API.get("/api/analytics/widgets/running-documents/"); //sends get request to backend endpoint to fetch running documents data
   return res.data;
 };
 
