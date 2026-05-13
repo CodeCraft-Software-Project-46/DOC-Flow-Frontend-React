@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Table, Tag, message, Tooltip } from 'antd';
+import React, { useState, useEffect } from 'react';                // Manage state + lifecycle
+import { Button, Table, Tag, message, Tooltip } from 'antd';       // Ant Design components for UI elements
 import { 
   PlusOutlined, 
   FolderAddOutlined, 
@@ -7,21 +7,21 @@ import {
   FileTextOutlined, 
   EyeOutlined 
 } from '@ant-design/icons';
-import axios from 'axios';
+import axios from 'axios';             // API calls to backend
 
 // Import both of your modal components
 import ManualUploadModal from '../../components/documents/ManualUploadModal';
 import CreatePipelineModal from '../../components/documents/CreatePipelineModal';
 
 // --- TypeScript Interfaces ---
-interface FolderMapping {
+interface FolderMapping {                   // Define the structure of the folder mapping data we get from the backend
   id: number;
   folder_name: string;
   workflow_name: string;
   is_active: boolean;
 }
 
-interface DocumentRecord {
+interface DocumentRecord {            // Define the structure of the document records we get from the backend
   id: number;
   document_name: string;
   source: string; // 'manual' or 'gdrive'
@@ -31,52 +31,52 @@ interface DocumentRecord {
   submitted_date: string;
 }
 
-const DocumentPage: React.FC = () => {
+const DocumentPage: React.FC = () => {              // Main component for the Documents page
   // Modal States
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [isPipelineModalOpen, setIsPipelineModalOpen] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);             // Controls manual upload modal visibility
+  const [isPipelineModalOpen, setIsPipelineModalOpen] = useState(false);        // Controls pipeline modal visibility
   
   // Data States
-  const [mappings, setMappings] = useState<FolderMapping[]>([]);
-  const [documents, setDocuments] = useState<DocumentRecord[]>([]);
+  const [mappings, setMappings] = useState<FolderMapping[]>([]);             // Stores folder-workflow mappings
+  const [documents, setDocuments] = useState<DocumentRecord[]>([]);            // Stores document records
   
   // Loading States
-  const [isMappingsLoading, setIsMappingsLoading] = useState(false);
-  const [isDocsLoading, setIsDocsLoading] = useState(false);
+  const [isMappingsLoading, setIsMappingsLoading] = useState(false);     // Loading state for pipelines table
+  const [isDocsLoading, setIsDocsLoading] = useState(false);           // Loading state for documents table
 
   // --- API Calls ---
   
   // 1. Fetch the active pipelines
-  const fetchMappings = async () => {
+  const fetchMappings = async () => {                // Fetch pipeline mappings from backend
     setIsMappingsLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/documents/mappings/');
+      const response = await axios.get('http://localhost:8000/api/documents/mappings/');       // Ensure URL matches Django endpoint
       setMappings(response.data);
     } catch (error) {
-      console.error("Failed to fetch mappings:", error);
+      console.error("Failed to fetch mappings:", error);              // Handle API error
     } finally {
-      setIsMappingsLoading(false);
+      setIsMappingsLoading(false);   // Stop loading
     }
   };
 
   // 2. Fetch all processed documents
-  const fetchDocuments = async () => {
+  const fetchDocuments = async () => {                   // Fetch document list from backend
     setIsDocsLoading(true);
     try {
-      // NOTE: Ensure this URL matches your Django urls.py endpoint for listing documents!
-      const response = await axios.get('http://localhost:8000/api/documents/list/'); 
+      // Ensure this URL matches your Django endpoint
+      const response = await axios.get('http://localhost:8000/api/documents/list/');
       setDocuments(response.data);
-    } catch (error) {
-      console.error("Failed to fetch documents:", error);
-      message.error("Failed to load document vault.");
+    } catch (error) {           
+      console.error("Failed to fetch documents:", error);    
+      message.error("Failed to load document vault.");             
     } finally {
-      setIsDocsLoading(false);
+      setIsDocsLoading(false);        
     }
   };
 
-  // Load both tables when the page opens
+  // Load both tables on mount
   useEffect(() => {
-    fetchMappings();
+    fetchMappings();         
     fetchDocuments();
   }, []);
 
@@ -88,20 +88,20 @@ const DocumentPage: React.FC = () => {
 
   const handleUploadModalClose = () => {
     setIsUploadModalOpen(false);
-    fetchDocuments(); // Refresh documents to show the newly uploaded one!
+    fetchDocuments(); // Refresh documents after upload
   };
-
 
   // --- Table Column Configurations ---
 
-  const pipelineColumns = [
+  const pipelineColumns = [                
     {
-      title: 'Google Drive Folder',
+      title: 'Google Drive Folder',      
       dataIndex: 'folder_name',
       key: 'folder_name',
       render: (text: string) => (
         <span className="font-medium text-gray-800">
-          <FolderOpenOutlined className="text-blue-500 mr-2" />
+          <FolderOpenOutlined className="text-blue-500 mr-2" />           
+          {/* Icon next to folder name */}
           {text}
         </span>
       ),
@@ -116,8 +116,9 @@ const DocumentPage: React.FC = () => {
       dataIndex: 'is_active',
       key: 'is_active',
       render: (isActive: boolean) => (
-        <Tag color={isActive ? 'green' : 'red'}>
-          {isActive ? 'Active (Scanning)' : 'Disabled'}
+        <Tag color={isActive ? 'green' : 'red'}>              
+          {/* Active/Disabled status */}
+          {isActive ? 'Active (Scanning)' : 'Disabled'}          
         </Tag>
       ),
     },
@@ -129,8 +130,9 @@ const DocumentPage: React.FC = () => {
       dataIndex: 'document_name',
       key: 'document_name',
       render: (text: string) => (
-        <span className="font-medium text-gray-800">
-          <FileTextOutlined className="text-blue-500 mr-2" />
+        <span className="font-medium text-gray-800">              
+          {/* Document icon */}
+          <FileTextOutlined className="text-blue-500 mr-2" />     
           {text}
         </span>
       ),
@@ -141,7 +143,8 @@ const DocumentPage: React.FC = () => {
       key: 'source',
       render: (source: string) => (
         <Tag color={source === 'gdrive' ? 'blue' : 'purple'}>
-          {source ? source.toUpperCase() : 'UNKNOWN'}
+          {/* Source type */}
+          {source ? source.toUpperCase() : 'UNKNOWN'}                   
         </Tag>
       ),
     },
@@ -149,12 +152,18 @@ const DocumentPage: React.FC = () => {
       title: 'Status',
       dataIndex: 'current_status',
       key: 'current_status',
-      render: (status: string) => {
+      render: (status: string) => {              
+        // Determine color based on status
         let color = 'default';
         if (status === 'uploaded') color = 'cyan';
         if (status === 'in_workflow') color = 'geekblue';
         if (status === 'purged') color = 'red';
-        return <Tag color={color}>{status ? status.replace('_', ' ').toUpperCase() : 'N/A'}</Tag>;
+
+        return (
+          <Tag color={color}>
+            {status ? status.replace('_', ' ').toUpperCase() : 'N/A'}
+          </Tag>
+        );
       },
     },
     {
@@ -162,26 +171,33 @@ const DocumentPage: React.FC = () => {
       dataIndex: 'ai_summary',
       key: 'ai_summary',
       render: (text: string) => (
-        <Tooltip title={text} placement="topLeft">
-          <span className="truncate block max-w-xs text-gray-600 cursor-help">
-            {text || 'Waiting for AI...'}
-          </span>
-        </Tooltip>
+        <>
+          {/* Tooltip shows full summary */}
+          <Tooltip title={text} placement="topLeft">
+            <span className="truncate block max-w-xs text-gray-600 cursor-help">
+              {/* Show fallback if AI not ready */}
+              {text || 'Waiting for AI...'}
+            </span>
+          </Tooltip>
+        </>
       ),
     },
     {
       title: 'Action',
       key: 'action',
       render: (_: any, record: DocumentRecord) => (
-        <Button 
-          type="link" 
-          icon={<EyeOutlined />} 
-          href={record.presigned_url} 
-          target="_blank"
-          disabled={!record.presigned_url} // Disable if S3 upload failed
-        >
-          View Securely
-        </Button>
+        <>
+          {/* Secure document view button */}
+          <Button 
+            type="link" 
+            icon={<EyeOutlined />} 
+            href={record.presigned_url} 
+            target="_blank"
+            disabled={!record.presigned_url}              
+          >
+            View Securely
+          </Button>
+        </>
       ),
     },
   ];
@@ -191,11 +207,16 @@ const DocumentPage: React.FC = () => {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Documents Dashboard</h1>
-          <p className="text-gray-500 text-sm mt-1">Manage all incoming documents and automated pipelines.</p>
+          <p className="text-gray-500 text-sm mt-1">
+            Manage all incoming documents and automated pipelines.
+          </p>         
+          {/* Subtitle for context */}
         </div>
         
         {/* BUTTON CONTAINER */}
         <div className="flex gap-3">
+
+          {/* Open pipeline modal */}
           <Button 
             icon={<FolderAddOutlined />} 
             onClick={() => setIsPipelineModalOpen(true)}
@@ -204,6 +225,7 @@ const DocumentPage: React.FC = () => {
             New Pipeline
           </Button>
 
+          {/* Open upload modal */}
           <Button 
             type="primary" 
             icon={<PlusOutlined />} 
@@ -223,13 +245,15 @@ const DocumentPage: React.FC = () => {
           dataSource={mappings} 
           rowKey="id" 
           loading={isMappingsLoading}
-          pagination={false} // Turn off pagination for pipelines since there won't be many
+          pagination={false} 
         />
       </div>
 
       {/* 2. THE MASTER DOCUMENT VAULT */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
+        {/* Document vault container */}
         <h2 className="text-lg font-semibold mb-4 text-gray-700">Document Vault</h2>
+        {/* Vault title */}
         <Table 
           columns={documentColumns} 
           dataSource={documents} 
@@ -240,12 +264,15 @@ const DocumentPage: React.FC = () => {
       </div>
 
       {/* YOUR HIDDEN MODALS */}
-      <ManualUploadModal 
+
+      {/* Manual upload modal */}
+      <ManualUploadModal
         isOpen={isUploadModalOpen} 
         onClose={handleUploadModalClose} 
       />
 
-      <CreatePipelineModal 
+      {/* Create pipeline modal */}
+      <CreatePipelineModal
         isOpen={isPipelineModalOpen} 
         onClose={handlePipelineModalClose} 
       />

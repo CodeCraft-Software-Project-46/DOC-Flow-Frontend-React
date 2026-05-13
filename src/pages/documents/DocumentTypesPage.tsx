@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Input, Tag, Switch, Space, Popconfirm, message } from 'antd';
 import { PlusOutlined, FileTextOutlined, DeleteOutlined, StopOutlined, CheckCircleOutlined } from '@ant-design/icons';
-import axios from 'axios';
+import axios from 'axios'; // Library for making HTTP requests to backend APIs
 
 
 
-// Define the TypeScript interface matching your MySQL table
+// Defines the structure of document type data.
+//Each document type object must contain:
 interface DocumentType {
   id: number;
   type_name: string;
@@ -14,6 +15,7 @@ interface DocumentType {
   is_active: boolean;
 }
 
+//Creates the main React page/component.
 export const DocumentTypesPage: React.FC = () => {
   const [types, setTypes] = useState<DocumentType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +23,7 @@ export const DocumentTypesPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form] = Form.useForm();
 
-  // Fetch the Document Types from Django
+  // Fetch the Document Types from Django backend  //load document types
   const fetchTypes = async () => {
     setIsLoading(true);
     try {
@@ -52,8 +54,8 @@ export const DocumentTypesPage: React.FC = () => {
       await axios.post('http://localhost:8000/api/documents/types/', payload);
       message.success("Document type created successfully!");
       setIsModalOpen(false);
-      form.resetFields();
-      fetchTypes(); // Refresh the table
+      form.resetFields(); //Clears form fields after submit.
+      fetchTypes(); // Reloads updated table data.
     } catch (error: any) {
       console.error("Creation error:", error);
       message.error("Failed to create document type.");
@@ -63,11 +65,13 @@ export const DocumentTypesPage: React.FC = () => {
   };
 
 // Function to Disable/Enable
+//Changes document type status.
   const handleToggleStatus = async (record: any) => {
     try {
       // Assuming your database field is called 'is_active'. Adjust if it's 'status'
-      const updatedStatus = !record.is_active; 
+      const updatedStatus = !record.is_active;          //Reverses current status.
       
+      //Updates only one field in backend.
       await axios.patch(`http://localhost:8000/api/documents/types/${record.id}/`, {
         is_active: updatedStatus
       });
@@ -83,7 +87,7 @@ export const DocumentTypesPage: React.FC = () => {
   // Function to Delete
   const handleDelete = async (id: number) => {
     try {
-      await axios.delete(`http://localhost:8000/api/documents/types/${id}/`);
+      await axios.delete(`http://localhost:8000/api/documents/types/${id}/`);   //Sends DELETE request.
       message.success('Document type deleted successfully!');
       fetchTypes(); // <-- Replace with whatever function fetches your table data
     } catch (error) {
@@ -92,11 +96,12 @@ export const DocumentTypesPage: React.FC = () => {
     }
   };
 
+  //Defines table structure.
   // Configure the Ant Design Table Columns
   const columns = [
     {
-      title: 'Type Name',
-      dataIndex: 'type_name',
+      title: 'Type Name',     //Column heading.
+      dataIndex: 'type_name',   //Gets value from object.
       key: 'type_name',
       render: (text: string) => (
         <span className="font-medium text-gray-800">
@@ -115,14 +120,14 @@ export const DocumentTypesPage: React.FC = () => {
       title: 'Allowed Extensions',
       dataIndex: 'allowed_extensions',
       key: 'allowed_extensions',
-      render: (text: string) => <span className="font-mono text-xs bg-gray-100 p-1 rounded">{text}</span>,
+      render: (text: string) => <span className="font-mono text-xs bg-blue-100 p-1 rounded">{text}</span>,
     },
     {
       title: 'Status',
       dataIndex: 'is_active',
       key: 'is_active',
       render: (isActive: any) => {
-        // Make it bulletproof: Accept boolean true, number 1, or string "1"
+        // Handles different backend boolean formats.
         const isActuallyActive = isActive === true || isActive === 1 || isActive === "1";
         
         return (
@@ -140,7 +145,7 @@ export const DocumentTypesPage: React.FC = () => {
           {/* Disable / Enable Button */}
           <Button 
             type="link" 
-            onClick={() => handleToggleStatus(record)}
+            onClick={() => handleToggleStatus(record)}   //Runs status update function.
             className={record.is_active ? "text-amber-500 hover:text-amber-600" : "text-green-500 hover:text-green-600"}
             icon={record.is_active ? <StopOutlined /> : <CheckCircleOutlined />}
           >
@@ -165,6 +170,7 @@ export const DocumentTypesPage: React.FC = () => {
     },
   ];
 
+  //Displays page UI.
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">

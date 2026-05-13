@@ -3,13 +3,13 @@ import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
 
 
 // Layouts
-import { RootLayout } from "./components/RootLayout";
-import {ProtectedRoute} from "./components/ProtectedRoute.tsx";
+import { RootLayout } from "./components/RootLayout"; //  Used for ALL pages after login,(Contains the Sidebar,Header & main contentarea)
+import {ProtectedRoute} from "./components/ProtectedRoute.tsx";// frontend security(check if user is logged in, if not redirect to login page)
 
 import  DocumentPage  from "./pages/documents/DocumentPage";
 import {SettingsPage} from "./pages/settings/SettingsPage.tsx";
 import {SignIn} from "./pages/signIn-signup/SignIn.tsx";
-import {DashboardSuperAdmin} from "./pages/dashboard/Dashboard-SuperAdmin.tsx";
+import {DashboardSuperAdmin} from "./pages/dashboard/Dashboard-SuperAdmin.tsx"; // Default landing page after login, can be different for each role
 import {WorkFlowVersionPage} from "./pages/workflow/WorkFlowVersionPage.tsx";
 import {UserPage} from "./pages/user/UserPage.tsx";
 import {DashBoardBuilder} from "./pages/dashboard/DashBoardBuilder.tsx";
@@ -19,18 +19,18 @@ import {AnalyticsPage} from "./pages/analytics/AnalyticsPage.tsx";
 import {DocumentTypesPage} from "./pages/documents/DocumentTypesPage.tsx";
 
 export default function App() {
-    const routes = createBrowserRouter([
+    const routes = createBrowserRouter([   //define all routes inside this
         // 1. Login Route
         { path: "/", element: <SignIn /> },
 
         // 2. Protected App Routes
         {
-            element: <RootLayout />, // Contains the Sidebar & Outlet
+            element: <RootLayout />, //Share same layout (sidebar + header)
             children: [
                 {
                     element: <ProtectedRoute />, // Checks if user is logged in
                     children: [
-                        { path: "/dashboard", element: <DashboardSuperAdmin /> },
+                        { path: "/dashboard", element: <DashboardSuperAdmin /> }, // Default landing page after login
                         { path: "/dashboard-builder", element: <DashBoardBuilder /> },
                         { path: "/document", element: <DocumentPage /> },
                         { path: "/document-types", element: <DocumentTypesPage /> },
@@ -47,8 +47,8 @@ export default function App() {
             ]
         },
 
-        { path: "*", element: <Navigate to="/dashboard" replace /> }
+        { path: "*", element: <Navigate to="/dashboard" replace /> } // Redirect any unknown routes(If user enters wrong URL:) to dashboard
     ]);
 
-    return <RouterProvider router={routes} />;
+    return <RouterProvider router={routes} />; // Wrap the app with RouterProvider and pass the defined routes
 }
