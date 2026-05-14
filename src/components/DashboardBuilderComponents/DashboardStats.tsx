@@ -1,9 +1,6 @@
 import React from "react";
 import type {Dashboard} from "../../model/Dashboard.ts";
 
-
-
-
 interface Props {
     dashboards: Dashboard[];
 }
