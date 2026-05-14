@@ -50,6 +50,9 @@ export default function RunningDocumentsDetails({ items, onClose }: Props) {
                     ⚙️ Workflow
                   </th>
                   <th className="text-left px-8 py-4 font-bold text-slate-700 text-sm uppercase tracking-wider">
+                    ⏱️ Running Hours
+                  </th>
+                  <th className="text-left px-8 py-4 font-bold text-slate-700 text-sm uppercase tracking-wider">
                     📌 Instance
                   </th>
                 </tr>
@@ -69,14 +72,19 @@ export default function RunningDocumentsDetails({ items, onClose }: Props) {
                       </div>
                     </td>
                     <td className="px-8 py-5 text-sm">
-                      <span className="inline-block bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">
+                      <div className="text-slate-700">
                         {item.workflow_name}
-                      </span>
+                      </div>
                     </td>
                     <td className="px-8 py-5 text-sm">
-                      <span className="inline-block bg-cyan-100 text-cyan-700 px-3 py-1 rounded-full text-xs font-semibold">
+                      <div className="text-slate-700">
+                        {item.running_hours}h
+                      </div>
+                    </td>
+                    <td className="px-8 py-5 text-sm">
+                      <div className="text-slate-700">
                         {item.instance_name}
-                      </span>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -87,15 +95,13 @@ export default function RunningDocumentsDetails({ items, onClose }: Props) {
 
         {/* Footer */}
         {items.length > 0 && (
-          <div className="bg-slate-50 border-t border-slate-200 px-8 py-4 flex justify-between items-center">
+          <div className="border-t border-slate-200 px-8 py-4 flex justify-between items-center">
             <p className="text-sm text-slate-600">
-              Total:{" "}
-              <span className="font-bold text-blue-600">{items.length}</span>{" "}
-              documents in process
+              Total: <span className="font-bold">{items.length}</span> documents in process
             </p>
             <button
               onClick={onClose}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors font-medium"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded transition-colors font-medium"
             >
               Close
             </button>

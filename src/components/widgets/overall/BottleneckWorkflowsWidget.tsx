@@ -1,22 +1,12 @@
 // Shows workflows with highest average processing time + breach rate
-// import { getBreachStyle, getProgressPercentage } from "../../utils/bottleneckUtils";
 
 import { useEffect, useState } from "react";
 import { fetchBottlenecks } from "../../../api/analyticsApi";
 import type { BottleneckWorkflow, BottleneckItem } from "../../../types";
 
-interface BottleneckWorkflowsProps {
-  onWorkflowSelect?: (workflow: string) => void; //onWorkflowSelect is just a prop name ?. just safely checks if the function exists before calling it
-} //If this prop is provided, it must be a function that takes a string and returns nothing
+export default function BottleneckWorkflows() {
 
-export default function BottleneckWorkflows({
-  onWorkflowSelect,
-}: BottleneckWorkflowsProps) {
-  //BottleneckWorkflows is a function component it receives one prop called onWorkflowSelect
-
-  void onWorkflowSelect;
-
-  const [data, setData] = useState<BottleneckItem[]>([]); // ✅ MOVE HERE
+  const [data, setData] = useState<BottleneckItem[]>([]); 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,16 +16,16 @@ export default function BottleneckWorkflows({
       try {
         const res = await fetchBottlenecks();
 
-        const raw = Array.isArray(res)
+        const raw = Array.isArray(res) //check if response is already an array 
           ? res
           : (res.data ?? []);
 
-        if (!Array.isArray(raw)) {
+        if (!Array.isArray(raw)) { //If data is broken → show empty state.
           setData([]);
           return;
         }
 
-        const formatted: BottleneckItem[] = (
+        const formatted: BottleneckItem[] = ( //converts backend data → UI format
           raw as BottleneckWorkflow[]
         )
           .map((item) => ({
@@ -44,8 +34,7 @@ export default function BottleneckWorkflows({
             breach: item.breach_percentage ?? 0,
             tasks: item.total_tasks ?? 0,
             score: item.bottleneck_score ?? 0,
-          }))
-          .sort((a, b) => b.score - a.score);
+          }));
 
         setData(formatted);
       } catch (err) {
@@ -59,7 +48,7 @@ export default function BottleneckWorkflows({
     load();
   }, []);
 
-  function getScoreStyle(score: number) {
+  function getScoreStyle(score: number) {  // Determines bar color based on bottleneck score
     if (score >= 0.7) {
       return {
         bar: "bg-red-500",
@@ -101,7 +90,6 @@ export default function BottleneckWorkflows({
   }
 
   return (
-    ////now the child can use the parent’s function. handleWorkflowSelect
     <div className="bg-white rounded-2xl shadow-sm p-6">
       <div className="font-semibold text-slate-900 text-base">
         📊 System Bottleneck Workflows
@@ -113,8 +101,6 @@ export default function BottleneckWorkflows({
       </div>
 
       <div className="flex flex-col gap-3 min-h-[160px]">
-        {" "}
-        {/*BOTTLENECK_DATA is your dummy data array*/}
         {loading ? (
           <div className="flex items-center justify-center min-h-[160px] text-xs text-slate-400">
             Loading workflows...
@@ -130,12 +116,7 @@ export default function BottleneckWorkflows({
             const widthClass = getScoreWidthClass(item.score);
 
             return (
-              <div
-                key={
-                  item.workflow
-                } /*this component receives props and those props must follow BottleneckWorkflowsProps*/
-                className="p-2 rounded-lg transition-colors"
-              >
+              <div key={item.workflow} className="p-2 rounded-lg transition-colors">
                 {/* Workflow name */}
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-sm font-semibold text-slate-800">
@@ -143,7 +124,7 @@ export default function BottleneckWorkflows({
                   </span>
 
                   <span className={`text-xs font-bold ${style.text}`}>
-                    {(item.score * 100).toFixed(0)}%
+                    {(item.score * 100).toFixed(0)}%  {/* show bottleneck score as percentage */}
                   </span>
                 </div>
 

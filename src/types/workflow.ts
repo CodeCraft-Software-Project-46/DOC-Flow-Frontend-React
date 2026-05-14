@@ -1,13 +1,8 @@
-import type {
-  StepStatus,
-  InstanceStatus,
-  RecoveryOutcome,
-} from "./common";
+import type { StepStatus } from "./common";
 
 /* =========================
-   WORKFLOW STEPS
+   WORKFLOW STEPS - Used in UI display
 ========================= */
-
 export interface WorkflowStep {
   name: string;
   assignee: string;
@@ -20,85 +15,8 @@ export interface WorkflowStep {
 }
 
 /* =========================
-   RECOVERY
+   WORKFLOW LIST - Used in AnalyticsPage.tsx
 ========================= */
-
-export interface RecoveryStep {
-  step: string;
-  originalSLA: number;
-  mustComplete: number;
-  save: number;
-  avgTime: number;
-  achievable: "yes" | "tight";
-}
-
-export interface InstanceDetail {
-  overallSLA: number;
-  timeUsed: number;
-  department: string;
-  steps: WorkflowStep[];
-  recovery: {
-    deficit: number;
-    overall: RecoveryOutcome;
-    remaining: RecoveryStep[];
-  };
-}
-
-export interface InstanceSummary {
-  id: string;
-  status: InstanceStatus;
-}
-
-/* =========================
-   WORKFLOW METRICS
-========================= */
-
-export interface TotalInstancesResponse {
-  total?: number;
-  count?: number;
-  value?: number;
-}
-
-export interface AvgCompletionTimeResponse {
-  avg_hours?: number;
-  hours?: number;
-  value?: number;
-  average?: number;
-}
-
-/* =========================
-   STEP FLOW
-========================= */
-
-export interface WorkflowStepFlowResponse {
-  totalInstances?: number;
-  steps?: Array<{
-    stepName?: string;
-    step_name?: string;
-    received?: number;
-    completed?: number;
-    completedOnTime?: number;
-    breached?: number;
-  }>;
-}
-
-/* =========================
-   WORKFLOW LIST
-========================= */
-
-export interface WorkflowInstanceItem {
-  id?: string | number;
-  name?: string;
-  instance_name?: string;
-  status?: string;
-  created_at?: string;
-}
-
-export interface WorkflowInstancesResponse {
-  instances?: WorkflowInstanceItem[];
-  count?: number;
-}
-
 export interface WorkflowListItem {
   workflow_id: number;
   name: string;
@@ -107,23 +25,27 @@ export interface WorkflowListItem {
 export type WorkflowListResponse = WorkflowListItem[];
 
 /* =========================
-   SIMPLE API RESPONSES
+   API RESPONSE TYPES - Used in analyticsApi.ts
 ========================= */
 
+// Total instances count response from workflow endpoints - Used in TotalInstancesWidget.tsx
 export interface WorkflowTotalInstancesValueResponse {
   value: number;
 }
 
+// Average completion time in hours for a workflow - Used in AvgCompletionTimeWidget.tsx
 export interface WorkflowAvgCompletionTimeApiResponse {
   avg_completion_time_hours: number;
 }
 
+// SLA compliance metrics for a workflow - Used in SLAComplianceWidget.tsx
 export interface WorkflowSLAComplianceApiResponse {
   total_tasks: number;
   met_tasks: number;
   percentage: number;
 }
 
+// Individual workflow instance data - Used in InstanceDrilldownWidget.tsx
 export interface WorkflowInstance {
   instance_id: number;
   instance_name: string;
@@ -133,12 +55,14 @@ export interface WorkflowInstance {
   document_id: number | null;
 }
 
+// API response array of workflow instances - Used in InstanceDrilldownWidget.tsx and fetchWorkflowInstances()
 export type WorkflowInstancesApiResponse = WorkflowInstance[];
 
 /* =========================
-   DRILLDOWN
+   DRILLDOWN DATA - Used in InstanceDrilldownWidget.tsx
 ========================= */
 
+// Individual task within a workflow instance
 export interface InstanceDrilldownTask {
   task_name: string;
   assigned_user: string | null;
@@ -149,12 +73,14 @@ export interface InstanceDrilldownTask {
   time_taken_hours: number | null;
 }
 
+// Array of tasks for instance drilldown view - Used in InstanceDrilldownWidget.tsx
 export type InstanceDrilldownResponse = InstanceDrilldownTask[];
 
 /* =========================
-   STEP FLOW DETAIL
+   STEP FLOW DETAILS - Used in WorkflowStepFlowWidget.tsx
 ========================= */
 
+// Individual step metrics in a workflow
 export interface WorkflowStepDetail {
   task_name?: string;
   received?: number;
@@ -166,6 +92,7 @@ export interface WorkflowStepDetail {
   processing_documents?: string[];
 }
 
+// Complete step flow response with aggregated metrics - Used in WorkflowStepFlowWidget.tsx
 export interface WorkflowStepFlowDetailResponse {
   total_instances?: number;
   completed_instances?: number;

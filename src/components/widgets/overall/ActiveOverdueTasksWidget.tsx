@@ -6,12 +6,11 @@ import { useState } from "react";
 import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery.ts";
 
 export default function ActiveOverdueTasksWidget() {
-  const { data, loading, error } =
-    useAnalyticsQuery<ActiveOverdueTasksResponse>(fetchActiveOverdueTasks);
+  const { data, loading, error } =          //Fetching Data from custom hook
+    useAnalyticsQuery<ActiveOverdueTasksResponse>(fetchActiveOverdueTasks); //This API returns ActiveOverdueTasksResponse
 
   const [open, setOpen] = useState(false);
 
-  // WHY: safe fallback so UI never breaks
   const value = error ? "-" : (data?.count ?? "-");
 
   return (

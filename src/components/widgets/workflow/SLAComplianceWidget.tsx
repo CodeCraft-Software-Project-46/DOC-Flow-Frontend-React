@@ -29,7 +29,7 @@ export default function SLAComplianceWidget({ workflowId }: Props) {
       value={error || !isReady ? "-" : `${data?.percentage ?? "-"}%`}
       label="SLA Compliance"
       description={error || !isReady ? "Unavailable" : "Overall rate"}
-      color="red"
+      color="green"
       loading={loading || !isReady}
     />
   );

@@ -1,62 +1,58 @@
 // Re-export grouped type modules for clearer organization
-// Explicit type-only re-exports to satisfy `verbatimModuleSyntax` and keep imports stable
+
 export type {
-	ChartSource,
-	ChartType,
-	KPIMetric,
-	ChartStatus,
+	// UI Components
 	StatCardColor,
-	StepStatus,
-	InstanceStatus,
-	RecoveryOutcome,
-	ChartColors,
-	ChartThresholds,
-	CustomChart,
 	StatCardProps,
-	TrendPoint,
+	// Status types
+	StepStatus,
+	// Business logic
 	WorkingHoursConfig,
 } from "./common";
 
 export type {
+	// Running Documents Widget
 	RunningDocument,
 	RunningDocumentsResponse,
 	RunningDocumentsApiResponse,
+	RunningDocumentsDetailsProps,
+	// Overdue Tasks Widget
 	ActiveOverdueTask,
 	ActiveOverdueTasksResponse,
+	ActiveTasksDetailsProps,
+	// User Performance Widget
 	UserPerformanceItem,
 	UserPerformanceResponse,
+	// SLA Distribution Widget
 	SLADistributionPoint,
 	SLADistributionResponse,
+	// Bottleneck Analysis Widget
 	BottleneckWorkflow,
 	BottleneckWorkflowsResponse,
-	BottleneckStep,
 	BottleneckItem,
-	UserSLA,
-	RunningDocumentsDetailsProps,
-	ActiveTasksDetailsProps,
+	// Completed Tasks & SLA Compliance
 	CompletedTasksResponse,
 	SLAComplianceResponse,
 } from "./overall";
 
 export type {
+	// UI Components
 	WorkflowStep,
-	RecoveryStep,
-	InstanceDetail,
-	InstanceSummary,
-	TotalInstancesResponse,
-	AvgCompletionTimeResponse,
-	WorkflowStepFlowResponse,
-	WorkflowInstanceItem,
-	WorkflowInstancesResponse,
+	// Workflow List
 	WorkflowListItem,
 	WorkflowListResponse,
+	// API Response Types
 	WorkflowTotalInstancesValueResponse,
 	WorkflowAvgCompletionTimeApiResponse,
 	WorkflowSLAComplianceApiResponse,
+	// Drilldown/Instance Data
 	WorkflowInstance,
 	WorkflowInstancesApiResponse,
 	InstanceDrilldownTask,
 	InstanceDrilldownResponse,
+	// Step Flow Details
 	WorkflowStepDetail,
 	WorkflowStepFlowDetailResponse,
 } from "./workflow";
+
+export type { ChatMessage } from "./chatTypes";

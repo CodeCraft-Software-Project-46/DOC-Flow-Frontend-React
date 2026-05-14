@@ -8,40 +8,50 @@ export function useAnalyticsQuery<T>(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
 
-  const fnRef = useRef(queryFn);
+  const queryRef = useRef(queryFn);
 
   useEffect(() => {
-    fnRef.current = queryFn;
+    queryRef.current = queryFn;
   }, [queryFn]);
 
   useEffect(() => {
-  let mounted = true;
+    let isMounted = true;  //React component is currently existing on the screen
 
-  const load = async () => {
-    try {
+    const fetchData = async () => {
       setLoading(true);
 
-      const result = await fnRef.current();
+      try {
+        const result = await queryRef.current();
 
-      if (mounted) {
+        if (!isMounted) return; 
+
         setData(result);
         setError(null);
+      } catch (err) {
+        if (!isMounted) return;
+
+        setError(err);
+        setData(null);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-    } catch (err) {
-      if (mounted) setError(err);
-    } finally {
-      if (mounted) setLoading(false);
-    }
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+    };
+
+    // queryFn handled using useRef intentionally
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+
+  return {
+    data,
+    loading,
+    error,
   };
-
-  load();
-
-  return () => {
-    mounted = false;
-  };
-
-// eslint-disable-next-line react-hooks/exhaustive-deps
-}, [...deps]);
-
-  return { data, loading, error };
 }

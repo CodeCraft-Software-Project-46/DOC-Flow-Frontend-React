@@ -13,8 +13,7 @@ export default function RunningDocumentsWidget() {
     useAnalyticsQuery<RunningDocumentsApiResponse>(fetchRunningDocuments);
 
   const [open, setOpen] = useState(false);
-
-  // WHY: normalize backend response shape safely
+  
   const payload: RunningDocumentsResponse | null =
     data && "value" in data ? data.value : data;
 

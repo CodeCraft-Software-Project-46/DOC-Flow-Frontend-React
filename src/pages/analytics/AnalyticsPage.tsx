@@ -13,11 +13,9 @@ import WorkflowStepFlowWidget from "../../components/widgets/workflow/WorkflowSt
 import InstanceDrilldownWidget from "../../components/widgets/workflow/InstanceDrilldownWidget";
 import {
   fetchWorkflows,
-  //fetchWorkflowSteps,
 } from "../../api/analyticsApi";
 import type {
   WorkflowListItem,
-  //WorkflowStepFlowDetailResponse,
 } from "../../types";
 //import { useAnalyticsQuery } from "../../hooks/useAnalyticsQuery";
 
