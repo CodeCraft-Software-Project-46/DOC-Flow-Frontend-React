@@ -1,11 +1,7 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import Swal from "sweetalert2";
+import type {Department} from "../../model/Department.ts";
 
-interface Department {
-    id?: number;
-    name: string;
-    description: string;
-}
 
 interface Props {
     initial?: Department | null;
@@ -44,7 +40,7 @@ export const DepartmentModal: React.FC<Props> = ({
         }
 
         setErrors(err);
-
+        //to check is error object is not null
         return Object.keys(err).length === 0;
     };
 
@@ -107,7 +103,7 @@ export const DepartmentModal: React.FC<Props> = ({
                         value={name}
                         onChange={(e) => {
                             setName(e.target.value);
-                            setErrors((p) => ({ ...p, name: "" }));
+                            setErrors((p) => ({...p, name: ""}));
                         }}
                     />
                     {errors.name && (
@@ -130,7 +126,7 @@ export const DepartmentModal: React.FC<Props> = ({
                         value={description}
                         onChange={(e) => {
                             setDescription(e.target.value);
-                            setErrors((p) => ({ ...p, description: "" }));
+                            setErrors((p) => ({...p, description: ""}));
                         }}
                     />
                     {errors.description && (

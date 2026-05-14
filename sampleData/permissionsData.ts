@@ -57,4 +57,9 @@ export const PERMISSION_CATEGORIES: PermissionCategory[] = [
 
         ],
     },
+    {
+        category:"Role",
+        permissions: ["Lead"]
+    }
+
 ];

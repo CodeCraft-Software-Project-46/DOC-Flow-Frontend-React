@@ -70,7 +70,7 @@ export const WorkflowVersionPage: React.FC = () => {
             }),
         }));
 
-        // @ts-ignore
+
         setWorkflows(updatedWorkflows);
         alert(`Rolled back to version ${version.version} successfully!`);
     };

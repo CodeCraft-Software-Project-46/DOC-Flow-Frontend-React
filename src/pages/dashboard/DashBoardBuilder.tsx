@@ -152,10 +152,7 @@ export function DashBoardBuilder() {
 }*/
 
 import {useEffect, useState} from "react";
-
-
 import type {Dashboard} from "../../model/Dashboard.ts";
-
 import {dashboardService} from "../../service/DashbaordService.ts";
 import {DashboardCanvasPage} from "../../components/DashboardBuilderComponents/DashboardCanvasPage.tsx";
 import {StatsBar} from "../../components/DashboardBuilderComponents/StatsBar.tsx";
@@ -182,6 +179,7 @@ export function DashBoardBuilder() {
     const [loading, setLoading] = useState(false);
     const [roleFilter, setRoleFilter] = useState<string>("All");
     const [roles, setRoles] = useState<any[]>([]);
+
     // LOAD ALL DASHBOARDS FROM BACKEND
     const loadDashboards = async () => {
 
@@ -192,7 +190,7 @@ export function DashBoardBuilder() {
             const data =
                 await dashboardService.getDashboards();
 
-            console.log("✅ Loaded dashboards:");
+            console.log("Loaded dashboards:");
             console.log(data);
 
             setDashboards(data);
@@ -200,7 +198,7 @@ export function DashBoardBuilder() {
         } catch (err) {
 
             console.error(
-                "❌ Failed to load dashboards:",
+                "Failed to load dashboards:",
                 err
             );
 
@@ -221,21 +219,20 @@ export function DashBoardBuilder() {
         } catch (err) {
 
             console.error(
-                "❌ Failed to load roles",
+                "Failed to load roles",
                 err
             );
         }
     };
 
-    // LOAD ON PAGE OPEN
+    // loading
     useEffect(() => {
 
         loadDashboards();
         loadRoles();
     }, []);
 
-    // FILTER
-    // FILTER
+    // filter
     const filtered = dashboards.filter((d) => {
 
         const matchSearch =
@@ -271,7 +268,7 @@ export function DashBoardBuilder() {
 
             const res = await dashboardService.saveDashboard(payload);
 
-            console.log("✅ Dashboard created:", res);
+            console.log("Dashboard created:", res);
 
             // create local dashboard object for editor
             const newDashboard = {
@@ -286,19 +283,18 @@ export function DashBoardBuilder() {
             await loadDashboards();
 
         } catch (err) {
-            console.error("❌ Create failed:", err);
+            console.error("Create failed:", err);
         }
     };
 
-    // SAVE DASHBOARD
+    // to save
     const handleSave = async (
         savedDashboard: Dashboard
     ) => {
 
         try {
-
             console.log(
-                "🚀 Updating dashboard:"
+                "Updating dashboard:"
             );
 
             console.log(savedDashboard);
@@ -307,7 +303,7 @@ export function DashBoardBuilder() {
                 savedDashboard
             );
 
-            console.log("✅ Dashboard updated");
+            console.log("Dashboard updated");
 
             // reload latest dashboards
             await loadDashboards();
@@ -317,7 +313,7 @@ export function DashBoardBuilder() {
         } catch (err) {
 
             console.error(
-                "❌ Update failed:",
+                "Update failed:",
                 err
             );
         }
@@ -360,7 +356,6 @@ export function DashBoardBuilder() {
     };
 
 
-
     const handleChangeStatus = async (
         id: number,
         status: string
@@ -389,7 +384,7 @@ export function DashBoardBuilder() {
             setDashboards(prev =>
                 prev.map(d =>
                     d.id === id
-                        ? { ...d, status }
+                        ? {...d, status}
                         : d
                 )
             );

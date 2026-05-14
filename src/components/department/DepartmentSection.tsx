@@ -16,7 +16,7 @@ export const DepartmentSection = () => {
     useEffect(() => {
         load();
     }, []);
-
+// TO handle save and edit
     const handleSave = async (data: any) => {
         if (selected) {
             await departmentService.update(selected.id, data);
@@ -34,9 +34,21 @@ export const DepartmentSection = () => {
         });
 
         if (res.isConfirmed) {
-            await departmentService.delete(id);
+
+            try{
+                await departmentService.delete(id);
+                Swal.fire("Deleted!", "", "success");
+            }
+            catch (err:any){
+
+                Swal.fire(
+                    "Error",
+                    err?.response?.data?.error || "Server error",
+                    "error"
+                );
+            }
             await load();
-            Swal.fire("Deleted!", "", "success");
+
         }
     };
 
@@ -56,7 +68,7 @@ export const DepartmentSection = () => {
                 </button>
             </div>
 
-            <div className="border rounded-lg overflow-hidden">
+            <div className="border rounded-lg overflow-scroll h-96">
                 <table className="w-full">
                     <thead className="bg-gray-100">
                     <tr>

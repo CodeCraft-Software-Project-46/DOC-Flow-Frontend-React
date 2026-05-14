@@ -90,7 +90,7 @@ export const dashboardService = {
 
         const data = await response.json();
 
-        // 🚨 throw backend error properly
+        // throw backend error properly
         if (!response.ok) {
             throw data;
         }

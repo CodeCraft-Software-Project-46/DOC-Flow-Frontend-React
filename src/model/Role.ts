@@ -1,3 +1,4 @@
+/*
 
 export class Role {
     id: string;
@@ -19,4 +20,12 @@ export class Role {
         this.description = description;
         this.userCount = userCount;
     }
+}*/
+
+export interface Role {
+    id: string;
+    name: string;
+    description?: string;
+    permissions: string[];
+    userCount?: number;
 }

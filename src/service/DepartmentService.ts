@@ -29,6 +29,7 @@ export const departmentService = {
     },
 
     delete: async (id:string) => {
-        await axios.delete(`${API}/delete/${id}/`);
+        return await axios.delete(`${API}/delete/${id}/`);
+
     }
 };

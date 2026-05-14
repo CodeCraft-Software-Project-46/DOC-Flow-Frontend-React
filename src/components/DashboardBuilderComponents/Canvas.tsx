@@ -189,7 +189,7 @@ export function Canvas({ items, selectedUid, onSelect, onMoveUp, onMoveDown, onR
     );
 }*/
 
-export function Canvas({ items, selectedUid, onSelect, onMoveUp, onMoveDown, onRemove }) {
+export function Canvas({ items, selectedUid, onSelect,onRemove }) {
     if (items.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center h-48 text-center border-2 border-dashed border-slate-300 rounded-xl">
@@ -215,10 +215,6 @@ export function Canvas({ items, selectedUid, onSelect, onMoveUp, onMoveDown, onR
                     {/* Drag handle */}
                     <span className="text-slate-300 text-sm select-none">⠿</span>
 
-                    {/* Icon */}
-                   {/* <div className="w-8 h-8 bg-blue-50 border border-blue-100 rounded-lg flex items-center justify-center text-sm flex-shrink-0">
-                        {item.icon}
-                    </div>*/}
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
@@ -235,16 +231,6 @@ export function Canvas({ items, selectedUid, onSelect, onMoveUp, onMoveDown, onR
 
                     {/* Controls */}
                     <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                        <button
-                            onClick={() => onMoveUp(item.uid)}
-                            className="p-1 text-slate-400 hover:text-blue-600 text-xs"
-                            title="Move up"
-                        >▲</button>
-                        <button
-                            onClick={() => onMoveDown(item.uid)}
-                            className="p-1 text-slate-400 hover:text-blue-600 text-xs"
-                            title="Move down"
-                        >▼</button>
                         <button
                             onClick={() => onRemove(item.uid)}
                             className="p-1 text-red-300 hover:text-red-500 ml-1"
