@@ -1,26 +1,23 @@
 import { useState } from "react";
-
 import ChatInput from "./ChatInput";
 import ChatMessageComponent from "./ChatMessage";
-
 import type { ChatMessage } from "../../types/chatTypes";
-
 import { sendChatMessage } from "../../api/chatService";
 
 export default function ChatWidget() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false); //controls chat popup visibility
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); //shows "Typing..." when waiting for backend
 
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
-      id: "1",
+      id: "1", 
       role: "assistant",
       content: "Hi 👋 Ask me anything about workflows!",
     },
-  ]);
+  ]); //stores conversation history, starting with a welcome message from the assistant
 
-  const handleSend = async (text: string) => {
+  const handleSend = async (text: string) => { //Called when user sends a message from ChatInput
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: "user",
