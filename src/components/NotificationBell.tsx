@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'; // Added useRef
-import { Bell, Info, AlertTriangle, CheckCircle, AlertCircle } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import axiosInstance from '../api/axiosInstance';
 
 interface Notification {
@@ -26,7 +26,6 @@ const NotificationBell = () => {
     const handleMarkAsRead = async (id: number) => {
         console.log("Attempting to mark as read, ID:", id); // Debug Log
         try {
-            // CHECK: Make sure this URL matches your Django urls.py exactly!
             await axiosInstance.patch(`/notifications/inbox/${id}/read/`);
             
             setNotifications(prev => 
@@ -37,7 +36,6 @@ const NotificationBell = () => {
         }
     };
 
-    // --- FIX: Click Outside Logic ---
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (bellRef.current && !bellRef.current.contains(event.target as Node)) {
@@ -53,7 +51,6 @@ const NotificationBell = () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [isOpen]);
-    // --------------------------------
 
     useEffect(() => {
         fetchNotifications();
@@ -64,7 +61,7 @@ const NotificationBell = () => {
     const unreadCount = notifications.filter(n => !n.is_read).length;
 
     return (
-        <div className="relative" ref={bellRef}> {/* Added ref here */}
+        <div className="relative" ref={bellRef}> {}
             <button 
                 onClick={() => setIsOpen(!isOpen)} 
                 className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors relative"

@@ -90,7 +90,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             name: "Audit Logs",
             path: "/audit-logs",
             icon: History,
-            permission: "view_users"
+            permission: "audit_log"
         }
     ];
 

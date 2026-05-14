@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axiosInstance from '../../api/axiosInstance'; // Using your existing instance[cite: 2]
+import axiosInstance from '../../api/axiosInstance';
 import { Mail, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router';
 
@@ -12,7 +12,6 @@ const ForgotPassword = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Hits the backend view we just built
       await axiosInstance.post('/auth/password-reset/', { email });
       setMessage("If an account exists, a reset link has been sent to your email.");
     } catch (err) {

@@ -33,7 +33,7 @@ const AuditLogPage = () => {
 
     return (
         <div className="p-6">
-            <h1 className="text-2xl font-bold mb-4 text-white">System Audit Logs</h1>
+            <h1 className="text-2xl font-bold mb-4 text-black">System Audit Logs</h1>
             <div className="overflow-x-auto bg-[#1a2c3e] rounded-lg border border-white/10">
                 <table className="w-full text-left text-sm text-white/80">
                     <thead className="bg-white/5 text-xs uppercase text-blue-400">

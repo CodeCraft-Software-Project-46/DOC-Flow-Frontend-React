@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 import { AddRuleModal } from '../../components/AddRuleModal';
 import { Bell, CheckCircle, AlertTriangle, Plus, Trash2 } from 'lucide-react';
@@ -35,8 +35,6 @@ const NotificationsPage = () => {
     useEffect(() => {
         fetchRules();
     }, []);
-
-    // --- NEW ACTION LOGIC ---
 
     // 1. Toggle Active/Inactive Status
     const handleToggleActive = async (id: number, currentStatus: boolean) => {

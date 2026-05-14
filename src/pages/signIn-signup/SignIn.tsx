@@ -1,11 +1,10 @@
-import React, { useState, useContext } from 'react'; // useState: use this to remember things temporarily while the user is on the page.
-                                                     // In here we use it to remember Error message. So it can display on screen.
+import React, { useState, useContext } from 'react'; 
 import { Form, Input, Button, Card, Alert, Checkbox } from 'antd'; // ant design components.
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router'; //useNavigate: This tool acts as a teleporter. When Django says "Yes, the password is correct,
                                             // "you call Maps('/dashboard'), and it instantly swaps the screen to the dashboard without a loading screen.
 import axios from 'axios'; // To make HTTP requests.
-import { AuthContext } from '../../context/AuthContext'; // Import our specific pipe
+import { AuthContext } from '../../context/AuthContext';
 import { Link } from 'react-router';
 
 export const SignIn: React.FC = () => { // React.FC means(typescript) this is a React Functional Component. It's a fancy way of saying "This is a piece of the UI that can be reused and has its own logic."
