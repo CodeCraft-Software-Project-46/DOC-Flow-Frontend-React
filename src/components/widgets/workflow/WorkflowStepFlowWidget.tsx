@@ -1,5 +1,5 @@
 import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery";
-import { fetchWorkflowSteps } from "../../../services/api/analyticsApi";
+import { fetchWorkflowSteps } from "../../../api/analyticsApi";
 import type { WorkflowStepFlowDetailResponse } from "../../../types";
 
 interface Props {

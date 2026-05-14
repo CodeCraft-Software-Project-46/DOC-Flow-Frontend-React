@@ -14,7 +14,7 @@ import type {
   WorkflowSLAComplianceApiResponse,
   WorkflowStepFlowDetailResponse,
   WorkflowTotalInstancesValueResponse,
-} from "../../types";
+} from "../types";
 
 // 🔹 Running Documents
 export const fetchRunningDocuments = async (): Promise<RunningDocumentsApiResponse> => {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchUserPerformance } from "../../../services/api/analyticsApi";
+import { fetchUserPerformance } from "../../../api/analyticsApi";
 import type { UserPerformanceItem } from "../../../types";
 
 type User = {

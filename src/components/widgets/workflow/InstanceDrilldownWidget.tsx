@@ -3,7 +3,7 @@ import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery";
 import {
   fetchWorkflowInstances,
   fetchInstanceDrilldown,
-} from "../../../services/api/analyticsApi";
+} from "../../../api/analyticsApi";
 
 import type {
   InstanceDrilldownResponse,

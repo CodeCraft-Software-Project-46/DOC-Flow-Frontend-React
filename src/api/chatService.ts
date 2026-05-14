@@ -1,4 +1,4 @@
-import API from "./api";
+import API from "./axios";
 
 export const sendChatMessage = async (
   message: string

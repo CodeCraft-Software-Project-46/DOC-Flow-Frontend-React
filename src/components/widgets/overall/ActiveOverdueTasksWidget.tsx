@@ -1,5 +1,5 @@
 import StatCard from "../../StatCard.tsx";
-import { fetchActiveOverdueTasks } from "../../../services/api/analyticsApi";
+import { fetchActiveOverdueTasks } from "../../../api/analyticsApi.ts";
 import type { ActiveOverdueTasksResponse } from "../../../types";
 import ActiveTasksDetails from "./ActiveTasksDetails";
 import { useState } from "react";

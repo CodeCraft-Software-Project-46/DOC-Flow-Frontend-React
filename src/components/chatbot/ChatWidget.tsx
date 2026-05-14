@@ -5,7 +5,7 @@ import ChatMessageComponent from "./ChatMessage";
 
 import type { ChatMessage } from "../../types/chatTypes";
 
-import { sendChatMessage } from "../../services/chatService";
+import { sendChatMessage } from "../../api/chatService";
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);

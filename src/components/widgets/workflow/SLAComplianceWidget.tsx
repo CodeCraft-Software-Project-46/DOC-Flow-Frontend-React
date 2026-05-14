@@ -4,7 +4,7 @@ import StatCard from "../../StatCard";
 
 import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery";
 
-import { fetchWorkflowSLACompliance } from "../../../services/api/analyticsApi";
+import { fetchWorkflowSLACompliance } from "../../../api/analyticsApi";
 
 interface Props {
   workflowId: number | null;
