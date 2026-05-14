@@ -17,7 +17,7 @@ export default function RunningDocumentsDetails({ items, onClose }: Props) {
                 Running Documents
               </h2>
               <p className="text-blue-100 text-sm mt-1">
-                {items.length} active document{items.length !== 1 ? "s" : ""}
+                {items.length} active document{items.length !== 1 ? "s" : ""} {/* Add an 's' only when there is more than one item */}
               </p>
             </div>
           </div>
@@ -95,13 +95,15 @@ export default function RunningDocumentsDetails({ items, onClose }: Props) {
 
         {/* Footer */}
         {items.length > 0 && (
-          <div className="border-t border-slate-200 px-8 py-4 flex justify-between items-center">
+          <div className="bg-slate-50 border-t border-slate-200 px-8 py-4 flex justify-between items-center">
             <p className="text-sm text-slate-600">
-              Total: <span className="font-bold">{items.length}</span> documents in process
+              Total:{" "}
+              <span className="font-bold text-blue-600">{items.length}</span>{" "}
+              documents in process
             </p>
             <button
               onClick={onClose}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded transition-colors font-medium"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors font-medium"
             >
               Close
             </button>

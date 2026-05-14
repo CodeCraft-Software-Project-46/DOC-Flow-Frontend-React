@@ -3,21 +3,17 @@ import StatCard from "../../StatCard.tsx";
 import { fetchRunningDocuments } from "../../../api/analyticsApi.ts";
 import type {
   RunningDocumentsApiResponse,
-  RunningDocumentsResponse,
 } from "../../../types";
 import RunningDocumentsDetails from "./RunningDocumentsDetails";
 import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery.ts";
 
 export default function RunningDocumentsWidget() {
   const { data, loading, error } =
-    useAnalyticsQuery<RunningDocumentsApiResponse>(fetchRunningDocuments);
+    useAnalyticsQuery<RunningDocumentsApiResponse>(fetchRunningDocuments); //Fetch running documents from API
 
   const [open, setOpen] = useState(false);
-  
-  const payload: RunningDocumentsResponse | null =
-    data && "value" in data ? data.value : data;
 
-  const value = error ? "-" : (payload?.count ?? "-");
+  const value = error ? "-" : (data?.count ?? "-"); //If error → show "-"
 
   return (
     <>
@@ -28,13 +24,13 @@ export default function RunningDocumentsWidget() {
         label="Running Documents"
         description={error ? "Unavailable" : "Currently Active"}
         color="blue"
-        onClick={() => !loading && !error && setOpen(true)}
+        onClick={() => !loading && !error && setOpen(true)} //Open details modal on click if not loading or error
       />
 
       {open && (
         <RunningDocumentsDetails
           onClose={() => setOpen(false)}
-          items={payload?.documents || []}
+          items={data?.documents || []} //If no documents → show empty array
         />
       )}
     </>

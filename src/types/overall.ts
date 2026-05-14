@@ -21,10 +21,8 @@ export interface RunningDocumentsResponse {
   documents: RunningDocument[];
 }
 
-// Flexible API response type supporting multiple response formats - Used in RunningDocumentsWidget.tsx
-export type RunningDocumentsApiResponse =
-  | RunningDocumentsResponse
-  | { value: RunningDocumentsResponse };
+// API response type used in RunningDocumentsWidget.tsx
+export type RunningDocumentsApiResponse = RunningDocumentsResponse;
 
 /* =========================
    OVERDUE TASKS - Used in ActiveOverdueTasksWidget.tsx
@@ -82,9 +80,7 @@ export interface SLADistributionPoint {
 }
 
 // API response for SLA distribution data - Used in SlaDistributionWidget.tsx via analyticsApi.ts
-export type SLADistributionResponse =
-  | SLADistributionPoint[]
-  | { data?: SLADistributionPoint[] };
+export type SLADistributionResponse = SLADistributionPoint[];
 
 /* =========================
    BOTTLENECK ANALYSIS - Used in BottleneckWorkflowsWidget.tsx
@@ -139,11 +135,7 @@ export interface CompletedTasksResponse {
   count?: number;
 }
 
-// SLA compliance percentage response (flexible format) - Used in SLAComplianceWidget.tsx via analyticsApi.ts
+// SLA compliance percentage response - Used in SLAComplianceWidget.tsx via analyticsApi.ts
 export interface SLAComplianceResponse {
-  percentage?: number;
-  data?: {
-    percentage?: number;
-  };
-  value?: number;
+  percentage: number;
 }

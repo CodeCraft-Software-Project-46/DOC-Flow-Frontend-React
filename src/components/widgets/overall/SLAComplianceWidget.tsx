@@ -7,14 +7,7 @@ export default function SLAComplianceWidget() {
   const { data, loading, error } =
     useAnalyticsQuery<SLAComplianceResponse>(fetchSLACompliance);
 
-  /**
-   * WHY: backend response may come in multiple shapes,
-   * so we safely normalize using only known types (no any needed)
-   */
-  const percent =
-    data?.percentage ?? data?.data?.percentage ?? data?.value ?? undefined;
-
-  const value = error ? "-" : (percent ?? "-");
+  const value = error ? "-" : (data?.percentage ?? "-");
 
   return (
     <StatCard

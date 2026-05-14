@@ -59,20 +59,20 @@ export default function UserPerformanceWidget() {
 
         const raw = Array.isArray(res) ? res : (res.data ?? []);
 
-        if (!Array.isArray(raw)) {
+        if (!Array.isArray(raw)) { //Prevents crashes if API is wrong by checking if raw is an array before mapping
           setUsers([]);
           return;
         }
 
-        const formatted: User[] = (raw as UserPerformanceItem[])
-          .map((item) => ({
-            name: item.user_name || "Unknown",
+        const formatted: User[] = (raw as UserPerformanceItem[]) // transform data into User format for UI display
+          .map((item: UserPerformanceItem) => ({
+            name: item.user_name || "Unknown",          // handles missing fields with defaults
             compliance: item.sla_compliance ?? 0,
             avg: item.avg_completion_time_hours ?? 0,
             breaches: item.breached_tasks ?? 0,
             tasks: item.total_tasks ?? 0,
           }))
-          .sort((a, b) => b.compliance - a.compliance);
+          .sort((a: User, b: User) => b.compliance - a.compliance);
 
         setUsers(formatted);
       } catch (err) {
@@ -93,7 +93,7 @@ export default function UserPerformanceWidget() {
       </div>
 
       <div className="text-xs text-slate-400 mt-1 mb-5">
-        Sorted by Compliance Rate
+        Users with Highest SLA Compliance
       </div>
 
       <div className="flex flex-col gap-5 min-h-[160px]">

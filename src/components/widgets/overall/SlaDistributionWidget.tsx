@@ -6,7 +6,7 @@ import { fetchSLADistribution } from "../../../api/analyticsApi";
 import type { SLADistributionPoint } from "../../../types";
 
 type SLAItem = {
-  name: string;
+  name: "On Time" | "Breached";
   value: number;
   color: string;
 };
@@ -15,34 +15,21 @@ export default function SlaDistributionWidget() {
   const [data, setData] = useState<SLAItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  function getLegendDotClass(color: string) {
-    return color === "#22c55e"
-      ? "bg-green-500"
-      : color === "#ef4444"
-        ? "bg-red-500"
-        : "bg-slate-400";
-  }
-
   useEffect(() => {
     const load = async () => {
       try {
         const res = await fetchSLADistribution();
 
-        const raw = Array.isArray(res) ? res : (res.data ?? []);
+        // Transform API response to chart format
+        const formatted: SLAItem[] = res.map((item: SLADistributionPoint) => {//Go through every item in the array and transform it to SLAItem format
+          const isMet = item.name === "met";    //if name is "met" → true
 
-        if (!Array.isArray(raw)) {
-          console.error("Invalid SLA API response:", raw);
-          setData([]);
-          return;
-        }
-
-        const formatted: SLAItem[] = (raw as SLADistributionPoint[]).map(
-          (item) => ({
-            name: item.name === "met" ? "On Time" : "Breached",
+          return {
+            name: isMet ? "On Time" : "Breached",
             value: item.value ?? 0,
-            color: item.name === "met" ? "#22c55e" : "#ef4444",
-          }),
-        );
+            color: isMet ? "#22c55e" : "#ef4444",  //color green if "met", red if "breached" for recharts
+          }; 
+        });
 
         setData(formatted);
       } catch (err) {
@@ -56,26 +43,6 @@ export default function SlaDistributionWidget() {
     load();
   }, []);
 
-  // // Aggregate COMPLETED step statuses (Met or Breached only) across all instances
-  // let met = 0;
-  // let breached = 0;
-
-  // Object.values(INSTANCE_DETAILS).forEach((instance) => {//metika kre complteted tasks wltth
-  //   instance.steps.forEach((step) => {
-  //     // Only count completed steps (Met or Breached), ignore At Risk and Pending
-  //     if (step.status === "Met") {
-  //       met++;
-  //     } else if (step.status === "Breached") {//meka hdnna dummmy eke met breached witrk tynn
-  //       breached++;
-  //     }
-  //   });
-  // });
-
-  // const data = [ //Recharts expects data like this
-  //   { name: "On Time", value: met, color: "#22c55e" },
-  //   { name: "Breached", value: breached, color: "#ef4444" },
-  // ].filter(item => item.value > 0); // Remove empty categories met = 10 breached = 0 => only show met
-
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6">
       <div className="font-semibold text-slate-900 text-base">
@@ -83,7 +50,7 @@ export default function SlaDistributionWidget() {
       </div>
 
       <div className="text-xs text-slate-400 mt-1 mb-5">
-        All workflows — step-level status snapshot (counts shown)
+        All workflows status snapshot (counts shown)
       </div>
 
       <div className="min-h-[160px]">
@@ -97,7 +64,7 @@ export default function SlaDistributionWidget() {
           </div>
         ) : (
           <div className="flex items-center gap-8">
-            <ResponsiveContainer width={160} height={160}>
+            <ResponsiveContainer width={160} height={160}> {/* wrapper that handles size */}
               <PieChart>
                 <Pie //data = [
                   data={data} // { name: "On Time", value: 10, color: "green" },
@@ -109,16 +76,9 @@ export default function SlaDistributionWidget() {
                   startAngle={90}
                   endAngle={-270} //clockwise full circle because default is anti-clockwise and we want to start from top (90) and go full circle back to top (-270)
                 >
-                  {" "}
-                  {/*Recharts does NOT care about: color: "#22c55e" you must explicitly say <Cell fill={entry.color} /> */}
-                  {data.map(
-                    (
-                      item,
-                      index, //item means one item in the array item = { name: "On Time", value: 10, color: "#22c55e" }     //<Cell fill="green" /> first slice green, second slice red
-                    ) => (
-                      <Cell key={index} fill={item.color} /> //Each slice gets its own color from the data array          //<Cell fill="red" />
-                    ),
-                  )}
+                  {data.map((item, index) => (
+                    <Cell key={index} fill={item.color} />
+                  ))}
                 </Pie>
               </PieChart>
             </ResponsiveContainer>
@@ -129,7 +89,11 @@ export default function SlaDistributionWidget() {
                 <div key={item.name}>
                   <div className="flex items-center gap-2">
                     <span
-                      className={`w-3 h-3 rounded-full inline-block ${getLegendDotClass(item.color)}`}
+                      className={`w-3 h-3 rounded-full inline-block ${
+                        item.color === "#22c55e"
+                          ? "bg-green-500"
+                          : "bg-red-500"
+                      }`}
                     />
 
                     <span className="text-sm font-semibold text-slate-700">
