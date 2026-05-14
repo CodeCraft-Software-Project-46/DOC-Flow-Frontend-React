@@ -13,13 +13,13 @@ import WorkflowStepFlowWidget from "../../components/widgets/workflow/WorkflowSt
 import InstanceDrilldownWidget from "../../components/widgets/workflow/InstanceDrilldownWidget";
 import {
   fetchWorkflows,
-  fetchWorkflowSteps,
+  //fetchWorkflowSteps,
 } from "../../services/api/analyticsApi";
 import type {
   WorkflowListItem,
-  WorkflowStepFlowDetailResponse,
+  //WorkflowStepFlowDetailResponse,
 } from "../../types";
-import { useAnalyticsQuery } from "../../hooks/useAnalyticsQuery";
+//import { useAnalyticsQuery } from "../../hooks/useAnalyticsQuery";
 
 type Tab = "overall" | "workflow";
 type TimeRange = "7d" | "30d" | "90d" | "custom" | "all";
@@ -36,18 +36,12 @@ export const AnalyticsPage = () => {
 
   // Workflow tab — selected workflow
   const [workflows, setWorkflows] = useState<WorkflowListItem[]>([]);
-  const [selectedWorkflowId, setSelectedWorkflowId] = useState<number | null>(null,);
+  const [selectedWorkflowId, setSelectedWorkflowId] = useState<number | null>(
+    null,
+  );
 
   const handleTabChange = (selectedTab: Tab) => {
     setTab(selectedTab);
-  };
-  
-  const handleWorkflowSelect = (workflowName: string) => {
-    const workflow = workflows.find((w) => w.name === workflowName);
-    if (workflow) {
-      setSelectedWorkflowId(workflow.workflow_id);
-    }
-    setTab("workflow");
   };
 
   useEffect(() => {
@@ -79,48 +73,6 @@ export const AnalyticsPage = () => {
     return true;
   };
 
-  function WorkflowStepFlowWrapper({
-    workflowId,
-  }: {
-    workflowId: number | null;
-  }) {
-    const { data, loading, error } =
-      useAnalyticsQuery<WorkflowStepFlowDetailResponse | null>(
-        () =>
-          workflowId === null
-            ? Promise.resolve(null)
-            : fetchWorkflowSteps(workflowId),
-        [workflowId],
-      );
-
-    if (workflowId === null || loading) {
-      return (
-        <div className="bg-white rounded-xl shadow-sm p-6 min-h-[260px]">
-          <div className="space-y-3 animate-pulse">
-            <div className="h-4 w-40 rounded bg-slate-200" />
-            <div className="h-24 rounded-xl bg-slate-50 border border-slate-100" />
-          </div>
-        </div>
-      );
-    }
-
-    if (error || !data) {
-      return (
-        <div className="bg-white rounded-xl shadow-sm p-6 min-h-[260px] text-slate-400">
-          Failed to load step flow
-        </div>
-      );
-    }
-
-    return (
-      <WorkflowStepFlowWidget
-        steps={data.steps ?? []}
-        totalInstances={data.total_instances ?? 0}
-        completedInstances={data.completed_instances ?? 0}
-      />
-    );
-  }
-
   return (
     
     <div className="min-h-screen bg-slate-100 font-sans">
@@ -128,7 +80,7 @@ export const AnalyticsPage = () => {
       <div className="bg-white border-b border-slate-200 px-8 flex -mt-2">
         {(["overall", "workflow"] as Tab[]).map(
           (
-            t, ////map loops through the array and creates UI for each item. So it runs twice create 2 buttons
+            t,                                                        ///map loops through the array and creates UI for each item. So it runs twice create 2 buttons
           ) => (
             <button
               key={t} //React needs a unique ID for each element in a list.
@@ -247,9 +199,7 @@ export const AnalyticsPage = () => {
 
               {/* bottleneck + user sections */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
-                <BottleneckWorkflowsWidget
-                  onWorkflowSelect={handleWorkflowSelect}
-                />{" "}
+                <BottleneckWorkflowsWidget/>
                 {/* I am passing a function called handleWorkflowSelect into BottleneckSteps not run just hand over... component Pass the handler to BottleneckSteps */}
                 <UserPerformanceWidget />
                 {/* onWorkflowSelect is a prop*/}
@@ -303,9 +253,7 @@ export const AnalyticsPage = () => {
                 <AvgCompletionTimeWidget workflowId={selectedWorkflowId} />
                 <SLAComplianceWidgetWorkflow workflowId={selectedWorkflowId} />
               </div>
-
-              <WorkflowStepFlowWrapper workflowId={selectedWorkflowId} />
-
+              <WorkflowStepFlowWidget workflowId={selectedWorkflowId} />
               <InstanceDrilldownWidget workflowId={selectedWorkflowId} />
             </div>
           </div>

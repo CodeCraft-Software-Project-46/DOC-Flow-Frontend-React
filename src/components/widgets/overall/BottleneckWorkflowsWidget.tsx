@@ -3,19 +3,11 @@
 
 import { useEffect, useState } from "react";
 import { fetchBottlenecks } from "../../../services/api/analyticsApi";
-import type { BottleneckWorkflow } from "../../../types";
+import type { BottleneckWorkflow, BottleneckItem } from "../../../types";
 
 interface BottleneckWorkflowsProps {
   onWorkflowSelect?: (workflow: string) => void; //onWorkflowSelect is just a prop name ?. just safely checks if the function exists before calling it
 } //If this prop is provided, it must be a function that takes a string and returns nothing
-
-type BottleneckItem = {
-  workflow: string;
-  avg: number;
-  breach: number;
-  tasks: number;
-  score: number; // ✅ ADD BOTTLENECK SCORE
-};
 
 export default function BottleneckWorkflows({
   onWorkflowSelect,
