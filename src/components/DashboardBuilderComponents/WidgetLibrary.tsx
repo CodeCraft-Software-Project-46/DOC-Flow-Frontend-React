@@ -175,7 +175,7 @@ import {WIDGET_CATEGORIES} from "../../model/WidgetCategories.ts";
 interface WidgetLibraryProps {
     role_id: string;
     onAdd: (widget: any) => void;
-    canvasItems: any[]; // ✅ Added: needed to compute isAdded per widget
+    canvasItems: any[]; // needed to compute isAdded per widget
 }
 
 export function WidgetLibrary({ onAdd, role_id, canvasItems }: WidgetLibraryProps) {
