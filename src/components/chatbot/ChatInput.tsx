@@ -19,14 +19,20 @@ export default function ChatInput({ onSend, loading }: Props) {
   };
 
   return (
-    <div className="flex gap-2 border-t p-3 bg-white">
-      <input
-        type="text"
+    <div className="flex gap-2 border-t p-3 bg-white items-end">
+      <textarea
         value={text}
         placeholder="Ask something..."
         onChange={(e) => setText(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && handleSend()} //Allows sending message by pressing Enter key
-        className="flex-1 border rounded-lg px-3 py-2 text-sm outline-none"
+        onKeyDown={(e) => {
+          // Enter sends, Shift+Enter adds a new line.
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+          }
+        }}
+        rows={2}
+        className="flex-1 border rounded-lg px-3 py-3 text-sm outline-none resize-none max-h-28 overflow-y-auto"
       />
 
       <button
