@@ -10,13 +10,13 @@ import { dashboardService } from "../../service/DashbaordService.ts";
 interface Props {
     dashboard: Dashboard;
     onBack: () => void;
-    onSave: (d: Dashboard) => void;
+  //  onSave: (d: Dashboard) => void;
 }
 
 export function DashboardCanvasPage({
                                         dashboard,
                                         onBack,
-                                        onSave,
+                                       /* onSave,*/
                                     }: Props) {
 
     const [canvasItems, setCanvasItems] =
@@ -34,14 +34,14 @@ export function DashboardCanvasPage({
     const [addedWidgetCodes, setAddedWidgetCodes] =
         useState<string[]>([]);
 
-    // loading
+    //for loading initial data
     useEffect(() => {
 
         const loadDashboard = async () => {
 
             try {
 
-                // EXISTING DASHBOARD
+                // for load dashboard for update
                 if (dashboard.id) {
 
                     const fullDashboard =
@@ -170,7 +170,7 @@ export function DashboardCanvasPage({
     };
 
 
-    //to save/update dashboard with widgets
+    //to save/update dashboard with widgets and their layout
     const handleSave = async () => {
 
         const payload = {
@@ -194,7 +194,7 @@ export function DashboardCanvasPage({
 
             let res;
 
-            // UPDATE
+            // to update a dashboard
             if (dashboard.id) {
 
                 res = await dashboardService.updateDashboard(
@@ -204,8 +204,8 @@ export function DashboardCanvasPage({
 
             }
 
-            // CREATE
-            else {
+            // to create dashabord
+          /*  else {
 
                 res = await dashboardService.saveDashboard(
                     payload
@@ -214,11 +214,9 @@ export function DashboardCanvasPage({
                 // assign backend id
                 dashboard.id = res.dashboard_id;
             }
-
+*/
             console.log("Saved:", res);
-
             setSaved(true);
-
             setTimeout(() => {
                 onBack();
             }, 500);

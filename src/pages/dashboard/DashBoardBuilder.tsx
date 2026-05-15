@@ -180,44 +180,38 @@ export function DashBoardBuilder() {
     const [roleFilter, setRoleFilter] = useState<string>("All");
     const [roles, setRoles] = useState<any[]>([]);
 
-    // LOAD ALL DASHBOARDS FROM BACKEND
+    // to load data from backend
     const loadDashboards = async () => {
 
         try {
-
             setLoading(true);
-
             const data =
                 await dashboardService.getDashboards();
 
             console.log("Loaded dashboards:");
             console.log(data);
-
             setDashboards(data);
 
         } catch (err) {
-
             console.error(
                 "Failed to load dashboards:",
                 err
             );
 
         } finally {
-
             setLoading(false);
         }
     };
+
+    //to load data for role selector
     const loadRoles = async () => {
-
         try {
-
             const data =
                 await roleService.getAll();
 
             setRoles(data);
 
         } catch (err) {
-
             console.error(
                 "Failed to load roles",
                 err
@@ -288,36 +282,36 @@ export function DashBoardBuilder() {
     };
 
     // to save
-    const handleSave = async (
-        savedDashboard: Dashboard
-    ) => {
+    /* const handleSave = async (
+         savedDashboard: Dashboard
+     ) => {
 
-        try {
-            console.log(
-                "Updating dashboard:"
-            );
+         try {
+             console.log(
+                 "Updating dashboard:"
+             );
 
-            console.log(savedDashboard);
+             console.log(savedDashboard);
 
-            await dashboardService.saveDashboard(
-                savedDashboard
-            );
+             await dashboardService.saveDashboard(
+                 savedDashboard
+             );
 
-            console.log("Dashboard updated");
+             console.log("Dashboard updated");
 
-            // reload latest dashboards
-            await loadDashboards();
+             // reload latest dashboards
+             await loadDashboards();
 
-            setCanvasDashboard(null);
+             setCanvasDashboard(null);
 
-        } catch (err) {
+         } catch (err) {
 
-            console.error(
-                "Update failed:",
-                err
-            );
-        }
-    };
+             console.error(
+                 "Update failed:",
+                 err
+             );
+         }
+     };*/
 
     // DELETE
     const handleDelete = async (id: number) => {
@@ -381,14 +375,6 @@ export function DashBoardBuilder() {
                     status
                 );
 
-            setDashboards(prev =>
-                prev.map(d =>
-                    d.id === id
-                        ? {...d, status}
-                        : d
-                )
-            );
-
             await loadDashboards();
 
             Swal.fire({
@@ -412,7 +398,7 @@ export function DashBoardBuilder() {
 
     };
 
-    // OPEN CANVAS
+    // if canvas object hv, then load dashboard canvas page
     if (canvasDashboard) {
 
         return (
@@ -421,7 +407,7 @@ export function DashBoardBuilder() {
                 onBack={() =>
                     setCanvasDashboard(null)
                 }
-                onSave={handleSave}
+                /*onSave={handleSave}*/
             />
         );
     }
@@ -429,7 +415,7 @@ export function DashBoardBuilder() {
     return (
         <div className="min-h-screen bg-slate-50 p-6 space-y-5">
 
-            {/* HEADER */}
+            {/* header */}
             <div className="flex items-center justify-between">
 
                 <div>
@@ -453,45 +439,29 @@ export function DashBoardBuilder() {
                 </button>
             </div>
 
-            {/* STATS */}
+            {/* to show statistics */}
             <StatsBar dashboards={dashboards}/>
 
-            {/* FILTERS */}
+            {/* filtering system */}
             <div className="flex flex-wrap gap-3 items-center">
 
-                {/* SEARCH */}
+                {/* to search dashaboard*/}
                 <input
                     placeholder="Search dashboards..."
                     value={search}
                     onChange={(e) =>
                         setSearch(e.target.value)
                     }
-                    className="
-            border
-            px-3 py-2
-            rounded-lg
-            bg-white
-            text-sm
-            shadow-sm
-            w-60
-        "
+                    className="border px-3 py-2 rounded-lg bg-white text-sm shadow-sm w-60"
                 />
 
-                {/* STATUS FILTER */}
+                {/* for selecting status */}
                 <select
                     value={statusFilter}
                     onChange={(e) =>
                         setStatusFilter(e.target.value)
                     }
-                    className="
-            border
-            px-3 py-2
-            rounded-lg
-            bg-white
-            text-sm
-            shadow-sm
-            min-w-[140px]
-        "
+                    className="border px-3 py-2 rounded-lg bg-white text-sm shadow-sm min-w-[140px]"
                 >
                     <option value="All">
                         All Status
@@ -507,22 +477,14 @@ export function DashBoardBuilder() {
                     </option>
                 </select>
 
-                {/* ROLE FILTER */}
+                {/* for selecting role  */}
                 <select
                     value={roleFilter}
                     onChange={(e) =>
                         setRoleFilter(e.target.value)
                     }
-                    className="
-              border
-        px-3 py-2
-        rounded-lg
-        bg-white
-        text-sm
-        text-slate-800
-        shadow-sm
-        min-w-[160px]
-        "
+                    className="border px-3 py-2 rounded-lg bg-white text-sm text-slate-800 shadow-sm min-w-[160px]"
+
                 >
                     <option value="All">
                         All Roles
@@ -540,7 +502,7 @@ export function DashBoardBuilder() {
 
             </div>
 
-            {/* LOADING */}
+            {/* for show status  */}
             {loading ? (
 
                 <div className="text-center py-10 text-slate-500">
@@ -557,7 +519,7 @@ export function DashBoardBuilder() {
                 />
             )}
 
-            {/* MODAL */}
+            {/* for create initial dashboard object  */}
             <CreateDashboardModal
                 isOpen={isModalOpen}
                 onClose={() =>

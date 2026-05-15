@@ -101,7 +101,7 @@ export function DashboardPreviewPage({
 
         const updatedWidgets = widgets.map((widget) => {
 
-            const layoutItem = layout.find(
+            const layoutItem:any = layout.find(
                 (l) => l.i === String(widget.id)
             );
 
@@ -233,6 +233,7 @@ export function DashboardPreviewPage({
                         isDraggable
                         isResizable
                         resizeHandles={[
+                            //for defines resize directions
                             "se",
                             "sw",
                             "ne",
@@ -244,15 +245,13 @@ export function DashboardPreviewPage({
                         ]}
                         margin={[12, 12]}
                         containerPadding={[0, 0]}
-                        compactType="vertical"
+                        compactType="vertical" //for removes empty gaps
                         draggableHandle=".drag-handle"
                     >
 
                         {widgets.map((widget) => {
 
-                            const colors =
-                                CATEGORY_COLORS[widget.category]
-                                || CATEGORY_COLORS.Custom;
+                            const colors= CATEGORY_COLORS[widget.category] || CATEGORY_COLORS.Custom;
 
                             const WidgetComponent =
                                 WIDGET_COMPONENTS[
@@ -275,10 +274,9 @@ export function DashboardPreviewPage({
                                             shadow-sm
                                             hover:shadow-md
                                             transition-shadow
-                                        `}
-                                    >
+                                        `} >
 
-                                        {/* HEADER */}
+                                        {/* header */}
                                         <div
                                             className={`
                                                 drag-handle
@@ -312,7 +310,7 @@ export function DashboardPreviewPage({
                                             </span>
                                         </div>
 
-                                        {/* BODY */}
+                                        {/* actual component */}
                                         <div className="flex-1 overflow-auto p-2">
 
                                             {WidgetComponent ? (
@@ -331,7 +329,7 @@ export function DashboardPreviewPage({
                                             )}
                                         </div>
 
-                                        {/* RESIZE ICON */}
+                                        {/*for resizing widgets*/}
                                         <div className="flex justify-end px-2 pb-1 select-none">
 
                                             <span className="text-slate-200 text-xs">
