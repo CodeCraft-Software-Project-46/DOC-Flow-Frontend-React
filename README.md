@@ -71,3 +71,41 @@ export default defineConfig([
   },
 ])
 ```
+
+---
+
+## Project-specific notes (Doc-Flow frontend)
+
+This section covers where to look and how to contribute for features that pair with backend services: analytics charts, working hours UI, workflow widgets, and the chatbot.
+
+- **Analytics charts**:
+  - Frontend analytics pages are under [src/pages/analytics](src/pages/analytics) with the main entry [src/pages/analytics/AnalyticsPage.tsx](src/pages/analytics/AnalyticsPage.tsx).
+  - Widget components live in [src/components/widgets](src/components/widgets). To add/update charts, implement the UI component, add a service call in [src/api/analyticsApi.ts] (or create a new API file), and add unit/visual tests in `src/tests`.
+
+- **Working Hours UI**:
+  - UI and modal for working-hours live in [src/components/WorkingHoursModal.tsx] and related components.
+  - Frontend API calls are in [src/api/WorkingHoursAPI.ts](src/api/WorkingHoursAPI.ts) and service helpers in [src/services/workingHoursService.ts].
+  - To change the input or add validation, edit the modal component and update the service to match the backend serializers.
+
+- **Workflow widgets (overall & per-workflow)**:
+  - Workflow-specific widgets are under [src/components/widgets/workflow] and correspond to backend helpers at [Doc-Flow-Backend/analytics/services/widgets/workflow_widgets.py](../Doc-Flow-Backend/analytics/services/widgets/workflow_widgets.py).
+
+- **Chatbot (UI)**:
+  - Chat UI components are in [src/components/chatbot](src/components/chatbot) — see `ChatWidget.tsx`, `ChatInput.tsx`, and `ChatMessage.tsx` for the message flow.
+  - The frontend calls the backend chatbot endpoints in [src/api/chatService.ts]. When changing prompts or payloads, coordinate with backend [chatbot/llm_service.py] to keep formats consistent.
+
+### Running the frontend locally
+
+```bash
+cd DOC-Flow-Frontend-React
+npm install
+npm run dev
+```
+
+### Tests
+
+Unit tests live in `src/tests`. Use `vitest` to run tests:
+
+```bash
+npm run test
+```

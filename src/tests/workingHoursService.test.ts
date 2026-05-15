@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getWorkingHoursPerDay, validateWorkingHoursConfig } from './workingHoursService';
+import { getWorkingHoursPerDay, validateWorkingHoursConfig } from '../services/workingHoursService';
 import type { WorkingHoursConfig } from '../types';
 
 describe('workingHoursService', () => {
