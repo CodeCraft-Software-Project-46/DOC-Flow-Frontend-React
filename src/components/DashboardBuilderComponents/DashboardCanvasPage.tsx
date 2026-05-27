@@ -1,22 +1,18 @@
-
-
-import { useState, useEffect, useCallback } from "react";
-import { WidgetLibrary } from "./WidgetLibrary";
-import { Canvas } from "./Canvas";
-import { DashboardPreviewPage } from "./DashBoardPreviewPage.tsx";
-import type { Dashboard } from "../../model/Dashboard.ts";
-import { dashboardService } from "../../service/DashbaordService.ts";
+import {useState, useEffect, useCallback} from "react";
+import {WidgetLibrary} from "./WidgetLibrary";
+import {Canvas} from "./Canvas";
+import {DashboardPreviewPage} from "./DashBoardPreviewPage.tsx";
+import type {Dashboard} from "../../model/Dashboard.ts";
+import {dashboardService} from "../../service/DashbaordService.ts";
 
 interface Props {
     dashboard: Dashboard;
     onBack: () => void;
-  //  onSave: (d: Dashboard) => void;
 }
 
 export function DashboardCanvasPage({
                                         dashboard,
                                         onBack,
-                                       /* onSave,*/
                                     }: Props) {
 
     const [canvasItems, setCanvasItems] =
@@ -40,39 +36,25 @@ export function DashboardCanvasPage({
         const loadDashboard = async () => {
 
             try {
-
                 // for load dashboard for update
                 if (dashboard.id) {
+                    const fullDashboard = await dashboardService.getDashboard(dashboard.id);
 
-                    const fullDashboard =
-                        await dashboardService
-                            .getDashboard(
-                                dashboard.id
-                            );
-
-                    console.log(
-                        "Loaded dashboard:"
-                    );
-
+                    console.log("Loaded dashboard:");
                     console.log(fullDashboard);
 
-                    const widgets =
-                        fullDashboard.widgets || [];
+                    const widgets = fullDashboard.widgets || [];
 
                     setCanvasItems(widgets);
 
                     setAddedWidgetCodes(
                         widgets.map(
-                            (w: any) =>
-                                w.widget_code
-                        )
+                            (w: any) => w.widget_code)
                     );
 
                 } else {
-
                     // for a new dashboard
                     setCanvasItems([]);
-
                     setAddedWidgetCodes([]);
                 }
 
@@ -91,7 +73,6 @@ export function DashboardCanvasPage({
 
     // to add widget
     const handleAdd = useCallback(
-
         (widget: any) => {
 
             // to block duplicates
@@ -139,7 +120,7 @@ export function DashboardCanvasPage({
         [addedWidgetCodes]
     );
 
-    // remove widget
+    //to remove widget
     const handleRemove = (
         widget_code: string
     ) => {
@@ -160,8 +141,7 @@ export function DashboardCanvasPage({
         );
 
         if (
-            selectedWidgetCode ===
-            widget_code
+            selectedWidgetCode === widget_code
         ) {
             setSelectedWidgetCode(null);
         }
@@ -170,7 +150,7 @@ export function DashboardCanvasPage({
     };
 
 
-    //to save/update dashboard with widgets and their layout
+    //to update dashboard with widgets and their layout
     const handleSave = async () => {
 
         const payload = {
@@ -193,10 +173,8 @@ export function DashboardCanvasPage({
         try {
 
             let res;
-
             // to update a dashboard
             if (dashboard.id) {
-
                 res = await dashboardService.updateDashboard(
                     dashboard.id,
                     payload
@@ -204,17 +182,6 @@ export function DashboardCanvasPage({
 
             }
 
-            // to create dashabord
-          /*  else {
-
-                res = await dashboardService.saveDashboard(
-                    payload
-                );
-
-                // assign backend id
-                dashboard.id = res.dashboard_id;
-            }
-*/
             console.log("Saved:", res);
             setSaved(true);
             setTimeout(() => {
@@ -237,10 +204,7 @@ export function DashboardCanvasPage({
                 onBack={() =>
                     setIsPreview(false)
                 }
-                onSave={(
-                    updatedWidgets:any
-                ) => {
-
+                onSave={(updatedWidgets: any) => {
                     setCanvasItems(
                         updatedWidgets
                     );
@@ -316,7 +280,7 @@ export function DashboardCanvasPage({
                         selectedUid={
                             selectedWidgetCode
                         }
-                        onSelect={(item:any) =>
+                        onSelect={(item: any) =>
                             setSelectedWidgetCode(
                                 item.widget_code
                             )

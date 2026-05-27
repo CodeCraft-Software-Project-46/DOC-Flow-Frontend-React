@@ -1,11 +1,23 @@
 import {StatusBadge} from "./StatusBadge.tsx";
+import type {Dashboard} from "../../model/Dashboard.ts";
+
+interface Props {
+    dashboards: Dashboard[];
+    onEdit: (dashboard: Dashboard) => void;
+    onDelete: (id: number) => void;
+    onChangeStatus: (
+        id: number,
+        status: string
+    ) => void;
+}
+
 
 export function DashboardList({
                                   dashboards,
                                   onEdit,
                                   onDelete,
                                   onChangeStatus
-                              }) {
+                              }:Props ){
 
 
     if (dashboards.length === 0) {
@@ -38,7 +50,6 @@ export function DashboardList({
                     className="bg-white rounded-xl border border-slate-200 shadow-sm px-5 py-4 flex items-center justify-between hover:shadow-md transition-shadow"
                 >
 
-                    {/* LEFT INFO */}
                     <div className="flex items-center gap-4">
 
                         <div
@@ -82,15 +93,12 @@ export function DashboardList({
 
                             disabled={d.status === "active"}
 
-                            className={`
-        px-3 py-1.5 text-xs font-semibold rounded-lg border transition
-
-        ${
+                            className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition
+                            ${
                                 d.status === "active"
                                     ? "bg-green-100 text-green-400 border-green-200 cursor-not-allowed opacity-60"
                                     : "bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
-                            }
-    `}
+                            }`}
                         >
                             ✅ Activate
                         </button>

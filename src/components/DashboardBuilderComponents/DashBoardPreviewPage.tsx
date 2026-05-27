@@ -1,14 +1,26 @@
-
 import { useState, useEffect } from "react";
 import GridLayout from "react-grid-layout";
-
-
-
 import { WIDGET_COMPONENTS } from "../../WIDGET_COMPONENTS.ts";
 
-function buildInitialLayout(widgets) {
+interface Props {
+    dashboard: {
+        id: number;
+        name: string;
+        description?: string;
+        role_id?: number;
+        status?: string;
+    };
 
-    return widgets.map((widget) => ({
+    widgets: any[];
+
+    onBack: () => void;
+
+    onSave: (widgets: any[]) => void;
+}
+
+function buildInitialLayout(widgets:any) {
+
+    return widgets.map((widget:any) => ({
         i: String(widget.id),
 
         x: widget.pos_x ?? 0,
@@ -62,7 +74,7 @@ export function DashboardPreviewPage({
                                          widgets,
                                          onBack,
                                          onSave,
-                                     }) {
+                                     }:Props) {
 
     const [layout, setLayout] = useState([]);
 
@@ -89,10 +101,9 @@ export function DashboardPreviewPage({
     }, [widgets, dashboard.id]);
 
     // layout changed
-    const handleLayoutChange = (newLayout) => {
+    const handleLayoutChange = (newLayout:any) => {
 
         setLayout(newLayout);
-
         setIsDirty(true);
     };
 

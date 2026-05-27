@@ -81,7 +81,7 @@ export function WidgetLibrary({ onAdd, role_id, canvasItems }: WidgetLibraryProp
                         <WidgetCard
                             key={w.id}
                             widget={w}
-                            isAdded={canvasItems.some((c) => c.id === w.id)}
+                            isAdded={canvasItems.some((c) => c.id === w.id)} //to check already added to the canvas
                             onAdd={onAdd}
                         />
                     ))
