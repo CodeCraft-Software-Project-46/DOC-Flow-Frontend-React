@@ -1,4 +1,3 @@
-
 import {useEffect, useState} from "react";
 import type {Dashboard} from "../../model/Dashboard.ts";
 import {dashboardService} from "../../service/DashbaordService.ts";
@@ -69,7 +68,6 @@ export function DashBoardBuilder() {
 
     // loading
     useEffect(() => {
-
         loadDashboards();
         loadRoles();
     }, []);
@@ -128,38 +126,6 @@ export function DashBoardBuilder() {
             console.error("Create failed:", err);
         }
     };
-
-    // to save
-    /* const handleSave = async (
-         savedDashboard: Dashboard
-     ) => {
-
-         try {
-             console.log(
-                 "Updating dashboard:"
-             );
-
-             console.log(savedDashboard);
-
-             await dashboardService.saveDashboard(
-                 savedDashboard
-             );
-
-             console.log("Dashboard updated");
-
-             // reload latest dashboards
-             await loadDashboards();
-
-             setCanvasDashboard(null);
-
-         } catch (err) {
-
-             console.error(
-                 "Update failed:",
-                 err
-             );
-         }
-     };*/
 
     // DELETE
     const handleDelete = async (id: number) => {
@@ -255,7 +221,6 @@ export function DashBoardBuilder() {
                 onBack={() =>
                     setCanvasDashboard(null)
                 }
-                /*onSave={handleSave}*/
             />
         );
     }

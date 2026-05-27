@@ -50,11 +50,11 @@ export function DashboardLoader() {
         );
     }
 
-    //  SUPER ADMIN DASHBOARD
+    // if role is super admin
     if (dashboard === "SUPER_ADMIN") {
         return <DashboardSuperAdmin />;
     }
 
-    // NORMAL ROLE DASHBOARD
+    // if select another user
     return <DashboardRenderer widgets={dashboard.widgets} />;
 }

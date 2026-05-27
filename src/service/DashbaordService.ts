@@ -115,7 +115,7 @@ export const dashboardService = {
 
         return data;
     },
-    // GET ACTIVE DASHBOARD FOR ROLE
+    // get active dashboard for a role
     async getActiveDashboard(role_id: number | string | null) {
 
         if (!role_id) {

@@ -46,3 +46,7 @@ Thumbs.db
 
 # Misc
 
+BottleneckSteps.ts
+/src/reducer/
+/src/api/
+

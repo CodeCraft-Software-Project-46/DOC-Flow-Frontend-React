@@ -1,11 +1,21 @@
 import { useState, useEffect } from "react";
 import { roleService } from "../../service/RoleService";
 
+interface Props {
+    isOpen: boolean;
+    onClose: () => void;
+    onSubmit: (data: {
+        name: string;
+        description: string;
+        role_id: string;
+    }) => void;
+}
+
 export function CreateDashboardModal({
                                          isOpen,
                                          onClose,
                                          onSubmit,
-                                     }) {
+                                     }: Props) {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [selectedRole, setSelectedRole] = useState("");
@@ -162,7 +172,7 @@ export function CreateDashboardModal({
                             Select Role
                         </option>
 
-                        {roles.map((r) => (
+                        {roles.map((r:any) => (
                             <option
                                 key={r.id}
                                 value={r.id}

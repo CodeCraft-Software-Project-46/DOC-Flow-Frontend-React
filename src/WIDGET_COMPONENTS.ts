@@ -9,6 +9,7 @@ import SystemAlerts from "./components/chart/SystemAlerts.tsx";
 import UserSLAList from "./components/chart/Userperformance.tsx";
 
 export const WIDGET_COMPONENTS: Record<string, any> = {
+    //map keys with components
     W001: BottleneckSteps,
     W002: WorkflowPerformance,
     W003: UserSLAList,
