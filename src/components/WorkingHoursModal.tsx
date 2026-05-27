@@ -17,7 +17,7 @@ interface Props {
 
 /* UI editable empty state */
 const EMPTY_CONFIG: WorkingHoursConfig = {
-  //UI fallback state i        f no config from backend (first time setup)
+  //UI fallback state if no config from backend (first time setup)
   workStartTime: "",
   workEndTime: "",
   workDays: [],

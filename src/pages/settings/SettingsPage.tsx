@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import { WorkingHoursModal } from "../../components/WorkingHoursModal";
 import type { WorkingHoursConfig } from "../../types";
-
 import { getWorkingHours, saveWorkingHours } from "../../api/WorkingHoursAPI";
-
 import { getWorkingHoursPerDay } from "../../services/workingHoursService";
 
 /* UI helper */
@@ -142,7 +140,7 @@ export const SettingsPage = () => {
   );
 };
 
-const Stat = ({ label, value }: { label: string; value: string | number }) => (
+const Stat = ({ label, value }: { label: string; value: string | number }) => ( 
   <div className="bg-slate-50 rounded border border-slate-200 p-3">
     <p className="text-xs text-slate-500">{label}</p>
     <p className="text-lg font-bold text-slate-900">{value}</p>

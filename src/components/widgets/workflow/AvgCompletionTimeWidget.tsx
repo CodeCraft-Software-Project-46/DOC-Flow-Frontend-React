@@ -1,9 +1,6 @@
 import { useCallback } from "react";
-
 import StatCard from "../../StatCard";
-
 import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery";
-
 import { fetchWorkflowAvgTime } from "../../../api/analyticsApi";
 
 export default function AvgCompletionTimeWidget({
@@ -11,14 +8,14 @@ export default function AvgCompletionTimeWidget({
 }: {
   workflowId: number | null;
 }) {
-  const isReady = workflowId !== null;
+  const isReady = workflowId !== null; //check if workflow is selected
 
-  const queryFn = useCallback(
+  const queryFn = useCallback( //Create a function that fetches data for the current workflowId
     () =>
       workflowId === null
-        ? Promise.resolve(null)
+        ? Promise.resolve(null) //If no workflow is selected, return a resolved promise with null to avoid api calls
         : fetchWorkflowAvgTime(workflowId),
-    [workflowId],
+    [workflowId], //Only recreate this function when workflowId changes
   );
 
   const { data, loading, error } = useAnalyticsQuery(queryFn, [workflowId]);

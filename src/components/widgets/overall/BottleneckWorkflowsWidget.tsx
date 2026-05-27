@@ -14,7 +14,7 @@ export default function BottleneckWorkflows() {
       setLoading(true);
 
       try {
-        const res = await fetchBottlenecks();
+        const res = await fetchBottlenecks(); //API call 
 
         const raw = Array.isArray(res) //check if response is already an array 
           ? res
@@ -25,7 +25,7 @@ export default function BottleneckWorkflows() {
           return;
         }
 
-        const formatted: BottleneckItem[] = ( //converts backend data → UI format
+        const formatted: BottleneckItem[] = ( //converts backend data → UI format 
           raw as BottleneckWorkflow[]
         )
           .map((item) => ({
@@ -69,10 +69,10 @@ export default function BottleneckWorkflows() {
     };
   }
 
-  function getScoreWidthClass(score: number) {
+  function getScoreWidthClass(score: number) { //Determines bar width based on bottleneck score
     const percentage = Math.max(
       0,
-      Math.min(100, Math.round(score * 100)),
+      Math.min(100, Math.round(score * 100)), //convert score to percentage
     );
 
     if (percentage >= 100) return "w-full";

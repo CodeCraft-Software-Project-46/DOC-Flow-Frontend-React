@@ -62,7 +62,7 @@ export default function ChatWidget() {
   return (
     <>
       <button
-        onClick={() => setOpen(!open)}
+        onClick={() => setOpen(!open)} //Toggle chat visibility when clicking the chat icon button
         className="fixed bottom-5 right-5 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg text-xl z-50"
       >
         💬
@@ -71,7 +71,7 @@ export default function ChatWidget() {
       {open && (
         <div
           className={`fixed bottom-24 right-5 bg-white rounded-xl shadow-2xl flex flex-col overflow-hidden z-50 transition-all duration-200 ${
-            expanded ? "w-[500px] h-[700px]" : "w-[350px] h-[500px]"
+            expanded ? "w-[500px] h-[700px]" : "w-[350px] h-[500px]" // Set width and height based on expanded state
           }`}
         >
           <div className="bg-blue-600 text-white p-4 flex justify-between items-center">
@@ -79,7 +79,7 @@ export default function ChatWidget() {
 
             <div className="flex items-center gap-3">
               <button
-                onClick={() => setExpanded((prev) => !prev)}
+                onClick={() => setExpanded((prev) => !prev)} //Toggle expanded state
                 aria-label={expanded ? "Shrink chat" : "Expand chat"}
                 title={expanded ? "Shrink" : "Expand"}
                 className="text-sm leading-none"

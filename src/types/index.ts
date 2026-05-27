@@ -22,6 +22,7 @@ export type {
 	ActiveTasksDetailsProps,
 	// User Performance Widget
 	UserPerformanceItem,
+	User,
 	UserPerformanceResponse,
 	// SLA Distribution Widget
 	SLADistributionPoint,
@@ -42,7 +43,7 @@ export type {
 	WorkflowListItem,
 	WorkflowListResponse,
 	// API Response Types
-	WorkflowTotalInstancesValueResponse,
+	WorkflowRunningInstancesValueResponse,
 	WorkflowAvgCompletionTimeApiResponse,
 	WorkflowSLAComplianceApiResponse,
 	// Drilldown/Instance Data

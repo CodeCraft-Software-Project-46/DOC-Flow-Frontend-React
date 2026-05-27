@@ -17,9 +17,8 @@ export default function InstanceDrilldownWidget({
 }) {
   const [selectedInstance, setSelectedInstance] = useState<number | null>(null);
 
-  // ===============================
   // LOAD INSTANCES
-  // ===============================
+
   const instancesQuery = useCallback(() => {
     if (workflowId === null) return Promise.resolve([]);
     return fetchWorkflowInstances(workflowId);
@@ -34,9 +33,7 @@ export default function InstanceDrilldownWidget({
   const effectiveSelectedInstance =
     selectedInstance ?? instanceList[0]?.instance_id ?? null;
 
-  // ===============================
   // DRILLDOWN DATA
-  // ===============================
   const drilldownQuery = useCallback(() => {
     if (!effectiveSelectedInstance) return Promise.resolve(null);
 
@@ -98,16 +95,11 @@ export default function InstanceDrilldownWidget({
         </div>
       </div>
 
-      {/* ===============================
-          LOADING / ERROR
-        =============================== */}
+      {/* LOADING / ERROR MESSAGES */}
       {Boolean(drilldownError) && (
         <p className="text-red-500">Failed to load instance details</p>
       )}
 
-      {/* ===============================
-          TABLE VIEW (CORE PART)
-      =============================== */}
       {drilldownData && (
         <div className="overflow-x-auto">
           <table className="w-full text-sm border border-slate-200 rounded-lg">

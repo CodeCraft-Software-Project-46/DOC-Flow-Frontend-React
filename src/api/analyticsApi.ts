@@ -13,53 +13,54 @@ import type {
   WorkflowListResponse,
   WorkflowSLAComplianceApiResponse,
   WorkflowStepFlowDetailResponse,
-  WorkflowTotalInstancesValueResponse,
+  WorkflowRunningInstancesValueResponse,
 } from "../types";
 
-// 🔹 Running Documents
+// Overall APIs
+
+//Running Documents
 export const fetchRunningDocuments = async (): Promise<RunningDocumentsApiResponse> => {
   const res = await API.get("/api/analytics/widgets/running-documents/"); //sends get request to backend endpoint to fetch running documents data
   return res.data;
 };
 
-// 🔹 Active Overdue Tasks
+//Active Overdue Tasks
 export const fetchActiveOverdueTasks = async (): Promise<ActiveOverdueTasksResponse> => {
   const res = await API.get("/api/analytics/widgets/active-overdue-tasks/");
   return res.data;
 };
 
-// 🔹 Completed Tasks
+//Completed Tasks
 export const fetchCompletedTasks = async (): Promise<CompletedTasksResponse> => {
   const res = await API.get("/api/analytics/widgets/completed-tasks/");
   return res.data;
 };
 
-// 🔹 SLA Compliance
+//SLA Compliance
 export const fetchSLACompliance = async (): Promise<SLAComplianceResponse> => {
   const res = await API.get("/api/analytics/widgets/sla-compliance/");
   return res.data;
 };
 
-// 🔹 SLA Distribution
+//SLA Distribution
 export const fetchSLADistribution = async (): Promise<SLADistributionResponse> => {
   const res = await API.get("/api/analytics/widgets/sla-distribution/");
   return res.data;
 };
 
-// 🔹 Bottleneck Workflows
+//Bottleneck Workflows
 export const fetchBottlenecks = async (): Promise<BottleneckWorkflowsResponse> => {
   const res = await API.get("/api/analytics/widgets/bottleneck-workflows/");
   return res.data;
 };
 
-// 🔹 User Performance
+//User Performance
 export const fetchUserPerformance = async (): Promise<UserPerformanceResponse> => {
   const res = await API.get("/api/analytics/widgets/user-performance/");
   return res.data;
 };
 // =====================================================
 // WORKFLOW APIs
-// =====================================================
 
 // Available workflows
 export const fetchWorkflows = async (): Promise<WorkflowListResponse> => {
@@ -67,12 +68,12 @@ export const fetchWorkflows = async (): Promise<WorkflowListResponse> => {
   return res.data;
 };
 
-// Total instances
-export const fetchWorkflowTotalInstances = async (
+// Running instances
+export const fetchWorkflowRunningInstances = async (
   workflowId: number
-): Promise<WorkflowTotalInstancesValueResponse> => {
+): Promise<WorkflowRunningInstancesValueResponse> => {
   const res = await API.get(
-    `/api/analytics/widgets/workflow/${workflowId}/total-instances/`
+    `/api/analytics/widgets/workflow/${workflowId}/running-instances/`
   );
   return res.data;
 };

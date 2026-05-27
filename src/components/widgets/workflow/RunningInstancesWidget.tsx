@@ -1,12 +1,9 @@
 import { useCallback } from "react";
-
 import StatCard from "../../StatCard";
-
 import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery";
+import { fetchWorkflowRunningInstances } from "../../../api/analyticsApi";
 
-import { fetchWorkflowTotalInstances } from "../../../api/analyticsApi";
-
-export default function TotalInstancesWidget({
+export default function RunningInstancesWidget({
   workflowId,
 }: {
   workflowId: number | null;
@@ -17,7 +14,7 @@ export default function TotalInstancesWidget({
     () =>
       workflowId === null
         ? Promise.resolve(null)
-        : fetchWorkflowTotalInstances(workflowId),
+        : fetchWorkflowRunningInstances(workflowId),
     [workflowId],
   );
 
@@ -27,7 +24,7 @@ export default function TotalInstancesWidget({
     <StatCard
       icon="📁"
       value={error || !isReady ? "-" : (data?.value ?? "-")}
-      label="Total Instances"
+      label="Running Instances"
       description={error || !isReady ? "Unavailable" : "Selected workflow"}
       color="blue"
       loading={loading || !isReady}

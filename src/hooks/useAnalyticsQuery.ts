@@ -1,17 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 
-export function useAnalyticsQuery<T>(
-  queryFn: () => Promise<T>,
-  deps: unknown[] = []
+export function useAnalyticsQuery<T>( //query function that returns a promise of type T, and an optional dependency array
+  queryFn: () => Promise<T>, //T means generic type in TypeScript
+  deps: unknown[] = [] //dependency array for useEffect, default is empty array
 ) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
 
-  const queryRef = useRef(queryFn);
+  const queryRef = useRef(queryFn);//Stores the latest query function
 
   useEffect(() => {
-    queryRef.current = queryFn;
+    queryRef.current = queryFn; //whenever queryFn changes update the ref
   }, [queryFn]);
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export function useAnalyticsQuery<T>(
       setLoading(true);
 
       try {
-        const result = await queryRef.current();
+        const result = await queryRef.current(); //Calls API function
 
         if (!isMounted) return; 
 
@@ -42,7 +42,7 @@ export function useAnalyticsQuery<T>(
     fetchData();
 
     return () => {
-      isMounted = false;
+      isMounted = false; //Runs when component unmounts
     };
 
     // queryFn handled using useRef intentionally

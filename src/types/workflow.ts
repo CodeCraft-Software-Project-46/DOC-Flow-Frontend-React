@@ -28,8 +28,8 @@ export type WorkflowListResponse = WorkflowListItem[];
    API RESPONSE TYPES - Used in analyticsApi.ts
 ========================= */
 
-// Total instances count response from workflow endpoints - Used in TotalInstancesWidget.tsx
-export interface WorkflowTotalInstancesValueResponse {
+// Running instances count response from workflow endpoints - Used in RunningInstancesWidget.tsx
+export interface WorkflowRunningInstancesValueResponse {
   value: number;
 }
 

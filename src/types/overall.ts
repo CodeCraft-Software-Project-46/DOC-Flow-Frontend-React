@@ -64,6 +64,15 @@ export interface UserPerformanceItem {
   total_tasks?: number;
 }
 
+// Normalized user row used by UserPerformanceWidget.tsx
+export type User = {
+  name: string;
+  compliance: number;
+  avg: number;
+  breaches: number;
+  tasks: number;
+};
+
 // API response for user performance (flexible format) - Used in UserPerformanceWidget.tsx via analyticsApi.ts
 export type UserPerformanceResponse =
   | UserPerformanceItem[]

@@ -6,7 +6,7 @@ import SLAComplianceWidget from "../../components/widgets/overall/SLAComplianceW
 import SlaDistributionWidget from "../../components/widgets/overall/SlaDistributionWidget";
 import BottleneckWorkflowsWidget from "../../components/widgets/overall/BottleneckWorkflowsWidget";
 import UserPerformanceWidget from "../../components/widgets/overall/UserPerformanceWidget";
-import TotalInstancesWidget from "../../components/widgets/workflow/TotalInstancesWidget";
+import RunningInstancesWidget from "../../components/widgets/workflow/RunningInstancesWidget";
 import AvgCompletionTimeWidget from "../../components/widgets/workflow/AvgCompletionTimeWidget";
 import SLAComplianceWidgetWorkflow from "../../components/widgets/workflow/SLAComplianceWidget";
 import WorkflowStepFlowWidget from "../../components/widgets/workflow/WorkflowStepFlowWidget";
@@ -17,13 +17,12 @@ import {
 import type {
   WorkflowListItem,
 } from "../../types";
-//import { useAnalyticsQuery } from "../../hooks/useAnalyticsQuery";
 
 type Tab = "overall" | "workflow";
 type TimeRange = "7d" | "30d" | "90d" | "custom" | "all";
 
 export const AnalyticsPage = () => {
-  ////only allow values that match the Tab type.setTab("hello") are prevented by TypeScript
+  //only allow values that match the Tab type.setTab("hello") are prevented by TypeScript
   const [tab, setTab] = useState<Tab>("overall");
 
   const [timeRange, setTimeRange] = useState<TimeRange>("30d");
@@ -192,15 +191,12 @@ export const AnalyticsPage = () => {
               {/* SLA Charts */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
                 <SlaDistributionWidget />
-                {/* keep trend chart for later */}
               </div>
 
               {/* bottleneck + user sections */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
                 <BottleneckWorkflowsWidget/>
-                {/* I am passing a function called handleWorkflowSelect into BottleneckSteps not run just hand over... component Pass the handler to BottleneckSteps */}
                 <UserPerformanceWidget />
-                {/* onWorkflowSelect is a prop*/}
               </div>
             </div>
           </div>
@@ -223,6 +219,7 @@ export const AnalyticsPage = () => {
                 <span className="text-xs font-medium text-slate-500 whitespace-nowrap">
                   Select Workflow:
                 </span>
+                
                 <select
                   value={selectedWorkflowId ?? ""}
                   onChange={(e) =>
@@ -247,7 +244,7 @@ export const AnalyticsPage = () => {
 
             <div className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
-                <TotalInstancesWidget workflowId={selectedWorkflowId} />
+                <RunningInstancesWidget workflowId={selectedWorkflowId} />
                 <AvgCompletionTimeWidget workflowId={selectedWorkflowId} />
                 <SLAComplianceWidgetWorkflow workflowId={selectedWorkflowId} />
               </div>

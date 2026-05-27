@@ -1,14 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchUserPerformance } from "../../../api/analyticsApi";
-import type { UserPerformanceItem } from "../../../types";
-
-type User = {
-  name: string;
-  compliance: number;
-  avg: number;
-  breaches: number;
-  tasks: number;
-};
+import type { User, UserPerformanceItem } from "../../../types";
 
 function getComplianceStyles(compliance: number) {
   if (compliance >= 90) {
@@ -72,7 +64,6 @@ export default function UserPerformanceWidget() {
             breaches: item.breached_tasks ?? 0,
             tasks: item.total_tasks ?? 0,
           }))
-          .sort((a: User, b: User) => b.compliance - a.compliance);
 
         setUsers(formatted);
       } catch (err) {

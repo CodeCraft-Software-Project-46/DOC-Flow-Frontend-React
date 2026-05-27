@@ -3,6 +3,7 @@ import type { ActiveTasksDetailsProps } from "../../../types";
 type Props = ActiveTasksDetailsProps;
 
 export default function ActiveTasksDetails({ items, onClose }: Props) {
+  
   const formatOverdue = (days?: number, hours?: number): string => {
     if (days === null || days === undefined) {
       return "-";

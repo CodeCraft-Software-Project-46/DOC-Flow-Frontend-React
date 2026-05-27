@@ -22,13 +22,13 @@ export default function ActiveOverdueTasksWidget() {
         label="Active Overdue Tasks"
         description={error ? "Unavailable" : "Needs Attention"}
         color="red"
-        onClick={() => !loading && !error && setOpen(true)}
+        onClick={() => !loading && !error && setOpen(true)} //Open details modal on click if not loading or error
       />
 
       {open && (
-        <ActiveTasksDetails
-          onClose={() => setOpen(false)}
-          items={data?.tasks || []}
+        <ActiveTasksDetails //send 2 props to details component: onClose function and tasks array
+          onClose={() => setOpen(false)} 
+          items={data?.tasks || []}//send tasks array to details component. If no tasks → show empty array
         />
       )}
     </>
