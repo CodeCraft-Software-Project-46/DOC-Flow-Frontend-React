@@ -8,7 +8,6 @@ describe('workingHoursService', () => {
     workEndTime: '17:00',
     workDays: [1, 2, 3, 4, 5], // Monday to Friday
     holidays: [],
-    timeZone: 'UTC',
   };
 
   describe('getWorkingHoursPerDay', () => {

@@ -11,6 +11,7 @@ import AvgCompletionTimeWidget from "../../components/widgets/workflow/AvgComple
 import SLAComplianceWidgetWorkflow from "../../components/widgets/workflow/SLAComplianceWidget";
 import WorkflowStepFlowWidget from "../../components/widgets/workflow/WorkflowStepFlowWidget";
 import InstanceDrilldownWidget from "../../components/widgets/workflow/InstanceDrilldownWidget";
+import MyPerformanceWidget from "../../components/widgets/personal/MyPerformanceWidget";
 import {
   fetchWorkflows,
 } from "../../api/analyticsApi";
@@ -18,14 +19,14 @@ import type {
   WorkflowListItem,
 } from "../../types";
 
-type Tab = "overall" | "workflow";
+type Tab = "overall" | "workflow" | "my-performance";
 type TimeRange = "7d" | "30d" | "90d" | "custom" | "all";
 
 export const AnalyticsPage = () => {
   //only allow values that match the Tab type.setTab("hello") are prevented by TypeScript
   const [tab, setTab] = useState<Tab>("overall");
 
-  const [timeRange, setTimeRange] = useState<TimeRange>("30d");
+  const [timeRange, setTimeRange] = useState<TimeRange>("all");
 
   const [customFromDate, setCustomFromDate] = useState("");
   const [customToDate, setCustomToDate] = useState("");
@@ -70,12 +71,37 @@ export const AnalyticsPage = () => {
     return true;
   };
 
+  // Converts the selected time range into "from"/"to" date bounds (YYYY-MM-DD) sent to every widget below.
+  // Filtering is applied against each task's completed_at on the backend, not created_at.
+  const toDateInputString = (d: Date) => d.toISOString().slice(0, 10);
+
+  const { dateFrom, dateTo } = (() => {
+    if (timeRange === "all") return { dateFrom: undefined, dateTo: undefined };
+
+    if (timeRange === "custom") {
+      const isValidRange =
+        !!customFromDate &&
+        !!customToDate &&
+        new Date(customToDate) >= new Date(customFromDate);
+      if (!isValidRange) {
+        return { dateFrom: undefined, dateTo: undefined };
+      }
+      return { dateFrom: customFromDate, dateTo: customToDate };
+    }
+
+    const days = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90;
+    const to = new Date();
+    const from = new Date();
+    from.setDate(from.getDate() - days);
+    return { dateFrom: toDateInputString(from), dateTo: toDateInputString(to) };
+  })();
+
   return (
     
     <div className="min-h-screen bg-slate-100 font-sans">
       {/* ── Tab Bar overall or workflow ── */}
       <div className="bg-white border-b border-slate-200 px-8 flex -mt-2">
-        {(["overall", "workflow"] as Tab[]).map(
+        {(["overall", "workflow", "my-performance"] as Tab[]).map(
           (
             t,                                                        ///map loops through the array and creates UI for each item. So it runs twice create 2 buttons
           ) => (
@@ -88,7 +114,11 @@ export const AnalyticsPage = () => {
                   : "border-transparent text-slate-500 hover:text-slate-700"
               }`}
             >
-              {t === "overall" ? "Overall Analytics" : "Workflow Analytics"}
+              {t === "overall"
+                ? "Overall Analytics"
+                : t === "workflow"
+                  ? "Workflow Analytics"
+                  : "My Performance"}
             </button>
           ),
         )}
@@ -184,19 +214,19 @@ export const AnalyticsPage = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
-                <CompletedTasksWidget />
-                <SLAComplianceWidget />
+                <CompletedTasksWidget dateFrom={dateFrom} dateTo={dateTo} />
+                <SLAComplianceWidget dateFrom={dateFrom} dateTo={dateTo} />
               </div>
 
               {/* SLA Charts */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
-                <SlaDistributionWidget />
+                <SlaDistributionWidget dateFrom={dateFrom} dateTo={dateTo} />
               </div>
 
               {/* bottleneck + user sections */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
-                <BottleneckWorkflowsWidget/>
-                <UserPerformanceWidget />
+                <BottleneckWorkflowsWidget dateFrom={dateFrom} dateTo={dateTo} />
+                <UserPerformanceWidget dateFrom={dateFrom} dateTo={dateTo} />
               </div>
             </div>
           </div>
@@ -251,6 +281,24 @@ export const AnalyticsPage = () => {
               <WorkflowStepFlowWidget workflowId={selectedWorkflowId} />
               <InstanceDrilldownWidget workflowId={selectedWorkflowId} />
             </div>
+          </div>
+        )}
+
+        {/* ══ MY PERFORMANCE TAB ══ */}
+        {tab === "my-performance" && (
+          <div className="space-y-5">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">
+                My Performance
+              </h2>
+              <p className="text-sm text-slate-500 mt-1">
+                Individual task history and SLA performance, with its own user and time-range picker
+              </p>
+            </div>
+
+            {/* Self-contained widget — owns its own filters, so it can be
+                dropped onto any page (e.g. a personal dashboard) as-is. */}
+            <MyPerformanceWidget />
           </div>
         )}
       </div>

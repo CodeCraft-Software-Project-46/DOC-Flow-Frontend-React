@@ -3,9 +3,16 @@ import { fetchCompletedTasks } from "../../../api/analyticsApi.ts";
 import type { CompletedTasksResponse } from "../../../types";
 import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery.ts";
 
-export default function CompletedTasksWidget() {
-  const { data, loading, error } =
-    useAnalyticsQuery<CompletedTasksResponse>(fetchCompletedTasks);
+type Props = {
+  dateFrom?: string;
+  dateTo?: string;
+};
+
+export default function CompletedTasksWidget({ dateFrom, dateTo }: Props) {
+  const { data, loading, error } = useAnalyticsQuery<CompletedTasksResponse>(
+    () => fetchCompletedTasks({ from: dateFrom, to: dateTo }),
+    [dateFrom, dateTo],
+  );
 
   // keeps UI stable even if backend fails
   const value = error ? "-" : (data?.count ?? "-");

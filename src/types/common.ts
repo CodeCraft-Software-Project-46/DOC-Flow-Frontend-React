@@ -31,11 +31,21 @@ export type StepStatus = "Met" | "Breached" | "At Risk" | "Pending";
 ========================= */
 
 // Working hours configuration for SLA calculations
-// Used in: WorkingHoursModal.tsx, SettingsPage.tsx
+// Used in: WorkingScheduleModal.tsx, HolidaysModal.tsx, SettingsPage.tsx
 export interface WorkingHoursConfig {
   workStartTime: string;      // HH:MM format
   workEndTime: string;        // HH:MM format
   workDays: number[];         // 0=Sunday, 1=Monday, etc.
   holidays: string[];         // YYYY-MM-DD format
-  timeZone?: string;
+}
+
+// Weights blended into a workflow's bottleneck score (avg completion time,
+// SLA breach %, task volume). Need not sum to 1 — the backend normalizes
+// them — but the UI shows the normalized split so admins can see what will
+// actually be applied.
+// Used in: BottleneckWeightsModal.tsx, SettingsPage.tsx
+export interface BottleneckScoreWeights {
+  timeWeight: number;
+  breachWeight: number;
+  volumeWeight: number;
 }

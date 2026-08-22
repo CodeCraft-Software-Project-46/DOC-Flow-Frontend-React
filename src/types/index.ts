@@ -8,6 +8,7 @@ export type {
 	StepStatus,
 	// Business logic
 	WorkingHoursConfig,
+	BottleneckScoreWeights,
 } from "./common";
 
 export type {
@@ -57,3 +58,14 @@ export type {
 } from "./workflow";
 
 export type { ChatMessage } from "./chatTypes";
+
+export type {
+	// My Performance Widget (single logged-in user)
+	UserListItem,
+	UserListResponse,
+	MyPerformanceTask,
+	MyPerformanceSummary,
+	MyPerformanceTrendPoint,
+	MyPerformanceMotivation,
+	MyPerformanceResponse,
+} from "./personal";

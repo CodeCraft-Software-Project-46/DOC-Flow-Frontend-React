@@ -40,14 +40,20 @@ function getComplianceWidthClass(compliance: number) {
   return "w-0";
 }
 
-export default function UserPerformanceWidget() {
+type Props = {
+  dateFrom?: string;
+  dateTo?: string;
+};
+
+export default function UserPerformanceWidget({ dateFrom, dateTo }: Props) {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
+      setLoading(true);
       try {
-        const res = await fetchUserPerformance();
+        const res = await fetchUserPerformance({ from: dateFrom, to: dateTo });
 
         const raw = Array.isArray(res) ? res : (res.data ?? []);
 
@@ -75,10 +81,10 @@ export default function UserPerformanceWidget() {
     };
 
     load();
-  }, []);
+  }, [dateFrom, dateTo]);
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-6">
+    <div className="bg-white rounded-2xl shadow-sm p-6 flex flex-col h-full">
       <div className="font-semibold text-slate-900 text-base">
         👤 SLA Compliance by User
       </div>
@@ -87,7 +93,7 @@ export default function UserPerformanceWidget() {
         Users with Highest SLA Compliance
       </div>
 
-      <div className="flex flex-col gap-5 min-h-[160px]">
+      <div className="flex flex-col gap-5 min-h-[160px] flex-1">
         {loading ? (
           <div className="flex items-center min-h-[160px] text-xs text-slate-400">
             Loading users...

@@ -3,9 +3,16 @@ import { fetchSLACompliance } from "../../../api/analyticsApi";
 import type { SLAComplianceResponse } from "../../../types";
 import { useAnalyticsQuery } from "../../../hooks/useAnalyticsQuery";
 
-export default function SLAComplianceWidget() {
-  const { data, loading, error } =
-    useAnalyticsQuery<SLAComplianceResponse>(fetchSLACompliance);
+type Props = {
+  dateFrom?: string;
+  dateTo?: string;
+};
+
+export default function SLAComplianceWidget({ dateFrom, dateTo }: Props) {
+  const { data, loading, error } = useAnalyticsQuery<SLAComplianceResponse>(
+    () => fetchSLACompliance({ from: dateFrom, to: dateTo }),
+    [dateFrom, dateTo],
+  );
 
   const value = error ? "-" : (data?.percentage ?? "-");
 

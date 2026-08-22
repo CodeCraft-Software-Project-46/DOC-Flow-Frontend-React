@@ -11,14 +11,20 @@ type SLAItem = {
   color: string;
 };
 
-export default function SlaDistributionWidget() {
+type Props = {
+  dateFrom?: string;
+  dateTo?: string;
+};
+
+export default function SlaDistributionWidget({ dateFrom, dateTo }: Props) {
   const [data, setData] = useState<SLAItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
+      setLoading(true);
       try {
-        const res = await fetchSLADistribution();
+        const res = await fetchSLADistribution({ from: dateFrom, to: dateTo });
 
         // Transform API response to chart format
         const formatted: SLAItem[] = res.map((item: SLADistributionPoint) => {//Go through every item in the array and transform it to SLAItem format
@@ -41,7 +47,7 @@ export default function SlaDistributionWidget() {
     };
 
     load();
-  }, []);
+  }, [dateFrom, dateTo]);
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6">

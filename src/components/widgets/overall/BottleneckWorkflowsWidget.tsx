@@ -4,9 +4,14 @@ import { useEffect, useState } from "react";
 import { fetchBottlenecks } from "../../../api/analyticsApi";
 import type { BottleneckWorkflow, BottleneckItem } from "../../../types";
 
-export default function BottleneckWorkflows() {
+type Props = {
+  dateFrom?: string;
+  dateTo?: string;
+};
 
-  const [data, setData] = useState<BottleneckItem[]>([]); 
+export default function BottleneckWorkflows({ dateFrom, dateTo }: Props) {
+
+  const [data, setData] = useState<BottleneckItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -14,7 +19,7 @@ export default function BottleneckWorkflows() {
       setLoading(true);
 
       try {
-        const res = await fetchBottlenecks(); //API call 
+        const res = await fetchBottlenecks({ from: dateFrom, to: dateTo }); //API call
 
         const raw = Array.isArray(res) //check if response is already an array 
           ? res
@@ -46,7 +51,7 @@ export default function BottleneckWorkflows() {
     };
 
     load();
-  }, []);
+  }, [dateFrom, dateTo]);
 
   function getScoreStyle(score: number) {  // Determines bar color based on bottleneck score
     if (score >= 0.7) {
