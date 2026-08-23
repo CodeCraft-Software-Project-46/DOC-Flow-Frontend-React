@@ -103,6 +103,24 @@ const DocumentPage: React.FC = () => {
   };
   // ---------------------------------
 
+  const handleTogglePipeline = async (mappingId: number, currentStatus: boolean) => {
+    try {
+      const newStatus = !currentStatus;
+      
+      await axios.patch(`http://localhost:8000/api/documents/mappings/${mappingId}/`, {
+        is_active: newStatus
+      });
+      
+      message.success(`Pipeline ${newStatus ? 'activated' : 'disabled'} successfully.`);
+      fetchPipelinesAndLinks(); // Refreshes the table to show the new status
+      
+    } catch (error) {
+      console.error("Failed to toggle pipeline:", error);
+      message.error("Error updating pipeline status.");
+    }
+  };
+  
+  
   const handleRevokeLink = async (id: string) => {
     try {
       await axios.post(`http://localhost:8000/api/documents/upload-links/${id}/revoke/`);
@@ -132,18 +150,26 @@ const DocumentPage: React.FC = () => {
       ),
     },
     { title: 'Target Workflow', dataIndex: 'workflow_name', key: 'workflow_name' },
+    
+    // --- UPDATED STATUS COLUMN ---
     {
       title: 'Status',
-      dataIndex: 'is_active',
       key: 'is_active',
-      render: (isActive: boolean) => (
-        <Tag color={isActive ? 'green' : 'red'}>
-          {isActive ? 'Active (Scanning)' : 'Disabled'}
-        </Tag>
+      render: (_: any, record: FolderMapping) => (
+        <button
+          onClick={() => handleTogglePipeline(record.id, record.is_active)}
+          className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-colors border ${
+            record.is_active 
+              ? 'bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700 border-green-200' 
+              : 'bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 border-red-200'
+          }`}
+        >
+          {record.is_active ? 'Active (Scanning)' : 'Disabled'}
+        </button>
       ),
     },
+    // -----------------------------
   ];
-
   const linkColumns = [
     { title: 'Target Document Type', dataIndex: 'document_type_name', render: (text: string) => <span className="font-semibold text-gray-800">{text}</span> },
     { title: 'Workflow ID', dataIndex: 'workflow_id', render: (text: string) => <span className="font-mono text-xs bg-gray-100 p-1 rounded">{text}</span> },
