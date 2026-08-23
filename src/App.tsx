@@ -1,7 +1,5 @@
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
 
-
-
 // Layouts
 import { RootLayout } from "./components/RootLayout"; //  Used for ALL pages after login,(Contains the Sidebar,Header & main contentarea)
 import {ProtectedRoute} from "./components/ProtectedRoute.tsx";// frontend security(check if user is logged in, if not redirect to login page)
@@ -18,12 +16,18 @@ import {WorkFlowInstances} from "./pages/workflow/WorkFlowInstances.tsx";
 import {AnalyticsPage} from "./pages/analytics/AnalyticsPage.tsx";
 import {DocumentTypesPage} from "./pages/documents/DocumentTypesPage.tsx";
 
+// --- NEW: Import the external upload page ---
+import ExternalUploadPage from "./pages/documents/ExternalUploadPage.tsx";
+
 export default function App() {
     const routes = createBrowserRouter([   //define all routes inside this
-        // 1. Login Route
+        // 1. PUBLIC ROUTES (No login required)
         { path: "/", element: <SignIn /> },
+        
+        // NEW: Public route for external vendors using API links
+        { path: "/external-upload/:linkId", element: <ExternalUploadPage /> },
 
-        // 2. Protected App Routes
+        // 2. PROTECTED APP ROUTES
         {
             element: <RootLayout />, //Share same layout (sidebar + header)
             children: [
@@ -38,8 +42,6 @@ export default function App() {
                         { path: "/workflow-version", element: <WorkFlowVersionPage /> },
                         { path: "/instances", element: <WorkFlowInstances /> },
                         { path: "/settings", element: <SettingsPage /> },
-                        
-
                         { path: "/user", element: <UserPage /> },
                         { path: "/analytics", element: <AnalyticsPage/> },
                     ]
