@@ -63,7 +63,12 @@ export const SettingsPage = () => {
       const result = await saveWorkingHours(updated);
       setConfig(result);
     } catch (error) {
+      // Rethrow: the modal that triggered this is the only place that can
+      // keep the admin's unsaved values on screen and show them why the
+      // save was rejected. Swallowing it here made a rejected save look
+      // exactly like a successful one that changed nothing.
       console.error("Save failed:", error);
+      throw error;
     } finally {
       setSaving(false);
     }

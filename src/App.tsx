@@ -1,8 +1,10 @@
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
+import { Kanban, Bell, Clock, Shield } from "lucide-react";
 
 // Layouts
 import { RootLayout } from "./components/RootLayout";
 import { ProtectedRoute } from "./components/ProtectedRoute.tsx";
+import { EmptyStatePage } from "./components/EmptyStatePage.tsx";
 
 import { DocumentPage } from "./pages/documents/DocumentPage";
 import { SettingsPage } from "./pages/settings/SettingsPage.tsx";
@@ -38,6 +40,10 @@ export default function App() {
             { path: "/settings", element: <SettingsPage /> },
             { path: "/user", element: <UserPage /> },
             { path: "/analytics", element: <AnalyticsPage /> },
+            { path: "/role-task-board", element: <EmptyStatePage title="Role Task Board" icon={Kanban} /> },
+            { path: "/notifications", element: <EmptyStatePage title="Notifications" icon={Bell} /> },
+            { path: "/my-activity", element: <EmptyStatePage title="My Activity" icon={Clock} /> },
+            { path: "/audit-logs", element: <EmptyStatePage title="Audit Logs" icon={Shield} /> },
           ],
         },
       ],

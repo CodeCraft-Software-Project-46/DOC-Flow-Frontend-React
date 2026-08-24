@@ -49,3 +49,36 @@ export interface BottleneckScoreWeights {
   breachWeight: number;
   volumeWeight: number;
 }
+
+/* =========================
+   MANUAL TASK CREATION (SLA testing)
+========================= */
+
+// Payload for the "New Task" floating button on the analytics dashboard.
+// created_at is never sent from the client — the backend always stamps it
+// with the server's current time.
+// Used in: CreateTaskFab.tsx
+export interface CreateTaskPayload {
+  taskName: string;
+  slaHours: number;
+}
+
+export interface CreateTaskResult {
+  taskId: number;
+  taskName: string;
+  workflowInstanceId: number;
+  createdAt: string;
+  dueAt: string | null;
+  slaHours: number;
+}
+
+// A not-yet-completed task in the "Open Tasks" list, with a Complete button.
+// Used in: CreateTaskFab.tsx
+export interface OpenTask {
+  taskId: number;
+  taskName: string | null;
+  status: string;
+  createdAt: string;
+  dueAt: string | null;
+  slaStatus: string | null;
+}

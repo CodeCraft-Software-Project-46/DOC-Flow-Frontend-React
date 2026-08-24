@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getWorkingHours, saveWorkingHours } from './WorkingHoursAPI';
+import { getWorkingHours, saveWorkingHours } from '../api/WorkingHoursAPI';
 
 describe('WorkingHoursAPI (basic)', () => {
   it('exports the API functions', () => {

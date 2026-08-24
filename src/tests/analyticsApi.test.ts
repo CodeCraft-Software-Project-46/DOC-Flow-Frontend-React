@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { mockGet } = vi.hoisted(() => ({ mockGet: vi.fn() }));
 
@@ -24,14 +24,13 @@ import {
 } from "../api/analyticsApi";
 
 describe("analyticsApi", () => {
+  beforeEach(() => {
+    mockGet.mockReset();
+  });
+
   it.each([
-    ["overall SLA compliance", fetchSLACompliance, "/api/analytics/widgets/sla-compliance/"],
-    ["SLA distribution", fetchSLADistribution, "/api/analytics/widgets/sla-distribution/"],
     ["running documents", fetchRunningDocuments, "/api/analytics/widgets/running-documents/"],
     ["active and overdue tasks", fetchActiveOverdueTasks, "/api/analytics/widgets/active-overdue-tasks/"],
-    ["completed tasks", fetchCompletedTasks, "/api/analytics/widgets/completed-tasks/"],
-    ["bottleneck workflows", fetchBottlenecks, "/api/analytics/widgets/bottleneck-workflows/"],
-    ["user performance", fetchUserPerformance, "/api/analytics/widgets/user-performance/"],
     ["workflow list", fetchWorkflows, "/api/analytics/widgets/workflows/"],
   ])("requests %s from its endpoint", async (_name, request, endpoint) => {
     const payload = { success: true };
@@ -39,6 +38,38 @@ describe("analyticsApi", () => {
 
     await expect(request()).resolves.toEqual(payload);
     expect(mockGet).toHaveBeenCalledWith(endpoint);
+  });
+
+  // These widgets share the "Overall Analytics" ?from=&to= date-range filter
+  // (see DateRangeParams in analyticsApi.ts), so they always pass a params
+  // object -- empty when the caller doesn't filter by date.
+  it.each([
+    ["overall SLA compliance", fetchSLACompliance, "/api/analytics/widgets/sla-compliance/"],
+    ["SLA distribution", fetchSLADistribution, "/api/analytics/widgets/sla-distribution/"],
+    ["completed tasks", fetchCompletedTasks, "/api/analytics/widgets/completed-tasks/"],
+    ["bottleneck workflows", fetchBottlenecks, "/api/analytics/widgets/bottleneck-workflows/"],
+    ["user performance", fetchUserPerformance, "/api/analytics/widgets/user-performance/"],
+  ])("requests %s from its endpoint with no date filter by default", async (_name, request, endpoint) => {
+    const payload = { success: true };
+    mockGet.mockResolvedValueOnce({ data: payload });
+
+    await expect(request()).resolves.toEqual(payload);
+    expect(mockGet).toHaveBeenCalledWith(endpoint, { params: {} });
+  });
+
+  it.each([
+    ["overall SLA compliance", fetchSLACompliance, "/api/analytics/widgets/sla-compliance/"],
+    ["SLA distribution", fetchSLADistribution, "/api/analytics/widgets/sla-distribution/"],
+    ["completed tasks", fetchCompletedTasks, "/api/analytics/widgets/completed-tasks/"],
+    ["bottleneck workflows", fetchBottlenecks, "/api/analytics/widgets/bottleneck-workflows/"],
+    ["user performance", fetchUserPerformance, "/api/analytics/widgets/user-performance/"],
+  ])("forwards the selected date range to %s's endpoint", async (_name, request, endpoint) => {
+    const payload = { success: true };
+    const range = { from: "2024-01-01", to: "2024-01-31" };
+    mockGet.mockResolvedValueOnce({ data: payload });
+
+    await expect(request(range)).resolves.toEqual(payload);
+    expect(mockGet).toHaveBeenCalledWith(endpoint, { params: range });
   });
 
   it.each([

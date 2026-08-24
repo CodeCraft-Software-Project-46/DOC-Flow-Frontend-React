@@ -18,16 +18,6 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                     ☰
                 </button>
 
-                {/* Left Section - Welcome Text (hidden on mobile) */}
-                <div className="hidden md:flex flex-col min-w-0">
-                    <h1 className="text-2xl font-semibold text-gray-900 mb-1">
-                        Welcome, Alice Cooper
-                    </h1>
-                    <p className="text-sm text-gray-600">
-                        Your tasks and documents overview
-                    </p>
-                </div>
-
                 {/* Center Section - Search */}
                 <div className="flex-1 max-w-lg min-w-0">
                     <div className="relative">
@@ -46,8 +36,8 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                         <input
                             type="text"
                             className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none transition-all focus:bg-white focus:border-blue-500 focus:ring-3 focus:ring-blue-100 placeholder:text-gray-400"
-                            placeholder="Search workflows..."
-                            aria-label="Search workflows"
+                            placeholder="Search workflows & documents..."
+                            aria-label="Search workflows & documents"
                         />
                     </div>
                 </div>
@@ -77,13 +67,13 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                     <div className="flex items-center gap-3 cursor-pointer p-2 hover:bg-gray-100 rounded-lg transition-colors group">
                         {/* Avatar always visible */}
                         <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
-                            AC
+                            SK
                         </div>
 
                         {/* Name hidden on mobile */}
                         <div className="hidden lg:flex flex-col gap-0.5">
-                            <div className="text-sm font-medium text-gray-900">Alice Cooper</div>
-                            <div className="text-xs text-gray-600">Staff / Initiator</div>
+                            <div className="text-sm font-medium text-gray-900">Savandi Kodithuwakku</div>
+                            <div className="text-xs text-gray-600">Super-Administrator</div>
                         </div>
 
                         {/* Dropdown arrow hidden on mobile */}

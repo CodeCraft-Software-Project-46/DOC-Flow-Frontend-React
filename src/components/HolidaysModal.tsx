@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Plus, Trash2 } from "lucide-react";
 import type { WorkingHoursConfig } from "../types";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (config: WorkingHoursConfig) => void;
+  // Rejects when the backend refuses the save, so this modal can stay open
+  // and show why instead of closing over a change that never landed.
+  onSave: (config: WorkingHoursConfig) => Promise<void>;
   // The working schedule (start/end time, working days) that this modal
   // never touches — required because holidays live on the same backend
   // record. If null (no schedule configured yet), holiday editing is
@@ -29,6 +31,19 @@ export function HolidaysModal({
   const [newHoliday, setNewHoliday] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  // The modal never unmounts (isOpen only toggles whether it renders), so
+  // without this its local state would leak between opens: holidays added
+  // then cancelled would come back, and the saved list from the server
+  // would never replace the stale one this component started with.
+  useEffect(() => {
+    if (isOpen) {
+      setHolidays(baseConfig?.holidays ?? []);
+      setNewHoliday("");
+      setError(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const addHoliday = () => {
@@ -51,11 +66,19 @@ export function HolidaysModal({
     setHolidays((prev) => prev.filter((h) => h !== holiday));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!baseConfig) return;
 
-    onSave({ ...baseConfig, holidays });
-    onClose();
+    try {
+      await onSave({ ...baseConfig, holidays });
+      onClose();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong while saving. Please try again."
+      );
+    }
   };
 
   return (

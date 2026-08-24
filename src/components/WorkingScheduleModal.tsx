@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, AlertTriangle } from "lucide-react";
 import type { WorkingHoursConfig } from "../types";
 import {
@@ -9,7 +9,9 @@ import {
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (config: WorkingHoursConfig) => void;
+  // Rejects when the backend refuses the save, so this modal can stay open
+  // and show why instead of closing over a change that never landed.
+  onSave: (config: WorkingHoursConfig) => Promise<void>;
   initialConfig: WorkingHoursConfig | null;
   saving: boolean;
 }
@@ -57,15 +59,40 @@ export function WorkingScheduleModal({
   const [errors, setErrors] = useState<string[]>([]);
   const [confirming, setConfirming] = useState(false);
 
+  // The modal never unmounts (isOpen just toggles whether it renders), so
+  // without this its local state would leak between opens: a stale edited-
+  // but-never-saved draft would reappear, and — worse — `confirming` would
+  // stay true after a confirmed save, permanently hiding the editable form
+  // behind the "you're changing the schedule" warning on every future open.
+  useEffect(() => {
+    if (isOpen) {
+      setConfig(initialConfig ?? EMPTY_CONFIG);
+      setErrors([]);
+      setConfirming(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
-  const commitSave = () => {
-    // Holidays live in their own modal — carry them through untouched.
-    onSave({
-      ...config,
-      holidays: initialConfig?.holidays ?? [],
-    });
-    onClose();
+  const commitSave = async () => {
+    try {
+      // Holidays live in their own modal — carry them through untouched.
+      await onSave({
+        ...config,
+        holidays: initialConfig?.holidays ?? [],
+      });
+      onClose();
+    } catch (error) {
+      // Drop back to the form (not the confirmation screen) so the entered
+      // values are still on screen next to the reason they were rejected.
+      setConfirming(false);
+      setErrors([
+        error instanceof Error
+          ? error.message
+          : "Something went wrong while saving. Please try again.",
+      ]);
+    }
   };
 
   const handleSave = () => {

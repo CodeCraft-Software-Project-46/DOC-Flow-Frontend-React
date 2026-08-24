@@ -148,3 +148,25 @@ export interface CompletedTasksResponse {
 export interface SLAComplianceResponse {
   percentage: number;
 }
+
+/* =========================
+   TASK INSTANCES TABLE - Used in TaskInstancesTableWidget.tsx
+========================= */
+
+// Raw analytics_task_instance row, filtered by the shared time-range bar
+// (created_at-based, unlike the completed_at-based filter most other
+// Overall widgets use — this table needs to show not-yet-completed tasks
+// too, so status/sla_status show real variety).
+export interface TaskInstanceRow {
+  task_id: number;
+  task_name: string | null;
+  created_at: string;
+  status: string;
+  due_at: string | null;
+  sla_hours: number;
+  completed_at: string | null;
+  sla_status: string | null;
+}
+
+// API response for the task instances table - Used in TaskInstancesTableWidget.tsx via analyticsApi.ts
+export type TaskInstancesResponse = TaskInstanceRow[];

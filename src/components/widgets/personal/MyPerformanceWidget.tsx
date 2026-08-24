@@ -15,46 +15,6 @@ type TimeRange = "7d" | "30d" | "90d" | "custom" | "all";
 
 const toDateInputString = (d: Date) => d.toISOString().slice(0, 10);
 
-function getMotivationCopy(data: MyPerformanceResponse) {
-  const { motivation, summary } = data;
-
-  if (motivation.trend_direction === "insufficient_data") {
-    return {
-      tone: "neutral" as const,
-      text:
-        "Not enough completed tasks yet in this range to show a day-by-day trend — complete a few more tasks to start tracking your progress.",
-    };
-  }
-
-  const from = motivation.first_half_avg ?? summary.breach_percentage;
-  const to = motivation.second_half_avg ?? summary.breach_percentage;
-
-  if (motivation.trend_direction === "improving") {
-    return {
-      tone: "good" as const,
-      text: `Great progress! Your SLA breach rate dropped from ${from}% to ${to}% across this period — keep it up and aim for zero breaches.`,
-    };
-  }
-
-  if (motivation.trend_direction === "worsening") {
-    return {
-      tone: "bad" as const,
-      text: `Your SLA breach rate rose from ${from}% to ${to}% across this period. Try to prioritize upcoming tasks earlier to bring it back down.`,
-    };
-  }
-
-  return {
-    tone: "neutral" as const,
-    text: `You're holding steady at around ${to}% breaches. Small, consistent improvements each day will help push that down further.`,
-  };
-}
-
-const TONE_STYLES = {
-  good: "bg-green-50 border-green-200 text-green-700",
-  bad: "bg-red-50 border-red-200 text-red-700",
-  neutral: "bg-blue-50 border-blue-200 text-blue-700",
-};
-
 export default function MyPerformanceWidget() {
   // ── user picker ──
   const usersQuery = useCallback(() => fetchUsers(), []);
@@ -126,17 +86,15 @@ export default function MyPerformanceWidget() {
     ];
   }, [data]);
 
-  const motivation = data ? getMotivationCopy(data) : null;
-
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6">
       <div className="flex items-start justify-between gap-4 flex-wrap mb-4">
         <div>
           <div className="font-semibold text-slate-900 text-base">
-            My Performance
+            Individual User Performance
           </div>
           <div className="text-xs text-slate-400 mt-1">
-            Your task history and SLA performance over time
+            Selected user's task history and SLA performance over time
           </div>
         </div>
 
@@ -346,15 +304,6 @@ export default function MyPerformanceWidget() {
               </tbody>
             </table>
           </div>
-
-          {/* Motivational message */}
-          {motivation && (
-            <div
-              className={`border rounded-xl px-4 py-3 text-sm font-medium ${TONE_STYLES[motivation.tone]}`}
-            >
-              {motivation.text}
-            </div>
-          )}
         </div>
       )}
     </div>
