@@ -8,7 +8,7 @@ type HeaderProps = {
 const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
     return (
         <header className="bg-white shadow-sm sticky top-0 z-50">
-            <div className="flex justify-between items-center gap-6 px-4 md:px-8 py-4">
+            <div className="flex justify-between items-center gap-6 px-4 md:px-8 py-2 md:py-3">
 
                 {/* Mobile Hamburger */}
                 <button

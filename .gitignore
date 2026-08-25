@@ -1,0 +1,34 @@
+# dependencies
+node_modules/
+
+# production build output
+dist/
+
+# local env files
+.env
+.env.*
+!.env.example
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# test and coverage output
+coverage/
+
+# cache directories
+.cache/
+.parcel-cache/
+.eslintcache
+*.tsbuildinfo
+
+# local-only overrides
+*.local
+
+# editor/system
+.vscode/
+.DS_Store
+Thumbs.db

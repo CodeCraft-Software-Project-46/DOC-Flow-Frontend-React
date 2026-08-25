@@ -39,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
     const configMenu = [
         { name: "Dashboard Builder", path: "/dashboard-builder", icon: LayoutDashboard },
-        { name: "Analytics & Charts", path: "/analytics", icon: BarChart3 },
+        { name: "Analytics Dashboard", path: "/analytics", icon: BarChart3 },
         { name: "Document Types", path: "/document-types", icon: Folder },
         { name: "Workflows-Versions", path: "/workflow-version", icon:GitBranch},
         { name: "Roles & Users", path: "/user", icon: Users },
@@ -61,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 className={`
                     fixed md:static z-50
                     w-72 h-screen
-                    bg-[#0F1E2E]
+                    bg-slate-900
                     border-r border-white/5
                     transform transition-transform duration-300
                     ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
@@ -71,7 +71,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
                     {/* Logo */}
                     <div className="flex items-center gap-3 mb-10">
-                        <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+                        <div className="w-10 h-10 bg-blue-700 rounded-xl flex items-center justify-center">
                             <LayoutDashboard size={18} className="text-white" />
                         </div>
                         <span className="text-lg font-semibold text-white">
@@ -91,7 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                                         flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all
                                         ${
                                         selectedKey === item.path
-                                            ? "bg-blue-500/20 text-white"
+                                            ? "bg-blue-600/20 text-blue-100"
                                             : "text-white/60 hover:bg-white/5 hover:text-white"
                                     }
                                     `}
@@ -105,7 +105,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
                     {/* Configuration Section */}
                     <div className="mt-5">
-                        <p className="text-xs text-blue-400/60 tracking-widest mb-3 px-3">
+                        <p className="text-xs text-slate-400 tracking-widest mb-3 px-3">
                             CONFIGURATION
                         </p>
 
@@ -120,7 +120,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                                             flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all
                                             ${
                                             selectedKey === item.path
-                                                ? "bg-blue-500/20 text-white"
+                                                ? "bg-blue-600/20 text-blue-100"
                                                 : "text-white/60 hover:bg-white/5 hover:text-white"
                                         }
                                         `}

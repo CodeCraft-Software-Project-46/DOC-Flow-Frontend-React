@@ -40,3 +40,12 @@
 .read-the-docs {
   color: #888;
 }
+
+/* ChatBot Loading Animation */
+.chat-bounce-delay-200 {
+  animation-delay: 200ms;
+}
+
+.chat-bounce-delay-400 {
+  animation-delay: 400ms;
+}
