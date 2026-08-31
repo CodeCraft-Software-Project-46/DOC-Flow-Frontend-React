@@ -31,8 +31,8 @@ export function RootLayout() {
             />
             <div className=" flex-1 flex flex-col h-screen overflow-hidden">
                 <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} currentPage={selectedKey} />
-                <main className="flex-1 overflow-auto p-2 md:p-3">
-                    <div className="bg-gray-50  shadow-sm p-1 md:p-2 min-h-full">
+                <main className="flex-1 overflow-auto ">
+                    <div className="bg-gray-50  shadow-sm 6 min-h-full">
                         {/* This is where the child routes (Dashboard, Documents) will render */}
                         <Outlet />
                     </div>
