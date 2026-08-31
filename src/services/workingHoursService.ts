@@ -41,6 +41,12 @@ export const validateWorkingHoursConfig = (
 
   if (workStartTime === workEndTime) {
     errors.push("Start and end time cannot be the same"); //09:00 → 09:00 (0 hours ❌) = invalid configuration no working hours
+  } else if (toMinutes(workStartTime) > toMinutes(workEndTime)) {
+    // The backend refuses start >= end outright (a window that wraps past
+    // midnight would give the SLA engine zero-or-negative hours per day).
+    // Catch it here too — otherwise the save round-trips only to come back
+    // as a 400 the admin has to decode.
+    errors.push("Start time must be earlier than end time");
   }
 
   if (!config.holidays.every((h) => /^\d{4}-\d{2}-\d{2}$/.test(h))) {

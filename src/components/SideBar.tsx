@@ -5,12 +5,15 @@ import {
     Activity,
     Workflow,
     BarChart3,
-    Folder,
     Users,
     Bell,
-    Settings,
     HelpCircle,
-    GitBranch
+    History,
+    SlidersHorizontal,
+    Kanban,
+    Clock,
+    Shield,
+    Settings,
 } from "lucide-react";
 
 
@@ -29,24 +32,72 @@ const Sidebar: React.FC<SidebarProps> = ({
                                              selectedKey,
                                              onMenuClick,
                                          }) => {
-    const mainMenu = [
-        { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-        { name: "Documents", path: "/document", icon: FileText },
+    const coreOperations = [
+        { name: "Master Dashboard", path: "/dashboard", icon: LayoutDashboard },
+        { name: "Role Task Board", path: "/role-task-board", icon: Kanban },
+        { name: "Doc & Workflow Start", path: "/document", icon: FileText },
         { name: "Instances", path: "/instances", icon: Activity },
         { name: "Workflows", path: "/workflow", icon: Workflow },
-
+        { name: "Version Control", path: "/workflow-version", icon: History },
     ];
 
-    const configMenu = [
-        { name: "Dashboard Builder", path: "/dashboard-builder", icon: LayoutDashboard },
-        { name: "Analytics Dashboard", path: "/analytics", icon: BarChart3 },
-        { name: "Document Types", path: "/document-types", icon: Folder },
-        { name: "Workflows-Versions", path: "/workflow-version", icon:GitBranch},
-        { name: "Roles & Users", path: "/user", icon: Users },
+    const personalAlerts = [
         { name: "Notifications", path: "/notifications", icon: Bell, badge: 3 },
-        { name: "Settings", path: "/settings", icon: Settings },
-
+        { name: "My Activity", path: "/my-activity", icon: Clock },
+        { name: "Audit Logs", path: "/audit-logs", icon: Shield },
     ];
+
+    const administration = [
+        { name: "Dashboard Builder", path: "/dashboard-builder", icon: SlidersHorizontal },
+        { name: "Analytics & Charts", path: "/analytics", icon: BarChart3 },
+        { name: "Users & Roles", path: "/user", icon: Users },
+        { name: "Settings", path: "/settings", icon: Settings },
+    ];
+
+    type MenuItem = {
+        name: string;
+        path: string;
+        icon: React.ComponentType<{ size?: number; className?: string }>;
+        badge?: number;
+    };
+
+    const renderMenuGroup = (title: string, items: MenuItem[]) => (
+        <div className="mt-6 first:mt-0">
+            <p className="text-[11px] text-slate-500 font-semibold tracking-widest mb-3 px-3">
+                {title}
+            </p>
+            <nav className="flex flex-col gap-1">
+                {items.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                        <button
+                            key={item.path}
+                            onClick={() => onMenuClick(item.path)}
+                            className={`
+                                flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all
+                                ${
+                                selectedKey === item.path
+                                    ? "bg-blue-600 text-white"
+                                    : "text-white/60 hover:bg-white/5 hover:text-white"
+                            }
+                            `}
+                        >
+                            <div className="flex items-center gap-3">
+                                <Icon size={18} />
+                                {item.name}
+                            </div>
+
+                            {item.badge && (
+                                <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                                    {item.badge}
+                                </span>
+                            )}
+                        </button>
+                    );
+                })}
+            </nav>
+        </div>
+    );
 
     return (
         <>
@@ -74,71 +125,21 @@ const Sidebar: React.FC<SidebarProps> = ({
                         <div className="w-10 h-10 bg-blue-700 rounded-xl flex items-center justify-center">
                             <LayoutDashboard size={18} className="text-white" />
                         </div>
-                        <span className="text-lg font-semibold text-white">
-                            DocFlow
-                        </span>
+                        <div className="flex flex-col leading-tight">
+                            <span className="text-lg font-semibold text-white">
+                                CodeCraft
+                            </span>
+                            <span className="text-xs text-slate-400">
+                                DocFlow Enterprise
+                            </span>
+                        </div>
                     </div>
 
-                    {/* Main Menu */}
-                    <nav className="flex flex-col gap-1">
-                        {mainMenu.map((item) => {
-                            const Icon = item.icon;
-                            return (
-                                <button
-                                    key={item.path}
-                                    onClick={() => onMenuClick(item.path)}
-                                    className={`
-                                        flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all
-                                        ${
-                                        selectedKey === item.path
-                                            ? "bg-blue-600/20 text-blue-100"
-                                            : "text-white/60 hover:bg-white/5 hover:text-white"
-                                    }
-                                    `}
-                                >
-                                    <Icon size={18} />
-                                    {item.name}
-                                </button>
-                            );
-                        })}
-                    </nav>
-
-                    {/* Configuration Section */}
-                    <div className="mt-5">
-                        <p className="text-xs text-slate-400 tracking-widest mb-3 px-3">
-                            CONFIGURATION
-                        </p>
-
-                        <nav className="flex flex-col gap-1">
-                            {configMenu.map((item) => {
-                                const Icon = item.icon;
-                                return (
-                                    <button
-                                        key={item.path}
-                                        onClick={() => onMenuClick(item.path)}
-                                        className={`
-                                            flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all
-                                            ${
-                                            selectedKey === item.path
-                                                ? "bg-blue-600/20 text-blue-100"
-                                                : "text-white/60 hover:bg-white/5 hover:text-white"
-                                        }
-                                        `}
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <Icon size={18} />
-                                            {item.name}
-                                        </div>
-
-                                        {item.badge && (
-                                            <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                                                {item.badge}
-                                            </span>
-                                        )}
-                                    </button>
-                                );
-                            })}
-                        </nav>
+                    {/* Menu Groups */}
+                    <div className="flex-1 overflow-y-auto scrollbar-hide">
+                        {renderMenuGroup("CORE OPERATIONS", coreOperations)}
+                        {renderMenuGroup("PERSONAL & ALERTS", personalAlerts)}
+                        {renderMenuGroup("ADMINISTRATION", administration)}
                     </div>
 
                     {/* Bottom Section */}

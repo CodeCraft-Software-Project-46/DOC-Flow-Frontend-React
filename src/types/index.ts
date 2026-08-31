@@ -9,6 +9,10 @@ export type {
 	// Business logic
 	WorkingHoursConfig,
 	BottleneckScoreWeights,
+	// Manual task creation (SLA testing)
+	CreateTaskPayload,
+	CreateTaskResult,
+	OpenTask,
 } from "./common";
 
 export type {
@@ -35,6 +39,9 @@ export type {
 	// Completed Tasks & SLA Compliance
 	CompletedTasksResponse,
 	SLAComplianceResponse,
+	// Task Instances Table
+	TaskInstanceRow,
+	TaskInstancesResponse,
 } from "./overall";
 
 export type {
@@ -60,12 +67,11 @@ export type {
 export type { ChatMessage } from "./chatTypes";
 
 export type {
-	// My Performance Widget (single logged-in user)
+	// Individual User Performance Widget (one selected user)
 	UserListItem,
 	UserListResponse,
 	MyPerformanceTask,
 	MyPerformanceSummary,
 	MyPerformanceTrendPoint,
-	MyPerformanceMotivation,
 	MyPerformanceResponse,
 } from "./personal";

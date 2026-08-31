@@ -4,6 +4,7 @@ import ActiveOverdueTasksWidget from "../../components/widgets/overall/ActiveOve
 import CompletedTasksWidget from "../../components/widgets/overall/CompletedTasksWidget";
 import SLAComplianceWidget from "../../components/widgets/overall/SLAComplianceWidget";
 import SlaDistributionWidget from "../../components/widgets/overall/SlaDistributionWidget";
+import TaskInstancesTableWidget from "../../components/widgets/overall/TaskInstancesTableWidget";
 import BottleneckWorkflowsWidget from "../../components/widgets/overall/BottleneckWorkflowsWidget";
 import UserPerformanceWidget from "../../components/widgets/overall/UserPerformanceWidget";
 import RunningInstancesWidget from "../../components/widgets/workflow/RunningInstancesWidget";
@@ -12,6 +13,7 @@ import SLAComplianceWidgetWorkflow from "../../components/widgets/workflow/SLACo
 import WorkflowStepFlowWidget from "../../components/widgets/workflow/WorkflowStepFlowWidget";
 import InstanceDrilldownWidget from "../../components/widgets/workflow/InstanceDrilldownWidget";
 import MyPerformanceWidget from "../../components/widgets/personal/MyPerformanceWidget";
+import { CreateTaskFab } from "../../components/CreateTaskFab";
 import {
   fetchWorkflows,
 } from "../../api/analyticsApi";
@@ -118,7 +120,7 @@ export const AnalyticsPage = () => {
                 ? "Overall Analytics"
                 : t === "workflow"
                   ? "Workflow Analytics"
-                  : "My Performance"}
+                  : "Individual User Performance"}
             </button>
           ),
         )}
@@ -228,6 +230,9 @@ export const AnalyticsPage = () => {
                 <BottleneckWorkflowsWidget dateFrom={dateFrom} dateTo={dateTo} />
                 <UserPerformanceWidget dateFrom={dateFrom} dateTo={dateTo} />
               </div>
+
+              {/* Task Instances — full width, at the very bottom */}
+              <TaskInstancesTableWidget dateFrom={dateFrom} dateTo={dateTo} />
             </div>
           </div>
         )}
@@ -289,7 +294,7 @@ export const AnalyticsPage = () => {
           <div className="space-y-5">
             <div>
               <h2 className="text-xl font-bold text-slate-900">
-                My Performance
+                Individual User Performance
               </h2>
               <p className="text-sm text-slate-500 mt-1">
                 Individual task history and SLA performance, with its own user and time-range picker
@@ -302,6 +307,8 @@ export const AnalyticsPage = () => {
           </div>
         )}
       </div>
+
+      <CreateTaskFab />
     </div>
   );
 };

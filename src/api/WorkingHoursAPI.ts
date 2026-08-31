@@ -1,3 +1,4 @@
+import axios from "axios"; //only for isAxiosError when unwrapping a failed save
 import API from "./axios"; //shared axios instance (baseURL from VITE_API_BASE_URL), same as analyticsApi.ts/chatService.ts
 import type { WorkingHoursConfig } from "../types";
 
@@ -46,11 +47,43 @@ export const getWorkingHours = async (): Promise<WorkingHoursConfig | null> => {
 //   "exists": false
 // }
 
+// A rejected save used to surface only as a raw AxiosError, which the caller
+// could do nothing useful with — so the UI silently dropped it and the admin
+// saw the old values with no explanation. The backend replies
+// { message, errors: { field: [msg, ...] } } on a 400 (e.g. start time not
+// earlier than end time); unwrap that into a message worth showing.
+const toReadableError = (error: unknown): Error => {
+  if (axios.isAxiosError(error)) {
+    const data = error.response?.data as
+      | { message?: string; errors?: Record<string, string[] | string> }
+      | undefined;
+
+    const fieldMessages = Object.values(data?.errors ?? {})
+      .flatMap((messages) => (Array.isArray(messages) ? messages : [messages]))
+      .filter(Boolean);
+
+    if (fieldMessages.length > 0) return new Error(fieldMessages.join(" "));
+    if (data?.message) return new Error(data.message);
+
+    if (!error.response) {
+      return new Error(
+        "Could not reach the server. Check your connection and try again."
+      );
+    }
+  }
+
+  return new Error("Something went wrong while saving. Please try again.");
+};
+
 export const saveWorkingHours = async (
   data: WorkingHoursConfig
 ): Promise<WorkingHoursConfig> => {
-  const res = await API.post(`${BASE_URL}/config/save/`, toBackend(data));
-  return toFrontend(res.data.data); //Backend saves + returns updated data
-   //Convert response back to frontend format. So parent can do setConfig(result); 👉 UI instantly updates after save
+  try {
+    const res = await API.post(`${BASE_URL}/config/save/`, toBackend(data));
+    return toFrontend(res.data.data); //Backend saves + returns updated data
+     //Convert response back to frontend format. So parent can do setConfig(result); 👉 UI instantly updates after save
+  } catch (error) {
+    throw toReadableError(error);
+  }
 };
 

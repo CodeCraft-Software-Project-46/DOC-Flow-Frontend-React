@@ -4,10 +4,14 @@ import type {
   BottleneckScoreWeights,
   BottleneckWorkflowsResponse,
   CompletedTasksResponse,
+  CreateTaskPayload,
+  CreateTaskResult,
+  OpenTask,
   InstanceDrilldownResponse,
   RunningDocumentsApiResponse,
   SLAComplianceResponse,
   SLADistributionResponse,
+  TaskInstancesResponse,
   UserPerformanceResponse,
   WorkflowAvgCompletionTimeApiResponse,
   WorkflowInstancesApiResponse,
@@ -69,13 +73,19 @@ export const fetchUserPerformance = async (params: DateRangeParams = {}): Promis
   return res.data;
 };
 
-//Available users (for the My Performance widget's user picker)
+//Task Instances table (raw list, shares the same time-range filter)
+export const fetchTaskInstances = async (params: DateRangeParams = {}): Promise<TaskInstancesResponse> => {
+  const res = await API.get("/api/analytics/widgets/task-instances/", { params });
+  return res.data;
+};
+
+//Available users (for the Individual User Performance widget's user picker)
 export const fetchUsers = async (): Promise<UserListResponse> => {
   const res = await API.get("/api/analytics/widgets/users/");
   return res.data;
 };
 
-//My Performance — single user's task history, SLA trend & motivational summary
+//Individual User Performance — single user's task history & SLA trend
 export const fetchMyPerformance = async (
   userId: number,
   params: DateRangeParams = {}
@@ -189,4 +199,69 @@ export const fetchInstanceDrilldown = async (
     `/api/analytics/widgets/instance/${instanceId}/drilldown/`
   );
   return res.data;
+};
+
+// =====================================================
+// TASKS (manual/testing) — the analytics dashboard's "New Task" button.
+// created_at is never sent: the backend always stamps it with the server's
+// current time, since this system only ever runs in Sri Lanka.
+
+interface BackendCreateTaskResult {
+  task_id: number;
+  task_name: string;
+  workflow_instance_id: number;
+  created_at: string;
+  due_at: string | null;
+  sla_hours: number;
+}
+
+const toFrontendCreateTaskResult = (
+  data: BackendCreateTaskResult
+): CreateTaskResult => ({
+  taskId: data.task_id,
+  taskName: data.task_name,
+  workflowInstanceId: data.workflow_instance_id,
+  createdAt: data.created_at,
+  dueAt: data.due_at,
+  slaHours: data.sla_hours,
+});
+
+export const createTask = async (
+  payload: CreateTaskPayload
+): Promise<CreateTaskResult> => {
+  const res = await API.post("/api/analytics/tasks/create/", {
+    task_name: payload.taskName,
+    sla_hours: payload.slaHours,
+  });
+  return toFrontendCreateTaskResult(res.data);
+};
+
+interface BackendOpenTask {
+  task_id: number;
+  task_name: string | null;
+  status: string;
+  created_at: string;
+  due_at: string | null;
+  sla_status: string | null;
+}
+
+const toFrontendOpenTask = (data: BackendOpenTask): OpenTask => ({
+  taskId: data.task_id,
+  taskName: data.task_name,
+  status: data.status,
+  createdAt: data.created_at,
+  dueAt: data.due_at,
+  slaStatus: data.sla_status,
+});
+
+// Most recent not-yet-completed tasks (max 20), newest first.
+export const fetchPendingTasks = async (): Promise<OpenTask[]> => {
+  const res = await API.get("/api/analytics/tasks/pending/");
+  return (res.data as BackendOpenTask[]).map(toFrontendOpenTask);
+};
+
+// Marks a task completed at the server's current time.
+export const completeTask = async (taskId: number): Promise<OpenTask> => {
+  const res = await API.post(`/api/analytics/tasks/${taskId}/complete/`);
+  return toFrontendOpenTask(res.data);
 };

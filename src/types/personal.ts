@@ -1,5 +1,5 @@
 /* =========================
-   MY PERFORMANCE (single-user widget) - Used in MyPerformanceWidget.tsx
+   INDIVIDUAL USER PERFORMANCE (single-user widget) - Used in MyPerformanceWidget.tsx
 ========================= */
 
 // Minimal user record for the widget's user picker
@@ -39,14 +39,6 @@ export interface MyPerformanceTrendPoint {
   breach_percentage: number;
 }
 
-// First-half vs second-half breach rate comparison, backing the motivational message
-export interface MyPerformanceMotivation {
-  trend_direction: "improving" | "worsening" | "stable" | "insufficient_data";
-  first_half_avg: number | null;
-  second_half_avg: number | null;
-  delta: number | null;
-}
-
 // Full response for a single user's performance widget
 export interface MyPerformanceResponse {
   user_id: number;
@@ -54,5 +46,4 @@ export interface MyPerformanceResponse {
   summary: MyPerformanceSummary;
   tasks: MyPerformanceTask[];
   trend: MyPerformanceTrendPoint[];
-  motivation: MyPerformanceMotivation;
 }

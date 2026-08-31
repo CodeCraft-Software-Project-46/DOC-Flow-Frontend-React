@@ -74,6 +74,10 @@ export default defineConfig([
 
 ---
 
+## Backend repository
+
+The backend for this project lives at [Doc-Flow-Backend](https://github.com/CodeCraft-Software-Project-46/Doc-Flow-Backend.git). Clone it alongside this repo and run it locally for the API endpoints used below.
+
 ## Project-specific notes (Doc-Flow frontend)
 
 This section covers where to look and how to contribute for features that pair with backend services: analytics charts, working hours UI, workflow widgets, and the chatbot.
