@@ -1,22 +1,18 @@
 
-import { Outlet, useLocation, useNavigate } from "react-router"; 
-import { useState, useEffect } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router";
+import { useState } from "react";
 import Header from "./Header";
 import Sidebar from "./SideBar";
 import Footer from "./Footer";
+import ChatWidget from "./chatbot/ChatWidget";
 
 export function RootLayout() {
     const navigate = useNavigate();
     const location = useLocation();
-    const [selectedKey, setSelectedKey] = useState<string>(location.pathname);
+    const selectedKey = location.pathname;
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
-    useEffect(() => {
-        setSelectedKey(location.pathname);
-    }, [location.pathname]);
-
     const handleMenuClick = (key: string) => {
-        setSelectedKey(key);
         navigate(key);
         setIsSidebarOpen(false);
     };
@@ -43,6 +39,8 @@ export function RootLayout() {
                 </main>
                 <Footer />
             </div>
+            {/* ChatBot RAG Assistant */}
+            <ChatWidget />
         </div>
     );
 }

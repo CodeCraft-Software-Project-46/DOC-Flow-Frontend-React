@@ -2,7 +2,7 @@ import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
 
 // Layouts
 import { RootLayout } from "./components/RootLayout";
-import {ProtectedRoute} from "./components/ProtectedRoute.tsx";
+import { ProtectedRoute } from "./components/ProtectedRoute.tsx";
 
 import { DocumentPage } from "./pages/documents/DocumentPage";
 import {SettingsPage} from "./pages/settings/SettingsPage.tsx";
@@ -28,30 +28,25 @@ export default function App() {
 
         // 2. Protected App Routes
         {
-            element: <RootLayout />, // Contains the Sidebar & Outlet
-            children: [
-                {
-                    element: <ProtectedRoute />, // Checks if user is logged in
-                    children: [
-
-                        { path: "/dashboard", element: <DashboardSuperAdmin /> },
-                        { path: "/dashboard-builder", element: <DashBoardBuilder /> },
-                        { path: "/document", element: <DocumentPage /> },
-                        { path: "/document-types", element: <DocumentTypesPage /> },
-                        { path: "/workflow", element: <WorkFlowPage /> },
-                        { path: "/workflow-version", element: <WorkFlowVersionPage /> },
-                        { path: "/instances", element: <WorkFlowInstances /> },
-                        { path: "/settings", element: <SettingsPage /> },
-                        { path: "/user", element: <UserPage /> },
-                        { path: "/analytics", element: <AnalyticsPage/> },
-
-                    ]
-                }
-            ]
+          element: <ProtectedRoute />, // Checks if user is logged in
+          children: [
+            { path: "/dashboard", element: <DashboardSuperAdmin /> },
+            { path: "/dashboard-builder", element: <DashBoardBuilder /> },
+            { path: "/document", element: <DocumentPage /> },
+            { path: "/document-types", element: <DocumentTypesPage /> },
+            { path: "/workflow", element: <WorkFlowPage /> },
+            { path: "/workflow-version", element: <WorkFlowVersionPage /> },
+            { path: "/instances", element: <WorkFlowInstances /> },
+            { path: "/settings", element: <SettingsPage /> },
+            { path: "/user", element: <UserPage /> },
+            { path: "/analytics", element: <AnalyticsPage /> },
+          ],
         },
+      ],
+    },
 
-        { path: "*", element: <Navigate to="/dashboard" replace /> }
-    ]);
+    { path: "*", element: <Navigate to="/dashboard" replace /> },
+  ]);
 
-    return <RouterProvider router={routes} />;
+  return <RouterProvider router={routes} />;
 }
